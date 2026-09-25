@@ -1,0 +1,160 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+// Generate paths for all markdown files in the `help` collection
+export async function getStaticPaths() {
+  const helpEntries = await getCollection('help');
+  return helpEntries.map(entry => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+
+// Fetch all entries to calculate Previous/Next and Related
+const allEntries = await getCollection('help');
+// Sort by order
+const sortedEntries = allEntries.sort((a, b) => a.data.order - b.data.order);
+const currentIndex = sortedEntries.findIndex(e => e.id === entry.id);
+
+const prevEntry = currentIndex > 0 ? sortedEntries[currentIndex - 1] : null;
+const nextEntry = currentIndex < sortedEntries.length - 1 ? sortedEntries[currentIndex + 1] : null;
+
+// Find related entries based on frontmatter array
+const relatedEntries = entry.data.related 
+  ? allEntries.filter(e => entry.data.related.includes(e.id))
+  : [];
+---
+
+<Layout 
+  title={`${entry.data.title} | 帮助中心 - 海外机场`}
+  description={entry.data.description}
+  keywords={entry.data.keywords}
+>
+  <!-- 1. Header -->
+  <section class="pt-32 pb-12 bg-brand-navy border-b border-white/5 relative">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-6">
+        <span class="text-xs font-mono tracking-[0.2em] text-brand-neon uppercase">{entry.data.category}</span>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight mb-4 text-white">
+        {entry.data.title}
+      </h1>
+      <p class="text-slate-400 text-sm">
+        5 min read &bull; Support Center
+      </p>
+    </div>
+  </section>
+
+  <!-- 2. Main Content (Markdown) -->
+  <section class="py-16 bg-brand-dark relative z-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-8 items-start">
+      
+      <!-- TOC Sidebar -->
+      {headings.length > 0 && (
+        <aside class="w-full md:w-64 shrink-0 md:sticky md:top-24 bg-brand-navy/50 border border-white/10 rounded-xl p-5 shadow-lg hidden md:block">
+          <h3 class="text-xs font-mono tracking-widest text-brand-neon uppercase mb-4 flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+            本页游览目录
+          </h3>
+          <ul class="space-y-2.5 text-sm">
+            {headings.map(heading => (
+              <li class={`${heading.depth === 2 ? 'pl-0' : heading.depth === 3 ? 'pl-3 text-slate-500' : 'pl-6 text-slate-600'}`}>
+                <a href={`#${heading.slug}`} class="block text-slate-400 hover:text-white transition-colors line-clamp-2">
+                  {heading.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
+
+      <!-- Right Column: Content + Footer -->
+      <div class="flex-grow min-w-0 w-full max-w-[800px]">
+        
+        <!-- Content Box -->
+        <div class="bg-brand-navy border border-white/10 rounded-xl p-8 md:p-12 shadow-2xl overflow-hidden mb-12">
+          
+          <!-- Mobile TOC -->
+          {headings.length > 0 && (
+            <details class="md:hidden mb-8 bg-black/40 border border-white/10 rounded-lg group">
+              <summary class="text-sm font-bold text-white p-4 cursor-pointer flex justify-between items-center">
+                <span class="flex items-center">
+                  <svg class="w-4 h-4 mr-2 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+                  游览目录
+                </span>
+                <svg class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </summary>
+              <ul class="space-y-3 px-4 pb-4 text-sm border-t border-white/5 pt-4">
+                {headings.map(heading => (
+                  <li class={`${heading.depth === 2 ? 'pl-0' : heading.depth === 3 ? 'pl-3' : 'pl-6'}`}>
+                    <a href={`#${heading.slug}`} class="text-slate-400 hover:text-white">
+                      {heading.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+
+          <article class="prose prose-invert prose-slate max-w-none prose-headings:text-white prose-a:text-brand-neon hover:prose-a:text-white prose-img:rounded-xl prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:font-bold prose-h2:font-bold prose-h3:font-bold prose-h2:mt-12 prose-h3:mt-8 prose-h2:mb-6 prose-h3:mb-4 prose-headings:scroll-mt-32">
+            <Content />
+          </article>
+        </div>
+
+        <!-- 3. Navigation: Prev / Next -->
+        <div class="flex flex-col sm:flex-row justify-between items-center border-t border-white/10 pt-8 gap-4">
+          {prevEntry ? (
+            <a href={`/help/${prevEntry.id}`} class="w-full sm:w-auto flex flex-col items-start p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors group">
+              <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest mb-1 group-hover:text-brand-neon transition-colors">&larr; 上一章 (Previous)</span>
+              <span class="font-bold text-slate-200 text-sm">{prevEntry.data.title}</span>
+            </a>
+          ) : (
+            <div class="w-full sm:w-auto"></div>
+          )}
+
+          {nextEntry ? (
+            <a href={`/help/${nextEntry.id}`} class="w-full sm:w-auto flex flex-col items-end p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors group text-right">
+              <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest mb-1 group-hover:text-brand-neon transition-colors">下一章 (Next) &rarr;</span>
+              <span class="font-bold text-slate-200 text-sm">{nextEntry.data.title}</span>
+            </a>
+          ) : (
+            <div class="w-full sm:w-auto"></div>
+          )}
+        </div>
+
+        <!-- 4. Related Articles -->
+        {relatedEntries.length > 0 && (
+          <div class="mt-12">
+            <h3 class="text-lg font-bold text-white mb-6 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              相关文章 (Related Articles)
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {relatedEntries.map(rel => (
+                <a href={`/help/${rel.id}`} class="p-5 bg-black/40 border border-white/10 rounded-lg hover:border-brand-neon/50 transition-colors group">
+                  <div class="text-[10px] font-mono text-brand-neon uppercase tracking-widest mb-2">{rel.data.category}</div>
+                  <h4 class="font-bold text-slate-200 text-sm group-hover:text-white line-clamp-2">{rel.data.title}</h4>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Back to help -->
+        <div class="mt-12 text-center pb-8">
+          <a href="/help" class="inline-flex items-center text-sm font-bold text-slate-400 hover:text-white transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            返回服务台大厅 (Back to Information Desk)
+          </a>
+        </div>
+      
+      </div>
+
+    </div>
+  </section>
+
+</Layout>

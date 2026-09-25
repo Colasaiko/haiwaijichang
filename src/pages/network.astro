@@ -1,0 +1,411 @@
+---
+import Layout from '../layouts/Layout.astro';
+import brands from '../data/brands.json';
+
+// Get top 5 brands for the featured cards
+const featuredBrands = brands.slice(0, 5);
+---
+
+<Layout 
+  title="全球网络 - 便宜稳定与高性价比机场推荐 | 海外机场"
+  description="了解海外机场的全球网络覆盖情况与优惠活动，为您精选便宜稳定机场、按量计费机场，并提供最新机场优惠码，助您选择最合适的网络航线。"
+  keywords="便宜机场推荐, 按量计费机场, 免费试用机场, 机场优惠码, 高性价比机场推荐, 便宜稳定机场"
+>
+  <!-- SEO: FAQ Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "哪个服务比较适合我？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "这取决于您的主要用途。如果注重低延迟（如游戏、日常浏览），建议选择主打专线的航班；如果需要大流量（如看视频），请选择提供高性价比大流量包的服务。"
+        }
+      }
+    ]
+  })} />
+
+  <!-- 1. Hero Section -->
+  <section class="relative min-h-[85vh] flex items-center pt-24 pb-12 overflow-hidden bg-brand-navy">
+    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none flex items-center justify-center">
+      <svg class="w-full h-full max-w-6xl mx-auto text-brand-neon" viewBox="0 0 1000 500" fill="currentColor">
+        <circle cx="800" cy="200" r="4" fill="var(--color-brand-neon)" class="animate-pulse-slow" />
+        <circle cx="500" cy="150" r="3" fill="var(--color-brand-accent)" />
+        <circle cx="200" cy="250" r="5" fill="var(--color-brand-neon)" class="animate-pulse-slow" />
+        <circle cx="300" cy="400" r="3" fill="var(--color-brand-accent)" />
+        <path d="M200,250 Q350,150 500,150 T800,200" stroke="var(--color-brand-neon)" stroke-width="1.5" fill="none" stroke-dasharray="4,4" class="opacity-50" />
+        <path d="M200,250 Q250,325 300,400" stroke="var(--color-brand-accent)" stroke-width="1.5" fill="none" class="opacity-70" />
+        <path d="M500,150 Q650,100 800,200" stroke="var(--color-brand-neon)" stroke-width="2" fill="none" class="opacity-30" />
+      </svg>
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-navy via-transparent to-brand-navy"></div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full text-center">
+      <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md">
+        <span class="w-2 h-2 rounded-full bg-brand-neon animate-pulse-slow"></span>
+        <span class="text-xs font-mono tracking-[0.2em] text-slate-300 uppercase">Global Network</span>
+      </div>
+      
+      <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8">
+        全球网络，<br class="md:hidden" />
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-neon to-brand-accent">连接你的每一站</span>
+      </h1>
+      
+      <p class="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+        打破地域限制，构建属于你的专属数字航线。从亚洲到北美，从欧洲到大洋洲，让每一次访问都畅通无阻。
+      </p>
+      
+      <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+        <a href="#how-to-choose" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-brand-dark bg-brand-accent hover:bg-yellow-400 rounded-sm transition-colors uppercase tracking-wider">
+          选择你的目的地
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Network Route Board (Airport Style) -->
+  <section class="py-16 bg-brand-dark border-y border-white/5 relative z-20 -mt-10 mx-4 sm:mx-8 rounded-lg shadow-2xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-end mb-8">
+        <div>
+          <h2 class="text-brand-accent font-mono tracking-[0.2em] text-xs mb-1">DEPARTURES INFO</h2>
+          <h3 class="text-xl font-bold">Network Route Board</h3>
+        </div>
+      </div>
+      
+      <div class="bg-black/80 rounded border border-white/10 p-1 overflow-x-auto">
+        <table class="w-full text-left font-mono min-w-[800px] relative">
+          <thead class="bg-white/5">
+            <tr class="text-slate-500 text-[10px] sm:text-xs border-b border-white/10 uppercase tracking-wider">
+              <th class="py-3 px-4 font-normal">BRAND / 航班</th>
+              <th class="py-3 px-4 font-normal">FEATURES / 特性</th>
+              <th class="py-3 px-4 font-normal">PROMO / 优惠</th>
+              <th class="py-3 px-4 font-normal text-right">STATUS</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm divide-y divide-white/5 text-slate-300">
+            {brands.map((brand, i) => {
+              // Alternate status for visual variety
+              const statuses = ['AVAILABLE', 'READY', 'ONLINE'];
+              const statusColors = ['text-green-400', 'text-brand-accent', 'text-green-400'];
+              const statusIndex = i % 3;
+              
+              return (
+                <tr class="hover:bg-white/5 transition-colors group cursor-default">
+                  <td class="py-4 px-4 font-bold text-white group-hover:text-brand-neon">{brand.name.replace('：', '')}</td>
+                  <td class="py-4 px-4 text-xs text-slate-400 truncate max-w-[300px]">
+                    {brand.features[0] || '全节点优化覆盖'}
+                  </td>
+                  <td class="py-4 px-4 text-xs text-slate-400">
+                    {brand.discount && brand.discount !== '(暂无优惠）' ? brand.discount : '-'}
+                  </td>
+                  <td class={`flight-status py-4 px-4 text-right ${statusColors[statusIndex]} font-bold tracking-widest`} data-current-color={statusColors[statusIndex]}>
+                    {statuses[statusIndex]}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Client-side script for Departure Board flickering effect
+    document.addEventListener('DOMContentLoaded', () => {
+      const allStatuses = [
+        { text: 'AVAILABLE', color: 'text-green-400' },
+        { text: 'READY', color: 'text-brand-accent' },
+        { text: 'ONLINE', color: 'text-green-400' },
+        { text: 'ON TIME', color: 'text-blue-400' },
+        { text: 'BOARDING', color: 'text-yellow-400' }
+      ];
+      
+      const elements = document.querySelectorAll('.flight-status');
+      
+      const flicker = (el) => {
+        if (el.dataset.flickering === 'true') return;
+        el.dataset.flickering = 'true';
+        
+        let flickers = 0;
+        const maxFlickers = Math.floor(Math.random() * 3) + 2; // 2 to 4 jumps (faster, more abrupt)
+        const finalStatus = allStatuses[Math.floor(Math.random() * allStatuses.length)];
+        const prevColor = el.getAttribute('data-current-color');
+        
+        // Rapidly change text to simulate mechanical board flipping
+        const interval = setInterval(() => {
+          flickers++;
+          
+          // Random middle states
+          const randomStatus = allStatuses[Math.floor(Math.random() * allStatuses.length)];
+          el.classList.remove(prevColor);
+          el.classList.add('text-white'); // Make the jumping state highly visible (white)
+          el.textContent = randomStatus.text.replace(/./g, () => Math.random() > 0.5 ? '-' : String.fromCharCode(65 + Math.floor(Math.random() * 26)));
+          
+          if (flickers >= maxFlickers) {
+            clearInterval(interval);
+            // Settle on final state
+            el.className = `flight-status py-4 px-4 text-right font-bold tracking-widest ${finalStatus.color}`;
+            el.setAttribute('data-current-color', finalStatus.color);
+            el.textContent = finalStatus.text;
+            el.dataset.flickering = 'false';
+          }
+        }, 100); // slightly slower interval (100ms) to make each frame readable
+      };
+      
+      // Periodically trigger random rows
+      setInterval(() => {
+        const numToChange = Math.floor(Math.random() * 4) + 2; // Change 2 to 5 rows at a time (more active)
+        for (let i = 0; i < numToChange; i++) {
+          const randomIdx = Math.floor(Math.random() * elements.length);
+          flicker(elements[randomIdx]);
+        }
+      }, 1500); // Trigger every 1.5 seconds so the board feels very alive
+    });
+  </script>
+
+  <!-- 3. Featured Brands (Replaced Regional Cards) -->
+  <section class="py-24 bg-brand-navy">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold mb-4">精选主力航线</h2>
+        <p class="text-slate-400 max-w-2xl mx-auto">覆盖全球主要核心骨干节点，为您提供优质、低延迟的国际连接体验。</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        {/* Brand Card 1 */}
+        {featuredBrands[0] && (
+          <div class="bg-brand-dark border border-white/10 rounded-xl p-8 hover:border-brand-neon/50 transition-all group relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-brand-neon/10 rounded-full blur-2xl group-hover:bg-brand-neon/20 transition-all"></div>
+            <div class="font-mono text-[10px] text-brand-neon mb-4 tracking-widest uppercase border border-brand-neon/30 px-2 py-1 inline-block rounded">FLIGHT: 001</div>
+            <h3 class="text-2xl font-bold text-white mb-2">{featuredBrands[0].name.replace('：', '')}</h3>
+            <p class="text-sm text-slate-400 mb-6 line-clamp-2">{featuredBrands[0].features.join('，') || '提供极速稳定的跨区访问体验。'}</p>
+            
+            <ul class="space-y-3 text-sm">
+              <li class="flex items-start">
+                <svg class="w-4 h-4 text-brand-accent mt-0.5 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-slate-300"><span class="text-white font-medium">主要用途：</span>日常浏览、跨服游戏加速、流媒体。</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-4 h-4 text-brand-accent mt-0.5 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-slate-300"><span class="text-white font-medium">起步价格：</span>{featuredBrands[0].pricing[0]?.monthly || '超高性价比'}</span>
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {/* Brand Card 2 */}
+        {featuredBrands[1] && (
+          <div class="bg-brand-dark border border-white/10 rounded-xl p-8 hover:border-blue-400/50 transition-all group relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
+            <div class="font-mono text-[10px] text-blue-400 mb-4 tracking-widest uppercase border border-blue-400/30 px-2 py-1 inline-block rounded">FLIGHT: 002</div>
+            <h3 class="text-2xl font-bold text-white mb-2">{featuredBrands[1].name.replace('：', '')}</h3>
+            <p class="text-sm text-slate-400 mb-6 line-clamp-2">{featuredBrands[1].features.join('，') || '提供极速稳定的跨区访问体验。'}</p>
+            
+            <ul class="space-y-3 text-sm">
+              <li class="flex items-start">
+                <svg class="w-4 h-4 text-brand-accent mt-0.5 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-slate-300"><span class="text-white font-medium">主要用途：</span>AI 工具(ChatGPT等)、开发者服务。</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-4 h-4 text-brand-accent mt-0.5 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-slate-300"><span class="text-white font-medium">起步价格：</span>{featuredBrands[1].pricing[0]?.monthly || '高性价比'}</span>
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {/* Brand Card 3 */}
+        {featuredBrands[2] && (
+          <div class="bg-brand-dark border border-white/10 rounded-xl p-8 hover:border-green-400/50 transition-all group relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition-all"></div>
+            <div class="font-mono text-[10px] text-green-400 mb-4 tracking-widest uppercase border border-green-400/30 px-2 py-1 inline-block rounded">FLIGHT: 003</div>
+            <h3 class="text-2xl font-bold text-white mb-2">{featuredBrands[2].name.replace('：', '')}</h3>
+            <p class="text-sm text-slate-400 mb-6 line-clamp-2">{featuredBrands[2].features.join('，') || '提供极速稳定的跨区访问体验。'}</p>
+            
+            <ul class="space-y-3 text-sm">
+              <li class="flex items-start">
+                <svg class="w-4 h-4 text-brand-accent mt-0.5 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-slate-300"><span class="text-white font-medium">主要用途：</span>外贸业务、隐私导向的日常通讯。</span>
+              </li>
+              <li class="flex items-start">
+                <svg class="w-4 h-4 text-brand-accent mt-0.5 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-slate-300"><span class="text-white font-medium">起步价格：</span>{featuredBrands[2].pricing[0]?.monthly || '高性价比'}</span>
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {/* Brand Card 4 & 5 (Spanning) */}
+        {featuredBrands[3] && (
+          <div class="bg-gradient-to-br from-brand-navy to-brand-dark border border-brand-accent/30 rounded-xl p-8 hover:border-brand-accent transition-all group relative overflow-hidden md:col-span-2 lg:col-span-3">
+            <div class="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-brand-accent/10 to-transparent pointer-events-none"></div>
+            <div class="font-mono text-[10px] text-brand-accent mb-4 tracking-widest uppercase border border-brand-accent/30 px-2 py-1 inline-block rounded">FLIGHT: 004</div>
+            <h3 class="text-2xl font-bold text-white mb-2">{featuredBrands[3].name.replace('：', '')}</h3>
+            <p class="text-sm text-slate-400 mb-6 max-w-xl">通过客户端策略组智能分流，根据访问目标自动选择最优落地节点。</p>
+            
+            <ul class="space-y-3 text-sm max-w-xl">
+              <li class="flex items-start">
+                <svg class="w-4 h-4 text-brand-accent mt-0.5 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-slate-300"><span class="text-white font-medium">核心特性：</span>{featuredBrands[3].features.join('，')}</span>
+              </li>
+            </ul>
+          </div>
+        )}
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. How to Choose (Scenarios) -->
+  <section id="how-to-choose" class="py-24 bg-brand-dark border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-brand-accent font-mono tracking-[0.2em] text-sm mb-2 uppercase">How to Choose</h2>
+        <p class="text-3xl font-bold mb-4">线路应该怎么选？</p>
+        <div class="bg-brand-neon/10 border border-brand-neon/20 p-4 rounded-lg inline-block text-left text-sm text-slate-300">
+          <span class="font-bold text-brand-neon">机长提示：</span> 不同用途不一定需要同一条线路。最好的方式是利用客户端的“规则分流”功能。
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { title: "日常浏览", icon: "M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9", desc: "如 Google 搜索、浏览维基百科、刷推特。建议选择延迟最低的亚洲节点（如日本、香港），响应速度最快。" },
+          { title: "AI 工具", icon: "M13 10V3L4 14h7v7l9-11h-7z", desc: "由于 OpenAI (ChatGPT)、Claude 等对 IP 归属地有严格限制，强烈建议固定使用北美节点或专属解锁线路。" },
+          { title: "流媒体", icon: "M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z", desc: "想看美区 Netflix 就选美国节点，想看日区动漫就选日本节点。主要看重带宽而非极致延迟。" },
+          { title: "游戏联机", icon: "M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z", desc: "对网络抖动（Jitter）极度敏感。必须选择地理位置近、专线路由的节点，并且建议开启 UDP 转发。" },
+          { title: "开发者服务", icon: "M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z", desc: "Pull/Push 代码、拉取 Docker 镜像。推荐北美节点，因为大部分开发者服务（如 GitHub）的核心服务器在美国。" },
+          { title: "远程办公", icon: "M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z", desc: "跨国视频会议（如 Zoom、Google Meet）。需要兼顾延迟和稳定性，优先选择丢包率最低的企业级线路。" }
+        ].map(item => (
+          <div class="bg-white/5 border border-white/10 p-6 rounded-lg hover:bg-white/10 transition-colors">
+            <div class="w-10 h-10 bg-brand-neon/20 rounded flex items-center justify-center mb-4">
+              <svg class="w-5 h-5 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={item.icon}/></svg>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">{item.title}</h3>
+            <p class="text-sm text-slate-400">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Network Technology Explanation -->
+  <section class="py-24 bg-brand-navy border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-16 md:flex md:items-end md:justify-between">
+        <div class="max-w-2xl">
+          <h2 class="text-brand-accent font-mono tracking-[0.2em] text-sm mb-2 uppercase">Core Technology</h2>
+          <p class="text-3xl font-bold mb-4">网络技术与指标解析</p>
+          <p class="text-slate-400">了解影响网络体验的关键因素。我们不断优化这些底层指标，以确保您的航班平稳运行。</p>
+        </div>
+        <a href="/technology" class="hidden md:inline-flex items-center mt-6 text-sm font-bold text-brand-neon hover:text-white transition-colors">
+          查看详细技术白皮书 &rarr;
+        </a>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-y-12 gap-x-8">
+        {[
+          { key: "Routing", name: "路由", desc: "数据包从您的设备到达目标服务器所经过的路径。智能路由能减少中转节点，避免数据包绕路。" },
+          { key: "Latency", name: "延迟 (Ping)", desc: "数据发送后收到回应的时间（毫秒）。优质的底层线路尽可能将其降至最低。" },
+          { key: "Bandwidth", name: "带宽", desc: "网络通道的宽度。带宽越大，单位时间内能传输的数据越多，决定了看4K视频是否卡顿。" },
+          { key: "Stability", name: "稳定性", desc: "数据在传输过程中丢失的比例。0%丢包率是理想状态，对于视频通话和游戏至关重要。" },
+          { key: "Protocol", name: "协议", desc: "封装和加密数据的方式。先进的混淆与加密协议能有效应对复杂网络环境下的特征识别。" },
+          { key: "Congestion", name: "网络拥堵", desc: "在晚高峰时期骨干网流量暴增导致的排队现象。冗余线路和负载均衡技术能有效分流。" }
+        ].map(item => (
+          <div class="border-l border-white/10 pl-4">
+            <div class="font-mono text-[10px] text-slate-500 mb-1 uppercase tracking-widest">{item.key}</div>
+            <h3 class="text-lg font-bold text-white mb-2">{item.name}</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Device Compatibility -->
+  <section class="py-16 bg-brand-dark border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-xl font-bold mb-8">全平台设备支持</h2>
+      <div class="flex flex-wrap justify-center gap-6 sm:gap-12 mb-8">
+        {['Windows', 'macOS', 'Android', 'iOS', 'Router'].map(device => (
+          <div class="flex flex-col items-center group cursor-pointer">
+            <div class="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-3 group-hover:bg-white/10 group-hover:border-brand-neon transition-colors">
+              <span class="font-mono text-sm text-slate-300 group-hover:text-brand-neon">{device[0]}</span>
+            </div>
+            <span class="text-sm font-medium text-slate-400 group-hover:text-white transition-colors">{device}</span>
+          </div>
+        ))}
+      </div>
+      <a href="/help" class="inline-block text-sm text-brand-neon hover:underline">查看各设备配置教程</a>
+    </div>
+  </section>
+
+  <!-- 7. Network Status -->
+  <section class="py-24 bg-brand-navy border-t border-white/5">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-brand-accent font-mono tracking-[0.2em] text-sm mb-2 uppercase">Live Metrics</h2>
+        <p class="text-3xl font-bold">Network Status</p>
+      </div>
+      
+      <div class="bg-black/40 border border-white/10 rounded-xl p-8">
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
+          <span class="text-sm text-slate-400">SYSTEM STATUS</span>
+          <div class="flex items-center space-x-2 bg-green-500/10 px-3 py-1 rounded border border-green-500/20">
+            <span class="w-2 h-2 rounded-full bg-green-400"></span>
+            <span class="text-xs font-mono text-green-400 font-bold">ALL SYSTEMS OPERATIONAL</span>
+          </div>
+        </div>
+        
+        <div class="space-y-4 font-mono text-sm">
+          {featuredBrands.slice(0, 3).map(brand => (
+             <div class="flex justify-between items-center bg-white/5 p-4 rounded">
+                <span class="text-white">{brand.name.replace('：', '')} 服务</span>
+                <span class="text-slate-400">Operational</span>
+             </div>
+          ))}
+          <div class="flex justify-between items-center bg-white/5 p-4 rounded">
+            <span class="text-white">Website & API</span>
+            <span class="text-slate-400">Operational</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. FAQ -->
+  <section class="py-24 bg-brand-dark border-t border-white/5">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold">常见问题</h2>
+      </div>
+
+      <div class="space-y-4">
+        {[
+          { q: "我应该选择哪家服务？", a: "这取决于您的主要用途。如果注重低延迟（如游戏、日常浏览），建议选择主打专线的航班；如果需要大流量（如看视频），请选择提供高性价比大流量包的服务。" },
+          { q: "为什么不同地区速度不同？", a: "速度差异主要来源于物理距离（光缆传输耗时）、国际出口带宽容量、目标地区服务器的性能，以及路由跳转的节点数量。物理距离越远，通常基础延迟越高。" },
+          { q: "延迟越低是不是一定越好？", a: "延迟低对于游戏和实时通话非常重要，但对于看视频或下载大文件，带宽容量和丢包率往往比单纯的低延迟更重要。一条延迟 150ms 但带宽高、不丢包的线路，看 4K 视频会比延迟 50ms 但经常丢包的线路流畅得多。" },
+          { q: "为什么同一条线路不同时间速度不同？", a: "互联网是共享网络。在晚上 8:00 - 11:00 的“晚高峰”时段，国际出口总带宽会被大量用户挤占，导致物理通道拥堵，从而出现速度变慢或延迟波动。优质服务会通过冗余带宽来缓解这一问题。" },
+          { q: "我应该选择哪个协议？", a: "建议交给现代客户端（如 Clash, V2ray）自动处理。通常，您只需导入订阅链接，客户端默认使用的协议（如 Trojan, ShadowsocksR, Vmess/Vless 等）已经在安全性与速度间做好了平衡。" }
+        ].map((faq) => (
+          <details class="group bg-brand-navy border border-white/10 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white hover:text-brand-neon transition-colors">
+              <span>{faq.q}</span>
+              <span class="transition group-open:rotate-180 text-brand-neon">
+                <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+              </span>
+            </summary>
+            <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-white/5 pt-4">
+              {faq.a}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+</Layout>

@@ -1,0 +1,204 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  keywords?: string;
+}
+
+const { title, description, keywords } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="zh-CN" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {keywords && <meta name="keywords" content={keywords} />}
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL('/og-image.png', Astro.site)} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL('/og-image.png', Astro.site)} />
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "海外机场 (Overseas Airport)",
+      "url": Astro.site?.toString()
+    })} />
+    
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "海外机场",
+      "alternateName": "Overseas Airport",
+      "url": Astro.site?.toString(),
+      "logo": new URL('/favicon.svg', Astro.site).toString()
+    })} />
+  </head>
+  <body class="bg-brand-navy text-brand-light antialiased min-h-screen flex flex-col">
+    <!-- Page Entry Animation (Only on initial load) -->
+    <div id="page-entry" class="page-entry-overlay fixed inset-0 z-[100] bg-brand-dark flex flex-col items-center justify-center">
+      <div class="text-center">
+        <div class="text-3xl font-bold tracking-widest text-brand-light mb-2">OVERSEAS AIRPORT</div>
+        <p class="text-xl text-brand-accent tracking-widest mb-8">海外机场</p>
+        <div class="font-mono text-sm text-brand-neon tracking-widest h-6 flex justify-center items-center">
+          <span class="page-entry-text"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header id="main-header" class="fixed w-full top-0 z-50 transition-all duration-300 bg-brand-navy/80 backdrop-blur-md border-b border-white/5">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+          <!-- Logo -->
+          <a href="/" class="flex items-center space-x-3 group">
+            <div class="w-10 h-10 rounded-full bg-brand-neon/10 border border-brand-neon/30 flex items-center justify-center group-hover:bg-brand-neon/20 transition-colors">
+              <svg class="w-6 h-6 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-lg font-bold leading-none tracking-wide">海外机场</span>
+              <span class="text-[0.65rem] text-brand-neon tracking-[0.2em] mt-1 uppercase">Overseas Airport</span>
+            </div>
+          </a>
+
+          <!-- Desktop Nav -->
+          <nav class="hidden md:flex items-center space-x-8">
+            <a href="/" class="text-sm font-medium hover:text-brand-neon transition-colors">首页</a>
+            <a href="/network" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">全球网络</a>
+            <a href="/technology" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">线路技术</a>
+            <a href="/use-cases" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">使用场景</a>
+            <a href="/help" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">帮助中心</a>
+            <a href="/guides" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">资讯</a>
+            <a href="/faq" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">FAQ</a>
+          </nav>
+
+          <!-- CTA & Mobile Menu Toggle -->
+          <div class="flex items-center space-x-4">
+            <a href="#board" class="hidden sm:inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-brand-dark bg-brand-accent hover:bg-yellow-400 rounded-sm transition-colors uppercase tracking-wider">
+              立即登机
+            </a>
+            <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-300 hover:text-white" aria-label="Menu">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Mobile Menu (Drawer) -->
+      <div id="mobile-menu" class="hidden md:hidden bg-brand-navy border-t border-white/5 absolute w-full pb-6 shadow-2xl">
+        <div class="px-4 pt-2 pb-4 space-y-1">
+          <a href="/" class="block px-3 py-3 rounded-md text-base font-medium bg-white/5 text-brand-neon">首页</a>
+          <a href="/network" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">全球网络</a>
+          <a href="/technology" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">线路技术</a>
+          <a href="/use-cases" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">使用场景</a>
+          <a href="/help" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">帮助中心</a>
+          <a href="/guides" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">资讯</a>
+          <a href="/faq" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">FAQ</a>
+          <a href="#board" class="block px-3 py-4 mt-4 text-center rounded-sm text-base font-bold text-brand-dark bg-brand-accent hover:bg-yellow-400 transition-colors uppercase">立即登机</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-20">
+      <slot />
+    </main>
+
+    <!-- Footer - Airport Terminal Directory Style -->
+    <footer class="bg-brand-dark border-t border-white/10 pt-16 pb-8 mt-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+          
+          <div class="col-span-2 md:col-span-1 mb-6 md:mb-0">
+            <div class="flex items-center space-x-2 mb-6">
+              <svg class="w-5 h-5 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-lg font-bold tracking-widest uppercase">TERMINAL DIR</span>
+            </div>
+            <p class="text-sm text-slate-400 mb-6 max-w-xs">为海外网站、流媒体、AI 工具、远程办公与日常网络访问场景，提供更顺畅的全球网络连接体验。</p>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">产品 PRODUCT</h3>
+            <ul class="space-y-3">
+              <li><a href="/network" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">全球网络</a></li>
+              <li><a href="/technology" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">线路技术</a></li>
+              <li><a href="/use-cases" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">使用场景</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">帮助 HELP</h3>
+            <ul class="space-y-3">
+              <li><a href="/help" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">帮助中心</a></li>
+              <li><a href="/guides" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">使用教程</a></li>
+              <li><a href="/faq" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">常见问题 (FAQ)</a></li>
+              <li><a href="/status" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">服务状态</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">关于 ABOUT</h3>
+            <ul class="space-y-3">
+              <li><a href="/about" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">关于我们</a></li>
+              <li><a href="/privacy" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">隐私政策</a></li>
+              <li><a href="/terms" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">服务条款</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 font-mono">
+          <p>&copy; {new Date().getFullYear()} Overseas Airport / 海外机场</p>
+          <p class="mt-2 md:mt-0">haiwaijichang.com</p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Mobile menu toggle
+      const btn = document.getElementById('mobile-menu-btn');
+      const menu = document.getElementById('mobile-menu');
+      
+      if (btn && menu) {
+        btn.addEventListener('click', () => {
+          menu.classList.toggle('hidden');
+        });
+      }
+
+      // Check if this is a first visit to show animation
+      // For demo purposes, we show it every time. In production, maybe use sessionStorage
+      const entry = document.getElementById('page-entry');
+      if (entry) {
+        // Fallback to remove entry block just in case animation hangs
+        setTimeout(() => {
+          entry.style.display = 'none';
+        }, 1100);
+      }
+    </script>
+  </body>
+</html>

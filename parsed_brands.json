@@ -1,0 +1,829 @@
+[
+  {
+    "name": "微风网络",
+    "discount": "weifeng90（7折）",
+    "features": [
+      "全IPLC专线，享受低延迟高速率",
+      "不限制设备同时接入",
+      "不限速"
+    ],
+    "pricing": [
+      {
+        "name": "清风 (Breeze)",
+        "traffic": "100 GB",
+        "monthly": "¥11.00",
+        "yearly": "¥137.00"
+      },
+      {
+        "name": "乘风 (Riding)",
+        "traffic": "200 GB",
+        "monthly": "¥27.00",
+        "yearly": "¥259.00"
+      },
+      {
+        "name": "破风 (Breaking)",
+        "traffic": "500 GB",
+        "monthly": "¥57.00",
+        "yearly": "¥547.00"
+      },
+      {
+        "name": "御风 (Mastery)",
+        "traffic": "1200 GB",
+        "monthly": "¥127.00",
+        "yearly": "¥1219.00"
+      },
+      {
+        "name": "信风 · 不限时",
+        "traffic": "270 GB",
+        "monthly": "（一次性",
+        "yearly": "¥200.00）"
+      },
+      {
+        "name": "长风 · 不限时",
+        "traffic": "570 GB",
+        "monthly": "（一次性",
+        "yearly": "¥370.00）"
+      }
+    ]
+  },
+  {
+    "name": "firefly",
+    "discount": "firefly (8折)",
+    "features": [
+      "不限速",
+      "不限设备数",
+      "IPLC专线网络"
+    ],
+    "pricing": [
+      {
+        "name": "Firefly年付版",
+        "traffic": "60 GB",
+        "monthly": "-",
+        "yearly": "¥96.00"
+      },
+      {
+        "name": "Firefly Lite",
+        "traffic": "150 GB",
+        "monthly": "¥25.00",
+        "yearly": "¥240.00"
+      },
+      {
+        "name": "Firefly Plus",
+        "traffic": "300 GB",
+        "monthly": "¥ 45.00",
+        "yearly": "¥ 432.00"
+      },
+      {
+        "name": "Firefly Blaze",
+        "traffic": "600 GB",
+        "monthly": "¥85.00",
+        "yearly": "¥816.00"
+      },
+      {
+        "name": "Firefly Nova",
+        "traffic": "1000 GB",
+        "monthly": "¥ 150.00",
+        "yearly": "1360.00"
+      },
+      {
+        "name": "Firefly不限时",
+        "traffic": "100 GB",
+        "monthly": "（一次性¥100.00）",
+        "yearly": "（一次性¥100.00）"
+      }
+    ]
+  },
+  {
+    "name": "跨界云aff链接",
+    "discount": "kuajie（8 折）",
+    "features": [
+      "IPLC高端线路，不限速，所有节点x1倍率",
+      "Netflix/Hulu/HBO/Disney+/DAZN等流媒体解锁",
+      "支持ChatGPT、Gemini、Claude等AI",
+      "不限制设备登录数，在线客服答疑，可按需求添加节点",
+      "拿不准就先买月付，随时可升档；全家多设备请看跃云",
+      "周期越长越省：年付 8 折 · 两年 7 折 · 三年 6 折，优惠码可叠加"
+    ],
+    "pricing": [
+      {
+        "name": "跨界年付版",
+        "traffic": "60 GB",
+        "monthly": "-",
+        "yearly": "¥96.00"
+      },
+      {
+        "name": "轻云 (Lite)",
+        "traffic": "120 GB",
+        "monthly": "¥20.00",
+        "yearly": "¥ 192.00"
+      },
+      {
+        "name": "跃云 (Leap)",
+        "traffic": "300 GB",
+        "monthly": "¥ 40.00",
+        "yearly": "¥384.00"
+      },
+      {
+        "name": "凌云 (Soar)",
+        "traffic": "700 GB",
+        "monthly": "¥ 100.00",
+        "yearly": "¥ 960.00"
+      },
+      {
+        "name": "无界 (Infinity)",
+        "traffic": "1500 GB",
+        "monthly": "¥180.00",
+        "yearly": "¥1728.00"
+      }
+    ]
+  },
+  {
+    "name": "闪跃",
+    "discount": "shanyue（8折）",
+    "features": [
+      "全IPLC专线",
+      "原生IP解锁各大流媒体",
+      "解锁 Chatgpt，Tiktok"
+    ],
+    "pricing": [
+      {
+        "name": "闪跃年付版",
+        "traffic": "60 GB",
+        "monthly": "-",
+        "yearly": "¥96.00"
+      },
+      {
+        "name": "闪动 (Flicker)",
+        "traffic": "150 GB",
+        "monthly": "¥24.00",
+        "yearly": "¥230.00"
+      },
+      {
+        "name": "飞跃 (Leap)",
+        "traffic": "300 GB",
+        "monthly": "¥44.00",
+        "yearly": "¥422.00"
+      },
+      {
+        "name": "瞬移 (Teleport)",
+        "traffic": "600 GB",
+        "monthly": "¥84.00",
+        "yearly": "¥806.00"
+      },
+      {
+        "name": "跃迁 (Warp)",
+        "traffic": "1000 GB",
+        "monthly": "¥134.00",
+        "yearly": "¥ 1315.00"
+      }
+    ]
+  },
+  {
+    "name": "无忧链接",
+    "discount": "(暂无优惠）",
+    "features": [
+      "全IPLC专线，节点速率×1",
+      "稳定全球Chatgpt，Gemini等AI支持",
+      "4K流畅Netfilx/Hulu/Hbo/Disney+/HUGO等观影体验"
+    ],
+    "pricing": [
+      {
+        "name": "MINI链接",
+        "traffic": "40 GB",
+        "monthly": "-",
+        "yearly": "¥79.00"
+      },
+      {
+        "name": "舒心链接",
+        "traffic": "100 GB",
+        "monthly": "¥19.00",
+        "yearly": "¥182.00"
+      },
+      {
+        "name": "省心链接",
+        "traffic": "200 GB",
+        "monthly": "¥ 33.00",
+        "yearly": "¥316.00"
+      },
+      {
+        "name": "随心链接",
+        "traffic": "500 GB",
+        "monthly": "¥77.00",
+        "yearly": "¥ 739.00"
+      },
+      {
+        "name": "忘忧链接",
+        "traffic": "1000 GB",
+        "monthly": "¥117.00",
+        "yearly": "¥1123.00"
+      }
+    ]
+  },
+  {
+    "name": "灵猫",
+    "discount": "lingmao（8折）",
+    "features": [
+      "流量重置：订单日自动重置或者购买加油包补充流量",
+      "全IPLC专线，不限速，不限制客户端，节点速率×1",
+      "可达到的最大带宽：1000 Mbps",
+      "原生IP解锁Netfilx/Hulu/Hbo/Disney+/HUGO等流媒体， 解锁 Chatgpt，Gemini，Tiktok",
+      "客服全天在线指导",
+      "增加节点需求请发工单"
+    ],
+    "pricing": [
+      {
+        "name": "灵猫 · 年付小包",
+        "traffic": "45 GB",
+        "monthly": "-",
+        "yearly": "¥85.00"
+      },
+      {
+        "name": "灵猫 · 年付Small",
+        "traffic": "150 GB",
+        "monthly": "-",
+        "yearly": "¥195.00"
+      },
+      {
+        "name": "灵猫 · 年付Big",
+        "traffic": "300 GB",
+        "monthly": "-",
+        "yearly": "¥295.00"
+      },
+      {
+        "name": "灵猫 · 季付Small",
+        "traffic": "150 GB",
+        "monthly": "-",
+        "yearly": "-"
+      },
+      {
+        "name": "灵猫 · 季付Big",
+        "traffic": "300 GB",
+        "monthly": "-",
+        "yearly": "-"
+      },
+      {
+        "name": "灵猫 · 月付Small",
+        "traffic": "150 GB",
+        "monthly": "¥25.00",
+        "yearly": "-"
+      },
+      {
+        "name": "灵猫 · 月付Big",
+        "traffic": "300 GB",
+        "monthly": "¥45.00",
+        "yearly": "-"
+      }
+    ]
+  },
+  {
+    "name": "BitzNet",
+    "discount": "(暂无优惠）",
+    "features": [
+      "流媒体解锁",
+      "广东 IEPL 专线",
+      "普通国际线路",
+      "不限制本人设备数",
+      "80 GB 流量/月",
+      "100 Mbps 峰值带宽",
+      "半年 / 年付优惠",
+      "在线客服售后保障"
+    ],
+    "pricing": [
+      {
+        "name": "BitzNet · 季付边缘访问",
+        "traffic": "80 GB",
+        "monthly": "-",
+        "yearly": "¥244.99"
+      },
+      {
+        "name": "BitzNet · 季付核心访问",
+        "traffic": "400 GB",
+        "monthly": "-",
+        "yearly": "¥429.99"
+      },
+      {
+        "name": "BitzNet ·季付深度访问",
+        "traffic": "1000 GB",
+        "monthly": "-",
+        "yearly": "¥295.00"
+      }
+    ]
+  },
+  {
+    "name": "飞猫云",
+    "discount": "(暂无优惠）",
+    "features": [
+      "季付及以上用户，购买日起每 30 天自动刷新流量",
+      "全 IPLC 专线网络，提供最高 2.5Gbps 稳定速率",
+      "原生 IP 线路，轻松解锁 Netflix、Disney+、ChatGPT、TikTok 等服务",
+      "不限制设备连接数量，多端同时登录使用",
+      "智能流量分配与路由优化，让访问更顺畅更智能",
+      "年付 8 折｜两年付 7 折｜三年付 6 折 优惠长期有效",
+      "全球节点覆盖：",
+      "香港 x20、台湾 x10、日本 x10、新加坡 x10、美国 x10、韩国 x3、马来西亚、越南、菲律宾、泰国、印度、英国、法国、德国、阿根廷等"
+    ],
+    "pricing": [
+      {
+        "name": "飞猫 · 学生版",
+        "traffic": "150GB",
+        "monthly": "-",
+        "yearly": "¥84.00"
+      },
+      {
+        "name": "飞猫 · 星耀版",
+        "traffic": "150GB",
+        "monthly": "¥25.00",
+        "yearly": "¥240.00"
+      },
+      {
+        "name": "飞猫 · 星环版",
+        "traffic": "300 GB",
+        "monthly": "¥45.00",
+        "yearly": "¥432.00"
+      },
+      {
+        "name": "飞猫 · 银河版",
+        "traffic": "600 GB",
+        "monthly": "¥85.00",
+        "yearly": "¥816.00"
+      },
+      {
+        "name": "飞猫 · 宇宙版",
+        "traffic": "1.0TB",
+        "monthly": "¥150.00",
+        "yearly": "¥1360.00"
+      },
+      {
+        "name": "飞猫 · 定制套餐",
+        "traffic": "500 GB",
+        "monthly": "¥550.00",
+        "yearly": "-"
+      }
+    ]
+  },
+  {
+    "name": "sogo云",
+    "discount": "sogo10000 (9折)",
+    "features": [
+      "刷新规则：每 30 天自动刷新流量。",
+      "VLESS 协议｜企业级 IEPL 专线｜三网优化",
+      "智能负载｜晚高峰不限速｜4K 秒开",
+      "全线路流媒体解锁",
+      "AI 全支持",
+      "节点覆盖",
+      "设备支持",
+      "Clash / Shadowrocket / v2rayN 等全兼容",
+      "服务保障",
+      "支持企业级定制线路",
+      "网络带宽：全 IEPL专线，低延迟；单节点峰值至 2.5Gbps。",
+      "设备并发：多设备不限量同时在线（电脑/手机/路由器）。",
+      "路由策略：智能路由自动择优，稳定顺滑。",
+      "长期优惠：年付 8 折｜两年付 7 折｜三年付 6 折。"
+    ],
+    "pricing": [
+      {
+        "name": "小包-年付版",
+        "traffic": "60 GB",
+        "monthly": "-",
+        "yearly": "¥98.00"
+      },
+      {
+        "name": "小包-基础版",
+        "traffic": "150 GB",
+        "monthly": "¥25.00",
+        "yearly": "¥250.00"
+      },
+      {
+        "name": "小包-优选版",
+        "traffic": "350 GB",
+        "monthly": "¥45.00",
+        "yearly": "¥485.00"
+      },
+      {
+        "name": "小包-强化版",
+        "traffic": "550 GB",
+        "monthly": "¥80.00",
+        "yearly": "¥850.00"
+      },
+      {
+        "name": "小包-顶配版",
+        "traffic": "1.1TB",
+        "monthly": "¥150.00",
+        "yearly": "¥1750.00"
+      }
+    ]
+  },
+  {
+    "name": "暮光加速",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "mm88（8折）",
+    "features": [
+      "BGP 多线路智能调度 + 专线级出口架构，全程不限速，节点统一 1x 计费倍率",
+      "Netflix / Hulu / HBO / Disney+ / DAZN 等主流流媒体完整解锁，4K 即点即播，支持 8K 资源",
+      "全面支持 ChatGPT、Claude 等 AI 应用与开发工具访问",
+      "采用高性能 Shadowsocks 协议，不限制同时在线设备数量"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "星岛梦",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "nmw888（9折）",
+    "features": [
+      "刷新规则：每 30 天自动刷新流量。",
+      "网络带宽：全 IEPL专线，低延迟；单节点峰值至 2.5Gbps。",
+      "解锁能力：原生 IP，支持 Netflix / Disney+ / ChatGPT / TikTok。",
+      "设备并发：多设备不限量同时在线（电脑/手机/路由器）。",
+      "路由策略：智能路由自动择优，稳定顺滑。",
+      "客服支持：专业客服，快速响应。",
+      "长期优惠：年付 8 折｜两年付 7 折｜三年付 6 折。",
+      "节点覆盖：香港×20、台湾×5、日本×10、新加坡×10、美国×10、马来西亚×2、英国、法国、德国、土耳其、泰国、巴西等"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "唯兔云",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "rabbit（8折）",
+    "features": [
+      "全IPLC专线，vless协议，不限速，不限制客户端",
+      "增加备用直连节点",
+      "节点速率×1",
+      "客服全天在线指导",
+      "原生IP解锁Netfilx/Hulu/Hbo/Disney+/HUGO等流媒体",
+      "解锁 Chatgpt，Tiktok",
+      "系统自带折扣：1年付8折、2年付7折、3年付6折。（如有节日活动，可享受基础折扣上继续打折）",
+      "香港x20、台湾x10、日本x10、新加坡x10、美国x10、马来西亚x2、英国x1、德国x1、法国x1、泰国x1、菲律宾x1、印度x1，需要其他节点请客服咨询"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "光速云",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "(暂无优惠）",
+    "features": [
+      "套餐流量：每 30 天自动刷新流量",
+      "全球 IPLC · 单节点至高 2.5 Gbps",
+      "原生 IP 解锁 Netflix / Disney+ / ChatGPT / TikTok",
+      "不限设备，多端同时在线",
+      "专业运维 7×24 支持",
+      "半年付9折，年付8折，俩年付75折，三年付7折",
+      "节点：港｜台｜日｜新｜马｜美｜德｜法｜英｜土｜越｜",
+      "特殊商品，不支持退款"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "U1S1",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "U1S1（85折）",
+    "features": [
+      "适配：刷视频、看剧、远程办公常规使用",
+      "BGP 三网智能优化 + IEPL 专线出口",
+      "不限速 · 不限设备数量",
+      "全平台ss协议支持（iOS / Android / Windows / macOS）",
+      "Netflix / Disney+ / HBO / DAZN 全平台解锁秒开",
+      "支持 ChatGPT / Claude / Midjourney / 三方 AI",
+      "每两个月额外 +200兆带宽，确保晚高峰冗余"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "极连云",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "JLY888（8折）",
+    "features": [
+      "季付以上购买日起算每30天自动更新流量",
+      "全 IPLC 专线，最大提供 2.5Gbps 速率",
+      "原生 IP 解锁各大流媒体",
+      "解锁 ChatGPT、TikTok",
+      "不限制同时使用客户端数量",
+      "高效客服响应",
+      "1 年付 8 折、2 年付 7 折、3 年付 6 折",
+      "香港 x20、台湾 x10、日本 x10、新加坡 x10、马来西亚、美国 x10、泰国 x1、德国 x1、法国 x1、英国 x1、土耳其x1、韩国",
+      "不接受退款服务"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "光年梯",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "(暂无优惠）",
+    "features": [
+      "季付及以上：按购买日起算，每 30 天 自动重置/更新流量",
+      "全程 IPLC 专线，最高可提供 2.5Gbps 速率",
+      "原生 IP，解锁主流流媒体平台",
+      "支持解锁 ChatGPT / TikTok",
+      "不限制同时在线客户端数量（多设备可用）",
+      "客服响应高效，工单处理及时",
+      "年付优惠：1 年付 8 折、2 年付 7 折、3 年付 6 折 可叠加优惠码享受折上折",
+      "节点地区：香港 、台湾 、日本 、新加坡 、马来西亚、美国 等",
+      "不提供退款服务"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "一翻云",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "(暂无优惠）",
+    "features": [
+      "超值特惠：季付  | 半年付  | 年付",
+      "解锁主流流媒体及各类 AI 智能工具",
+      "适配自研客户端，轻松一键快速连接",
+      "覆盖港/台/新/日/美等 60+ 优质全球节点"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "二猫云",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "ermao888（85折）",
+    "features": [
+      "刷新规则：每 30 天自动刷新流量。",
+      "网络带宽：全 IEPL专线，低延迟；单节点峰值至 2.5Gbps。",
+      "解锁能力：原生 IP，支持 Netflix / Disney+ / ChatGPT / TikTok。",
+      "设备并发：多设备不限量同时在线（电脑/手机/路由器）。",
+      "路由策略：智能路由自动择优，稳定顺滑。",
+      "客服支持：专业客服，快速响应。",
+      "长期优惠：年付 8 折｜两年付 7 折｜三年付 6 折。",
+      "节点覆盖：香港×20、台湾×5、日本×10、新加坡×10"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "边缘节点",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "xk808（8折）",
+    "features": [
+      "年费小包，适用于低流量用户学生党，每月自动刷新",
+      "全 IPLC 专线网络，提供最高 2.5Gbps 稳定速率",
+      "原生 IP 线路，轻松解锁 Netflix、Disney+、ChatGPT、TikTok 等服务",
+      "不限制设备连接数量，多端同时登录使用",
+      "智能流量分配与路由优化，让访问更顺畅更智能",
+      "年付 85 折｜两年付 8 折｜三年付 75 折 优惠长期有效",
+      "全球节点覆盖："
+    ],
+    "pricing": []
+  },
+  {
+    "name": "可信云",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "(暂无优惠）",
+    "features": [
+      "全IEPL专线，不限，不限制设备数量",
+      "季付95折 · 半年付9折 · 年付85折 · 两年付8折 · 三年付7折",
+      "解锁各大流媒体及AI工具",
+      "高效客服响应",
+      "不限制客户端",
+      "60+顶级专线节点，覆盖港/台/新/日/美/等地区"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "速界机场",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "sujie888（8折)",
+    "features": [
+      "年费小包，适用于低流量用户学生党，每月自动刷新",
+      "全 IPLC 专线网络，提供最高 2.5Gbps 稳定速率",
+      "原生 IP 线路，轻松解锁 Netflix、Disney+、ChatGPT、TikTok 等服务",
+      "不限制设备连接数量，多端同时登录使用",
+      "智能流量分配与路由优化，让访问更顺畅更智能",
+      "年付 8 折｜两年付 7 折｜三年付 6 折 优惠长期有效",
+      "全球节点覆盖： 香港 x20、台湾 x10、日本 x10、新加坡 x10、美国 x10、韩国 x3、马来西亚、越南、菲律宾、泰国、印度、英国、法国、德国、阿根廷等",
+      "客服全天在线指导",
+      "香港x20、台湾x10、日本x10、新加坡x10、美国x10、马来西亚x2、英国x1、德国x1、法国x1、泰国x1、菲律宾x1、印度x1，需要其他节点请客服咨询"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "快狸",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "(暂无优惠）",
+    "features": [
+      "刷新规则：每 30 天自动刷新流量。",
+      "网络带宽：全 IEPL专线，低延迟；单节点峰值至 2.5Gbps。",
+      "解锁能力：原生 IP，支持 Netflix / Disney+ / ChatGPT / TikTok。",
+      "设备并发：多设备不限量同时在线（电脑/手机/路由器）。",
+      "路由策略：智能路由自动择优，稳定顺滑。",
+      "客服支持：专业客服，快速响应。",
+      "长期优惠：年付 8 折｜两年付 7 折｜三年付 6 折。",
+      "节点覆盖：香港×20、台湾×5、日本×10、新加坡×10、美国×10、马来西亚×2、英国、法国、德国、土耳其、泰国、巴西等"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "飞V",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "fly20（8折)",
+    "features": [
+      "(150GB 满足深度网课用户、全高清视频会议、高强度短视频运营与流媒体长期深度用户需求)",
+      "云端多链路即时优化 + 全链路专线架构，秒级响应，节点统一 1x 计费倍率",
+      "流媒体全家桶：Netflix / Prime Video / BBC / Abema / TVer 等全面覆盖，原生IP直通，极致体验",
+      "开发者之选：ChatGPT 4 / GitHub Copilot / Hugging Face 完整支持，低延迟API调用",
+      "高性能协议，多国节点可选，不限制在线设备数，商务家庭优选"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "梯子云",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "tiziyun（8折)",
+    "features": [
+      "完美适配日常网页访问、跨境电商基础邮件、推特及电报社交轻度用户)。",
+      "梯子云基础中转方案 + 多入口智能调度，全程不限速，全节点统一 1x 计费倍率。",
+      "完整解锁 Netflix / YouTube /ChatGPT 等全球主流流媒体，前沿 AI 工具。",
+      "采用高性能 Shadowsocks (SS) 协议架构，不限制同时在线设备数。"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "WaveNet",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "lw888（8折)",
+    "features": [
+      "日常办公、高频视频用户的黄金套餐 三网智能优化+纯专线出口",
+      "超大流量池 大流量、高并发，满足商用级",
+      "独享私人专线节点（600元/月，500GB，独立公网 IP，专线独享）",
+      "独占带宽，不抢网，彻底告别直播画质模糊与卡顿",
+      "全球主流流媒体与内容平台全解锁，4K / 8K 稳定播放",
+      "企业级 BGP 智能路由 + 专线出口方案，全程不限速，节点流量不放大"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "灵动云",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "880223（8折)",
+    "features": [
+      "主力推荐｜适配重度办公、跨境电商与高频观影",
+      "纯专线线路｜BGP 三网优化专线，晚高峰绝不限速，1.0x 计费",
+      "全能解锁｜全线解锁海外流媒体，4K 秒开，完美兼容 8K",
+      "生产力工具｜原生纯净 IP，稳定支持 ChatGPT / Claude 创作",
+      "多端无阻｜SS 协议全平台一键导入，多设备同时在线无压力"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "隐形人",
+    "discount": "",
+    "features": [],
+    "pricing": []
+  },
+  {
+    "name": "优惠码",
+    "discount": "yxr888（8折)",
+    "features": [
+      "云端多链路即时优化 + 全链路专线架构，秒级响应，节点统一 1x 计费倍率",
+      "流媒体全家桶：Netflix / Prime Video / BBC / Abema / TVer 等全面覆盖，原生IP直通，极致体验",
+      "开发者之选：ChatGPT 4 / GitHub Copilot / Hugging Face 完整支持，低延迟API调用",
+      "高性能协议，多国节点可选，不限制在线设备数，商务家庭优选"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "NanoCloud",
+    "discount": "（加入tg享受内部优惠）",
+    "features": [
+      "安卓手机需要给Nano通知权限才能连接",
+      "每个价钱有自己的同时支持多少设备",
+      "添加TG频道享受内部优惠折扣"
+    ],
+    "pricing": [
+      {
+        "name": "猎户座",
+        "traffic": "100 GB",
+        "monthly": "¥1.00",
+        "yearly": "¥12.00"
+      },
+      {
+        "name": "白羊座",
+        "traffic": "300 GB",
+        "monthly": "¥10.00",
+        "yearly": "¥120.00"
+      },
+      {
+        "name": "双鱼座",
+        "traffic": "480 GB",
+        "monthly": "¥15.00",
+        "yearly": "¥180.00"
+      },
+      {
+        "name": "射手座",
+        "traffic": "650 GB",
+        "monthly": "¥20.00",
+        "yearly": "¥240.00"
+      }
+    ]
+  },
+  {
+    "name": "Phantom",
+    "discount": "（暂无优惠）",
+    "features": [],
+    "pricing": [
+      {
+        "name": "天蝎座",
+        "traffic": "100 GB",
+        "monthly": "¥1.00",
+        "yearly": "¥12.00"
+      },
+      {
+        "name": "水瓶座",
+        "traffic": "300 GB",
+        "monthly": "¥10.00",
+        "yearly": "¥120.00"
+      },
+      {
+        "name": "双子座",
+        "traffic": "650 GB",
+        "monthly": "¥20.00",
+        "yearly": "¥240.00"
+      }
+    ]
+  }
+]

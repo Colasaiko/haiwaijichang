@@ -1,0 +1,293 @@
+[
+  {
+    "name": "微风网络",
+    "discount": "weifeng90（7折）",
+    "features": [
+      "全IPLC专线，享受低延迟高速率",
+      "不限制设备同时接入",
+      "不限速"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "飞猫云",
+    "discount": "(暂无优惠）",
+    "features": [
+      "全 IPLC 专线网络，提供最高 2.5Gbps 稳定速率",
+      "原生 IP 线路，轻松解锁 Netflix、Disney+、ChatGPT、TikTok 等服务",
+      "不限制设备连接数量，多端同时登录使用"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "萤火虫 (FireFly)",
+    "discount": "firefly (8折)",
+    "features": [
+      "不限速",
+      "不限设备数",
+      "IPLC专线网络"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "跨界云",
+    "discount": "kuajie（8折）",
+    "features": [
+      "IPLC高端线路，不限速，所有节点x1倍率",
+      "Netflix/Hulu/HBO/Disney+/DAZN等流媒体解锁",
+      "支持ChatGPT、Gemini、Claude等AI",
+      "不限制设备登录数"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "灵猫",
+    "discount": "lingmao（8折）",
+    "features": [
+      "全IPLC专线，不限速，不限制客户端，节点速率×1",
+      "可达到的最大带宽：1000 Mbps",
+      "原生IP解锁Netfilx等流媒体， 解锁 Chatgpt，Gemini，Tiktok"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "闪跃",
+    "discount": "shanyue（8折）",
+    "features": [
+      "全IPLC专线",
+      "原生IP解锁各大流媒体",
+      "解锁 Chatgpt，Tiktok"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "无忧链接",
+    "discount": "(暂无优惠）",
+    "features": [
+      "全IPLC专线，节点速率×1",
+      "稳定全球Chatgpt，Gemini等AI支持",
+      "4K流畅Netfilx/Hulu等观影体验"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "BitzNet",
+    "discount": "(暂无优惠）",
+    "features": [
+      "流媒体解锁",
+      "广东 IEPL 专线",
+      "普通国际线路",
+      "不限制本人设备数"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "sogo云",
+    "discount": "sogo10000 (9折)",
+    "features": [
+      "VLESS 协议｜企业级 IEPL 专线｜三网优化",
+      "智能负载｜晚高峰不限速｜4K 秒开",
+      "全线路流媒体解锁"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "暮光加速",
+    "discount": "mm88（8折）",
+    "features": [
+      "BGP 多线路智能调度 + 专线级出口架构，全程不限速，节点统一 1x 计费倍率",
+      "Netflix / Hulu / HBO / Disney+ / DAZN 等主流流媒体完整解锁，4K 即点即播，支持 8K 资源",
+      "全面支持 ChatGPT、Claude 等 AI 应用与开发工具访问"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "星岛梦",
+    "discount": "nmw888（9折）",
+    "features": [
+      "网络带宽：全 IEPL专线，低延迟；单节点峰值至 2.5Gbps。",
+      "解锁能力：原生 IP，支持 Netflix / Disney+ / ChatGPT / TikTok。",
+      "设备并发：多设备不限量同时在线（电脑/手机/路由器）。"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "唯兔云",
+    "discount": "rabbit（8折）",
+    "features": [
+      "全IPLC专线，vless协议，不限速，不限制客户端",
+      "原生IP解锁Netfilx/Hulu/Hbo/Disney+/HUGO等流媒体",
+      "解锁 Chatgpt，Tiktok"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "光速云",
+    "discount": "(暂无优惠）",
+    "features": [
+      "全球 IPLC · 单节点至高 2.5 Gbps",
+      "原生 IP 解锁 Netflix / Disney+ / ChatGPT / TikTok",
+      "不限设备，多端同时在线"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "U1S1",
+    "discount": "U1S1（85折）",
+    "features": [
+      "BGP 三网智能优化 + IEPL 专线出口",
+      "不限速 · 不限设备数量",
+      "Netflix / Disney+ / HBO / DAZN 全平台解锁秒开"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "极连云",
+    "discount": "JLY888（8折）",
+    "features": [
+      "全 IPLC 专线，最大提供 2.5Gbps 速率",
+      "原生 IP 解锁各大流媒体",
+      "解锁 ChatGPT、TikTok"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "光年梯",
+    "discount": "(暂无优惠）",
+    "features": [
+      "全程 IPLC 专线，最高可提供 2.5Gbps 速率",
+      "原生 IP，解锁主流流媒体平台",
+      "支持解锁 ChatGPT / TikTok"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "一翻云",
+    "discount": "(暂无优惠）",
+    "features": [
+      "解锁主流流媒体及各类 AI 智能工具",
+      "适配自研客户端，轻松一键快速连接",
+      "覆盖港/台/新/日/美等 60+ 优质全球节点"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "二猫云",
+    "discount": "ermao888（85折）",
+    "features": [
+      "网络带宽：全 IEPL专线，低延迟；单节点峰值至 2.5Gbps。",
+      "解锁能力：原生 IP，支持 Netflix / Disney+ / ChatGPT / TikTok。",
+      "设备并发：多设备不限量同时在线（电脑/手机/路由器）。"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "边缘节点",
+    "discount": "xk808（8折）",
+    "features": [
+      "全 IPLC 专线网络，提供最高 2.5Gbps 稳定速率",
+      "原生 IP 线路，轻松解锁 Netflix、Disney+、ChatGPT、TikTok 等服务",
+      "不限制设备连接数量，多端同时登录使用"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "可信云",
+    "discount": "(暂无优惠）",
+    "features": [
+      "全IEPL专线，不限，不限制设备数量",
+      "解锁各大流媒体及AI工具",
+      "不限制客户端"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "速界机场",
+    "discount": "sujie888（8折)",
+    "features": [
+      "全 IPLC 专线网络，提供最高 2.5Gbps 稳定速率",
+      "原生 IP 线路，轻松解锁 Netflix、Disney+、ChatGPT、TikTok 等服务",
+      "智能流量分配与路由优化，让访问更顺畅更智能"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "快狸",
+    "discount": "(暂无优惠）",
+    "features": [
+      "网络带宽：全 IEPL专线，低延迟；单节点峰值至 2.5Gbps。",
+      "解锁能力：原生 IP，支持 Netflix / Disney+ / ChatGPT / TikTok。",
+      "设备并发：多设备不限量同时在线（电脑/手机/路由器）。"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "飞V",
+    "discount": "fly20（8折)",
+    "features": [
+      "云端多链路即时优化 + 全链路专线架构，秒级响应，节点统一 1x 计费倍率",
+      "流媒体全家桶：Netflix / Prime Video / BBC / Abema / TVer 等全面覆盖，原生IP直通，极致体验",
+      "开发者之选：ChatGPT 4 / GitHub Copilot / Hugging Face 完整支持，低延迟API调用"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "梯子云",
+    "discount": "tiziyun（8折)",
+    "features": [
+      "梯子云基础中转方案 + 多入口智能调度，全程不限速，全节点统一 1x 计费倍率。",
+      "完整解锁 Netflix / YouTube /ChatGPT 等全球主流流媒体，前沿 AI 工具。",
+      "采用高性能 Shadowsocks (SS) 协议架构，不限制同时在线设备数。"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "WaveNet",
+    "discount": "lw888（8折)",
+    "features": [
+      "日常办公、高频视频用户的黄金套餐 三网智能优化+纯专线出口",
+      "独占带宽，不抢网，彻底告别直播画质模糊与卡顿",
+      "全球主流流媒体与内容平台全解锁，4K / 8K 稳定播放"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "灵动云",
+    "discount": "880223（8折)",
+    "features": [
+      "纯专线线路｜BGP 三网优化专线，晚高峰绝不限速，1.0x 计费",
+      "全能解锁｜全线解锁海外流媒体，4K 秒开，完美兼容 8K",
+      "多端无阻｜SS 协议全平台一键导入，多设备同时在线无压力"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "隐形人",
+    "discount": "yxr888（8折)",
+    "features": [
+      "云端多链路即时优化 + 全链路专线架构，秒级响应，节点统一 1x 计费倍率",
+      "流媒体全家桶全面覆盖，原生IP直通，极致体验",
+      "高性能协议，多国节点可选，不限制在线设备数，商务家庭优选"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "NanoCloud",
+    "discount": "（加入tg享受内部优惠）",
+    "features": [
+      "安卓手机需要给Nano通知权限才能连接",
+      "每个价钱有自己的同时支持多少设备",
+      "添加TG频道享受内部优惠折扣"
+    ],
+    "pricing": []
+  },
+  {
+    "name": "Phantom",
+    "discount": "（暂无优惠）",
+    "features": [
+      "不限速",
+      "高防服务器"
+    ],
+    "pricing": []
+  }
+]

@@ -1,0 +1,237 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Data Mockup
+const coreServices = [
+  { id: "OA-WEB", name: "Website / 官网", status: "OPERATIONAL", color: "text-green-400", bg: "bg-green-500/10" },
+  { id: "OA-SUB", name: "Subscription / 订阅分发", status: "OPERATIONAL", color: "text-green-400", bg: "bg-green-500/10" },
+  { id: "OA-API", name: "API / 后端接口", status: "OPERATIONAL", color: "text-green-400", bg: "bg-green-500/10" },
+  { id: "OA-AUTH", name: "Authentication / 登录系统", status: "OPERATIONAL", color: "text-green-400", bg: "bg-green-500/10" },
+  { id: "OA-PAY", name: "Payment / 支付网关", status: "OPERATIONAL", color: "text-green-400", bg: "bg-green-500/10" },
+  { id: "OA-SUP", name: "Support / 客服中心", status: "AVAILABLE", color: "text-green-400", bg: "bg-green-500/10" }
+];
+
+const regionalNetworks = [
+  { id: "OA-ASIA", name: "Asia Network / 亚洲网络", status: "OPERATIONAL", color: "text-green-400" },
+  { id: "OA-US", name: "North America / 北美网络", status: "MAINTENANCE", color: "text-brand-accent" },
+  { id: "OA-EUR", name: "Europe Network / 欧洲网络", status: "OPERATIONAL", color: "text-green-400" },
+  { id: "OA-OCE", name: "Oceania Network / 大洋洲", status: "OPERATIONAL", color: "text-green-400" }
+];
+
+const incidents = [
+  {
+    date: "2026-09-25",
+    title: "订阅更新异常 (已解决)",
+    status: "RESOLVED",
+    time: "08:00 - 09:30 UTC+8",
+    desc: "由于 CDN 边缘节点缓存策略异常，部分用户无法更新订阅。已于 09:30 完全修复并刷新缓存。"
+  },
+  {
+    date: "2026-09-20",
+    title: "亚洲骨干网升级维护",
+    status: "COMPLETED",
+    time: "02:00 - 04:00 UTC+8",
+    desc: "进行了亚洲区域核心路由设备的硬件扩容，期间部分香港与日本航班发生短时间(约3分钟)闪断。"
+  },
+  {
+    date: "2026-09-15",
+    title: "官网控制面板访问缓慢",
+    status: "RESOLVED",
+    time: "20:00 - 21:15 UTC+8",
+    desc: "遭受突发性大流量 CC 攻击，已及时接入高级清洗策略，面板恢复正常访问。"
+  }
+];
+
+const scheduled = [
+  {
+    date: "2026-10-01",
+    title: "北美航线 BGP 路由优化",
+    time: "凌晨 03:00 - 05:00 UTC+8",
+    desc: "计划内网割接，将为您提供更低延迟的北美访问体验。期间 OA-US 航班可能会有短暂的不可用状态。"
+  }
+];
+
+// Generate 90 days uptime array (1 = green, 0 = yellow)
+const uptimeDays = Array.from({ length: 90 }, (_, i) => {
+  // Make a few random days yellow to look realistic, but mostly green
+  return (i === 15 || i === 70) ? 'yellow' : 'green';
+});
+---
+
+<Layout 
+  title="服务状态中心 (Status) | 海外机场"
+  description="查看海外机场官网、订阅服务、API 以及各区域航班网络的实时运行状态与维护公告。"
+>
+  <!-- 1. Hero / Overall Status -->
+  <section class="pt-32 pb-12 bg-brand-navy border-b border-white/5 relative overflow-hidden">
+    <div class="absolute inset-0 z-0 opacity-10 pointer-events-none" style="background-image: repeating-linear-gradient(45deg, var(--color-brand-neon) 0, var(--color-brand-neon) 1px, transparent 0, transparent 50%); background-size: 10px 10px;"></div>
+    
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8">
+        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse-slow"></span>
+        <span class="text-xs font-mono tracking-[0.2em] text-slate-300 uppercase">System Status</span>
+      </div>
+      
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-white uppercase font-mono">
+        FLIGHT OPERATIONS STATUS
+      </h1>
+      
+      <!-- Big Status Banner -->
+      <div class="mt-8 p-6 bg-green-500/10 border border-green-500/30 rounded-xl shadow-[0_0_30px_rgba(74,222,128,0.1)] flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+        <svg class="w-10 h-10 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="text-center sm:text-left">
+          <h2 class="text-2xl font-bold text-green-400 tracking-wider">ALL SYSTEMS OPERATIONAL</h2>
+          <p class="text-sm text-green-400/70 font-mono mt-1">Last updated: Just now</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Core Services (Flight Format) -->
+  <section class="py-16 bg-brand-dark relative z-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h3 class="text-xs font-mono text-slate-500 uppercase tracking-widest mb-6 border-b border-white/10 pb-2">Core Services / 核心系统</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {coreServices.map(service => (
+          <div class="bg-brand-navy border border-white/10 rounded-lg p-4 flex items-center justify-between hover:border-white/20 transition-colors">
+            <div class="flex items-center space-x-4">
+              <div class="px-2 py-1 bg-white/5 border border-white/10 rounded text-[10px] font-mono tracking-widest text-slate-400">
+                {service.id}
+              </div>
+              <span class="font-bold text-slate-200 text-sm">{service.name}</span>
+            </div>
+            <span class={`font-mono font-bold text-xs ${service.color}`}>
+              {service.status}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Regional Networks -->
+  <section class="py-8 bg-brand-navy">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h3 class="text-xs font-mono text-slate-500 uppercase tracking-widest mb-6 border-b border-white/10 pb-2">Regional Networks / 区域航班网络</h3>
+      
+      <div class="space-y-3">
+        {regionalNetworks.map(region => (
+          <div class="bg-black/30 border border-white/5 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between group hover:bg-black/50 transition-colors">
+            <div class="flex items-center space-x-4 mb-3 sm:mb-0">
+              <div class="px-2 py-1 bg-white/5 border border-white/10 rounded text-[10px] font-mono tracking-widest text-slate-400">
+                {region.id}
+              </div>
+              <span class="font-bold text-white text-sm">{region.name}</span>
+            </div>
+            <div class="flex items-center space-x-3">
+              <!-- Animated Ping Dot for Operational, Pulse for Maintenance -->
+              <span class={`relative flex h-3 w-3`}>
+                <span class={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${region.status === 'OPERATIONAL' ? 'bg-green-400' : 'bg-brand-accent'}`}></span>
+                <span class={`relative inline-flex rounded-full h-3 w-3 ${region.status === 'OPERATIONAL' ? 'bg-green-500' : 'bg-brand-accent'}`}></span>
+              </span>
+              <span class={`font-mono font-bold text-xs ${region.color}`}>
+                {region.status}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Uptime Graph (GitHub Style) -->
+  <section class="py-12 bg-brand-dark border-t border-white/5">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-end mb-6">
+        <div>
+          <h3 class="text-lg font-bold text-white">历史运行状态 (90 Days)</h3>
+          <p class="text-sm text-slate-400 mt-1">Uptime History</p>
+        </div>
+        <div class="text-2xl font-bold text-white font-mono">99.98%</div>
+      </div>
+      
+      <div class="bg-brand-navy p-6 rounded-xl border border-white/10">
+        <!-- Bars Container -->
+        <div class="flex items-end justify-between space-x-1 h-16 w-full">
+          {uptimeDays.map(day => (
+            <div 
+              class={`flex-1 rounded-t-sm opacity-80 hover:opacity-100 transition-opacity cursor-crosshair h-full ${day === 'green' ? 'bg-green-500' : 'bg-brand-accent h-3/4'}`}
+              title={day === 'green' ? 'No downtime recorded' : 'Degraded performance'}
+            ></div>
+          ))}
+        </div>
+        <!-- Legend -->
+        <div class="flex justify-between mt-4 text-xs font-mono text-slate-500">
+          <span>90 days ago</span>
+          <div class="flex space-x-4">
+            <span class="flex items-center"><span class="w-2 h-2 bg-green-500 rounded-sm mr-1"></span> Normal</span>
+            <span class="flex items-center"><span class="w-2 h-2 bg-brand-accent rounded-sm mr-1"></span> Degraded</span>
+          </div>
+          <span>Today</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Scheduled Maintenance -->
+  <section class="py-12 bg-brand-navy border-t border-white/5">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h3 class="text-xs font-mono text-brand-accent uppercase tracking-widest mb-6 border-b border-white/10 pb-2">Scheduled Maintenance / 计划维护</h3>
+      
+      <div class="space-y-6">
+        {scheduled.map(item => (
+          <div class="border-l-2 border-brand-accent pl-4 ml-2">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
+              <h4 class="text-lg font-bold text-white">{item.title}</h4>
+              <span class="text-xs font-mono bg-brand-accent/20 text-brand-accent px-2 py-1 rounded mt-2 sm:mt-0">{item.date}</span>
+            </div>
+            <p class="text-sm text-brand-accent/80 font-mono mb-2">{item.time}</p>
+            <p class="text-sm text-slate-400">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Incident History -->
+  <section class="py-12 bg-brand-dark border-t border-white/5">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h3 class="text-xs font-mono text-slate-500 uppercase tracking-widest mb-6 border-b border-white/10 pb-2">Incident History / 近期事件</h3>
+      
+      <div class="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300/10 before:to-transparent">
+        {incidents.map((incident, i) => (
+          <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+            <!-- Icon -->
+            <div class={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-brand-dark ${incident.status === 'RESOLVED' ? 'bg-green-500' : 'bg-slate-500'} text-brand-dark shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10`}>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <!-- Card -->
+            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-brand-navy p-5 rounded border border-white/10 shadow">
+              <div class="flex justify-between items-start mb-2">
+                <span class="font-bold text-white text-sm">{incident.title}</span>
+                <span class="text-[10px] font-mono text-slate-500">{incident.date}</span>
+              </div>
+              <div class={`text-[10px] font-mono tracking-widest mb-3 ${incident.status === 'RESOLVED' ? 'text-green-400' : 'text-slate-400'}`}>
+                [{incident.status}] {incident.time}
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">{incident.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Footer Note -->
+  <section class="py-8 bg-brand-navy border-t border-white/5">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <p class="text-xs text-slate-500 font-mono">
+        状态信息由后台系统手动维护。受地理位置、本地 ISP 运营商策略（如长城宽带、移动墙中墙）等因素影响，实时网络情况可能与本页显示存在差异。
+      </p>
+    </div>
+  </section>
+
+</Layout>

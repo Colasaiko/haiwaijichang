@@ -1,0 +1,73 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-brand-navy: #0F172A; /* Deep navy blue */
+  --color-brand-dark: #020617; /* Deep grey-black */
+  --color-brand-accent: #F59E0B; /* Airport yellow */
+  --color-brand-light: #F8FAFC; /* Cool white text */
+  --color-brand-neon: #38BDF8; /* Cool blue light */
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Tailwind v4 CSS configuration */
+body {
+  background-color: var(--color-brand-navy);
+  color: var(--color-brand-light);
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/* Page Entry Animation */
+@keyframes check-sequence {
+  0% { content: "CHECKING NETWORK..."; opacity: 0; }
+  10% { content: "CHECKING NETWORK..."; opacity: 1; }
+  30% { content: "ROUTE READY"; opacity: 1; }
+  50% { content: "DESTINATION AVAILABLE"; opacity: 1; }
+  70% { content: "BOARDING..."; opacity: 1; }
+  90% { content: "READY FOR DEPARTURE"; opacity: 1; }
+  100% { content: "READY FOR DEPARTURE"; opacity: 0; }
+}
+
+.page-entry-text::after {
+  content: "";
+  animation: check-sequence 0.8s ease-in-out forwards;
+}
+
+.page-entry-overlay {
+  animation: fade-out-overlay 0.3s ease-in-out 0.8s forwards;
+}
+
+@keyframes fade-out-overlay {
+  from { opacity: 1; visibility: visible; }
+  to { opacity: 0; visibility: hidden; }
+}
+
+/* Animations */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-brand-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}

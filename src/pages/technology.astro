@@ -1,0 +1,371 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// We can define some structured data for SEO (FAQ)
+const faqs = [
+  { q: "延迟越低越好吗？", a: "不完全是。延迟低对于打游戏和语音通话非常关键，但如果是看 4K 视频或下载大文件，带宽高且不丢包（稳定性）反而比绝对的低延迟更重要。" },
+  { q: "IPLC 是什么？", a: "IPLC (International Private Leased Circuit) 是一种国际专线。它不经过拥堵的公网出口，而是直接点对点传输，因此延迟极低且极度稳定，是目前最高端的跨境网络方案。" },
+  { q: "Clash 是协议吗？", a: "不是。Clash 是一个网络代理客户端软件（控制台），它本身不负责加密，而是通过内置支持 Shadowsocks、Trojan、Vmess 等各种协议来连接到服务器。这就好比 Clash 是浏览器，而协议是 HTTP 网址。" },
+  { q: "VLESS 和 Trojan 有什么区别？", a: "两者都是现代主流的代理协议。Trojan 的设计初衷是完全伪装成正常的 HTTPS 流量；而 VLESS 是 V2Ray 框架下的轻量级协议，性能更高。在实际使用中，两者的速度和安全性都很优秀。" },
+  { q: "为什么晚上速度会变慢？", a: "晚上 8:00 - 11:00 是互联网的“晚高峰”，所有人都在上网，国际公网出口带宽会被挤占（类似晚高峰堵车）。使用 IPLC 专线或优质中转线路可以完美避开这种拥堵。" },
+  { q: "为什么测速很快，但看视频还是卡？", a: "测速节点通常离您很近，能测出您宽带的极限速度；但视频服务器可能在海外。如果中间经过的跨境路由质量差、丢包严重，哪怕测速很快，实际看视频依然会卡顿。" }
+];
+---
+
+<Layout 
+  title="专线机场推荐 - IPLC、IEPL、CN2 线路技术与原理解析 | 海外机场"
+  description="了解海外机场底层的网络路由与连接协议。为您解析 IPLC、IEPL、中转、BGP 与 CN2 专线机场的差异，帮助您找到低延迟、晚高峰稳定的优质原生 IP 节点。"
+  keywords="专线机场推荐, IEPL 机场推荐, IPLC 机场推荐, 中转机场推荐, 直连机场推荐, BGP 机场推荐, CN2 机场推荐, 原生 IP 机场推荐, 低延迟机场推荐, 晚高峰稳定机场"
+>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.a
+      }
+    }))
+  })} />
+
+  <!-- 1. Hero Section: Flight Control Center -->
+  <section class="relative min-h-[85vh] flex items-center pt-24 pb-12 overflow-hidden bg-brand-navy">
+    <div class="absolute inset-0 z-0 opacity-10 pointer-events-none grid" style="background-image: radial-gradient(var(--color-brand-neon) 1px, transparent 1px); background-size: 40px 40px;"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full flex flex-col md:flex-row items-center gap-12">
+      <div class="w-full md:w-1/2 text-left">
+        <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md">
+          <span class="w-2 h-2 rounded-full bg-brand-neon animate-pulse-slow"></span>
+          <span class="text-xs font-mono tracking-[0.2em] text-slate-300 uppercase">Flight Control Center</span>
+        </div>
+        
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+          不同目的地，<br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-neon to-brand-accent">需要不同的航线。</span>
+        </h1>
+        
+        <h2 class="text-xl font-mono text-brand-accent tracking-widest mb-6">ROUTE TECHNOLOGY</h2>
+        
+        <p class="text-lg text-slate-400 mb-8 leading-relaxed">
+          全球连接并不是按下按钮就能瞬间“瞬移”。这是一段复杂的数据旅程。<br/>在这里，我们为您揭开网络底层的面纱，将晦涩的“协议、路由、专线”用最简单的方式解释清楚。
+        </p>
+      </div>
+
+      <!-- Right Side: Dynamic SVG Path Animation -->
+      <div class="w-full md:w-1/2 relative bg-black/40 border border-white/10 rounded-2xl p-8 backdrop-blur-sm overflow-hidden h-80 flex items-center justify-center">
+        <!-- SVG Connecting User to Server -->
+        <svg class="w-full h-full text-slate-600 absolute inset-0" viewBox="0 0 600 300">
+          <!-- Background grids -->
+          <line x1="100" y1="0" x2="100" y2="300" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.3"/>
+          <line x1="300" y1="0" x2="300" y2="300" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.3"/>
+          <line x1="500" y1="0" x2="500" y2="300" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.3"/>
+          
+          <!-- Path -->
+          <path id="data-path" d="M 50,150 Q 150,50 300,150 T 550,150" fill="none" stroke="var(--color-brand-neon)" stroke-width="2" opacity="0.3" />
+          
+          <!-- Animated Packet -->
+          <circle r="4" fill="var(--color-brand-accent)">
+            <animateMotion dur="3s" repeatCount="indefinite" rotate="auto">
+              <mpath href="#data-path" />
+            </animateMotion>
+          </circle>
+
+          <!-- Nodes -->
+          <g transform="translate(50, 150)">
+            <circle r="12" fill="var(--color-brand-dark)" stroke="var(--color-brand-neon)" stroke-width="2" />
+            <text x="0" y="25" fill="white" font-size="10" text-anchor="middle" font-family="monospace">USER</text>
+          </g>
+          
+          <g transform="translate(300, 150)">
+            <circle r="12" fill="var(--color-brand-dark)" stroke="var(--color-brand-accent)" stroke-width="2" />
+            <circle r="6" fill="var(--color-brand-accent)" class="animate-pulse-slow" />
+            <text x="0" y="25" fill="white" font-size="10" text-anchor="middle" font-family="monospace">TRANSIT NODE</text>
+          </g>
+
+          <g transform="translate(550, 150)">
+            <circle r="12" fill="var(--color-brand-dark)" stroke="white" stroke-width="2" />
+            <text x="0" y="25" fill="white" font-size="10" text-anchor="middle" font-family="monospace">DESTINATION</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Workflow: 一条连接是怎么工作的 -->
+  <section class="py-20 bg-brand-dark border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-sm font-mono tracking-widest text-brand-neon uppercase mb-2">Connection Workflow</h2>
+        <h3 class="text-3xl font-bold">一条连接是如何工作的？</h3>
+        <p class="text-slate-400 mt-4">数据包的跨国旅行就像一次航班，必须经过层层安检和中转。</p>
+      </div>
+
+      <div class="flex flex-col md:flex-row justify-between items-center relative">
+        <!-- Connecting Line -->
+        <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-white/10 -z-10"></div>
+        
+        {[
+          { step: "1. 设备起飞", icon: "M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z", title: "你的设备", desc: "客户端接管请求" },
+          { step: "2. 本地安检", icon: "M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9", title: "ISP 运营商", desc: "接入本地网络入口" },
+          { step: "3. 航线加密", icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z", title: "加密协议", desc: "数据封装混淆" },
+          { step: "4. 国际航线", icon: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z", title: "中转与专线", desc: "跨境骨干网传输" },
+          { step: "5. 落地到达", icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4", title: "海外服务", desc: "目标服务器响应" }
+        ].map((item, index) => (
+          <div class="flex flex-col items-center bg-brand-navy border border-white/5 p-6 rounded-lg shadow-lg relative w-full md:w-48 mb-8 md:mb-0 z-10 group hover:border-brand-neon transition-colors">
+            <div class="text-[10px] font-mono text-brand-neon mb-4 uppercase tracking-widest">{item.step}</div>
+            <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-4 group-hover:text-brand-accent transition-colors">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d={item.icon} />
+              </svg>
+            </div>
+            <h4 class="text-white font-bold mb-1">{item.title}</h4>
+            <p class="text-xs text-slate-400 text-center">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Metrics Dashboards: Latency, Bandwidth, Stability -->
+  <section class="py-20 bg-brand-navy border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Latency -->
+        <div class="bg-black/30 border border-white/10 rounded-2xl p-8 overflow-hidden relative group">
+          <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-green-500/10 rounded-full blur-2xl"></div>
+          <h3 class="text-xl font-bold mb-2 text-white">延迟 (Latency)</h3>
+          <p class="text-slate-400 text-sm mb-6 h-10">低延迟意味着响应快，但这与下载速度无关。</p>
+          <div class="flex items-end mb-4">
+            <span class="text-4xl font-mono text-green-400 font-bold">~25</span>
+            <span class="text-slate-500 ml-2 mb-1">ms (例: 专线至香港)</span>
+          </div>
+          <div class="w-full bg-white/10 h-1 mt-4 rounded">
+            <div class="bg-green-400 h-1 rounded w-[15%]"></div>
+          </div>
+          <p class="text-xs text-slate-500 mt-4">⚠️ 极度影响：网络游戏、实时通话</p>
+        </div>
+
+        <!-- Bandwidth -->
+        <div class="bg-black/30 border border-white/10 rounded-2xl p-8 overflow-hidden relative group">
+          <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
+          <h3 class="text-xl font-bold mb-2 text-white">带宽 (Bandwidth)</h3>
+          <p class="text-slate-400 text-sm mb-6 h-10">带宽决定了单位时间内的数据吞吐量，即“水管有多粗”。</p>
+          <div class="flex items-end mb-4">
+            <span class="text-4xl font-mono text-blue-400 font-bold">1000+</span>
+            <span class="text-slate-500 ml-2 mb-1">Mbps 冗余接入</span>
+          </div>
+          <div class="w-full bg-white/10 h-1 mt-4 rounded flex space-x-1">
+            <div class="bg-blue-400 h-1 rounded w-full animate-pulse-slow"></div>
+          </div>
+          <p class="text-xs text-slate-500 mt-4">⚠️ 极度影响：4K/8K视频流、大文件下载</p>
+        </div>
+
+        <!-- Stability -->
+        <div class="bg-black/30 border border-white/10 rounded-2xl p-8 overflow-hidden relative group">
+          <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-brand-accent/10 rounded-full blur-2xl"></div>
+          <h3 class="text-xl font-bold mb-2 text-white">稳定性 (Stability)</h3>
+          <p class="text-slate-400 text-sm mb-6 h-10">由丢包率(Packet Loss)和抖动(Jitter)决定。稳定压倒一切。</p>
+          <div class="flex items-end mb-4">
+            <span class="text-4xl font-mono text-brand-accent font-bold">0.01</span>
+            <span class="text-slate-500 ml-2 mb-1">% 目标丢包率</span>
+          </div>
+          <div class="flex space-x-1 mt-4">
+            {[...Array(10)].map((_, i) => (
+              <div class="flex-1 h-3 rounded bg-brand-accent opacity-80"></div>
+            ))}
+          </div>
+          <p class="text-xs text-slate-500 mt-4">⚠️ 极度影响：SSH连接、远程办公、直播</p>
+        </div>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Routing & Route Types -->
+  <section class="py-24 bg-brand-dark border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-sm font-mono tracking-widest text-brand-neon uppercase mb-2">Network Infrastructure</h2>
+        <h3 class="text-3xl font-bold">为什么同是“美国节点”，体验天差地别？</h3>
+      </div>
+      
+      <!-- Routing knowledge -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
+        <div>
+          <h4 class="text-xl font-bold mb-4 text-white">路由决定生死</h4>
+          <p class="text-slate-400 leading-relaxed mb-4">
+            数据包就像快递，同样是从亚洲发往北美，有些快递直接空运（直连/专线），有的却要绕道欧洲再海运（绕路路由）。这也是为什么许多廉价服务器即使标称千兆带宽，到了晚上依然卡顿的原因。
+          </p>
+          <ul class="space-y-3 mt-6 text-sm">
+            <li class="flex items-center text-slate-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-accent mr-3"></span> 物理距离极限：光速不可超越，中美直连物理极限约 130ms。
+            </li>
+            <li class="flex items-center text-slate-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-accent mr-3"></span> 中转次数 (Hops)：经过的路由节点越少，丢包概率越低。
+            </li>
+            <li class="flex items-center text-slate-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-accent mr-3"></span> 国际出口拥堵：晚高峰公网出口塞车，导致延迟突增。
+            </li>
+          </ul>
+        </div>
+        
+        <div class="bg-black/50 border border-white/10 rounded-lg p-6">
+          <h4 class="text-sm font-mono text-slate-500 mb-6 uppercase tracking-widest border-b border-white/10 pb-2">四大线路类型对比</h4>
+          <div class="space-y-6">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-white">1. 普通公网 (Public)</span>
+                <span class="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">晚高峰拥堵</span>
+              </div>
+              <p class="text-xs text-slate-400">像免费的国道，便宜但不稳定，遇到大流量直接卡死。</p>
+            </div>
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-white">2. CN2 GIA / 优化直连</span>
+                <span class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded">表现优异</span>
+              </div>
+              <p class="text-xs text-slate-400">类似高速公路，有专属通道，大部分时间通畅。</p>
+            </div>
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-white">3. BGP 中转 (Transit)</span>
+                <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">高性价比</span>
+              </div>
+              <p class="text-xs text-slate-400">在国内就近接入极速服务器，然后再通过隧道穿过国际出口，大幅提升稳定性。</p>
+            </div>
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-brand-neon">4. IPLC / IEPL 专线</span>
+                <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded border border-green-500/50">终极方案</span>
+              </div>
+              <p class="text-xs text-slate-400">国际内网专线。数据不经过防火墙公网出口，点对点直连，拥有雷打不动的延迟和0丢包率。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Protocols -->
+  <section class="py-20 bg-brand-navy border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold">连接协议图谱 (Protocols)</h2>
+        <p class="text-slate-400 mt-4 max-w-2xl mx-auto">不同的语言和封装方式。优质的服务端会兼容现代主流协议以应对各种网络环境审查，而客户端则负责将您的流量转化为这些协议。</p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { name: "Shadowsocks", type: "经典/轻量", tag: "支持" },
+          { name: "Trojan", type: "HTTPS 伪装", tag: "支持" },
+          { name: "VLESS", type: "V2Ray 高性能", tag: "支持" },
+          { name: "Hysteria / TUIC", type: "UDP 暴力加速", tag: "知识库" },
+          { name: "WireGuard", type: "内核级 VPN", tag: "知识库" },
+          { name: "Clash Core", type: "分流控制内核", tag: "推荐客户端" }
+        ].map(proto => (
+          <div class="border border-white/10 bg-white/5 rounded-lg p-5 hover:bg-white/10 transition-colors">
+            <div class="flex justify-between items-start mb-2">
+              <span class="font-bold text-white text-lg">{proto.name}</span>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">{proto.type}</p>
+            <span class={`inline-block text-[10px] uppercase font-bold px-2 py-1 rounded ${proto.tag === '支持' ? 'bg-green-500/20 text-green-400' : 'bg-slate-700 text-slate-300'}`}>
+              {proto.tag}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Smart Routing Concept -->
+  <section class="py-24 bg-brand-dark border-t border-white/5 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div class="text-center mb-16 relative z-10">
+        <h2 class="text-sm font-mono tracking-widest text-brand-neon uppercase mb-2">Smart Rules</h2>
+        <h3 class="text-3xl font-bold">智能分流：将控制权交给规则</h3>
+        <p class="text-slate-400 mt-4 max-w-2xl mx-auto">无需手动频繁切换节点。配置好客户端规则后，不同应用会自动走不同的底层航线，国内流量直连，海外流量智能分拨。</p>
+      </div>
+      
+      <div class="max-w-4xl mx-auto bg-black/60 border border-white/10 rounded-xl p-8 backdrop-blur-md relative z-10">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+          
+          <div class="flex-shrink-0 text-center">
+            <div class="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <span class="font-bold text-sm text-white">您的设备</span>
+          </div>
+
+          <div class="flex-1 w-full space-y-4 relative before:hidden md:before:block before:absolute before:h-[2px] before:bg-white/10 before:w-12 before:-left-12 before:top-1/2 before:-mt-2">
+            
+            <div class="flex items-center justify-between bg-white/5 border border-white/10 rounded p-3 relative">
+              <span class="text-xs text-slate-300">Netflix / Disney+</span>
+              <span class="text-xs text-brand-accent border border-brand-accent/30 bg-brand-accent/10 px-2 py-0.5 rounded">自动匹配 🇺🇸 美国原生IP线路</span>
+            </div>
+            
+            <div class="flex items-center justify-between bg-white/5 border border-white/10 rounded p-3">
+              <span class="text-xs text-slate-300">ChatGPT / API</span>
+              <span class="text-xs text-green-400 border border-green-400/30 bg-green-400/10 px-2 py-0.5 rounded">固定分流至 🇯🇵 日本解锁专线</span>
+            </div>
+            
+            <div class="flex items-center justify-between bg-white/5 border border-white/10 rounded p-3">
+              <span class="text-xs text-slate-300">Bilibili / 淘宝</span>
+              <span class="text-xs text-slate-400 border border-white/20 bg-black px-2 py-0.5 rounded">DIRECT 本地网络直连</span>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Scenarios & Client Mapping -->
+  <section class="py-20 bg-brand-navy border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h3 class="text-2xl font-bold mb-8">准备好配置您的设备了吗？</h3>
+      <p class="text-slate-400 mb-8 max-w-xl mx-auto">
+        不管技术多复杂，在用户端只需要下载客户端并扫码/导入订阅链接，剩下的都由系统自动完成。
+      </p>
+      
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="/help" class="px-8 py-3 bg-brand-accent text-brand-dark font-bold uppercase rounded-sm hover:bg-yellow-400 transition-colors">
+          查看设备配置向导
+        </a>
+        <a href="/use-cases" class="px-8 py-3 bg-white/10 text-white font-bold uppercase rounded-sm hover:bg-white/20 transition-colors border border-white/20">
+          探索更多使用场景
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. FAQ -->
+  <section class="py-24 bg-brand-dark border-t border-white/5">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-brand-accent font-mono tracking-[0.2em] text-sm mb-2 uppercase">Knowledge Base</h2>
+        <h2 class="text-3xl font-bold">塔台解惑 (FAQ)</h2>
+      </div>
+
+      <div class="space-y-4">
+        {faqs.map((faq) => (
+          <details class="group bg-brand-navy border border-white/10 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between p-6 cursor-pointer font-bold text-white hover:text-brand-neon transition-colors">
+              <span>{faq.q}</span>
+              <span class="transition group-open:rotate-180 text-brand-neon">
+                <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+              </span>
+            </summary>
+            <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-white/5 pt-4">
+              {faq.a}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+</Layout>
