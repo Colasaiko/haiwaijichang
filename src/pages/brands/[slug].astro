@@ -234,7 +234,7 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
       </div>
 
       <!-- Sidebar -->
-      <div class="space-y-8 sticky top-24">
+      <div class="space-y-8 sticky top-24 self-start h-max max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar pt-4 pb-8">
         <!-- TOC -->
         {headings && headings.length > 0 && (
           <div class="bg-brand-dark border border-white/5 p-6 rounded-xl hidden lg:block">
