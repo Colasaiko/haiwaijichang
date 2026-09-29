@@ -1,0 +1,64 @@
+---
+export interface Props {
+  brand: any;
+}
+const { brand } = Astro.props;
+
+// Determine facts
+const facts = [];
+if (brand.lineType && brand.lineType.length > 0) facts.push({ label: '线路类型', value: brand.lineType.join(', ') });
+if (brand.speedLimit) facts.push({ label: '峰值带宽', value: brand.speedLimit });
+if (brand.deviceLimit) facts.push({ label: '设备限制', value: brand.deviceLimit });
+if (brand.ipType) facts.push({ label: 'IP属性', value: brand.ipType });
+if (brand.pricing && brand.pricing.length > 0) {
+  const traffics = brand.pricing.map(p => p.traffic).filter(Boolean);
+  if (traffics.length > 0) facts.push({ label: '流量范围', value: `${traffics[0]} - ${traffics[traffics.length - 1]}` });
+  
+  const prices = brand.pricing.map(p => p.originalPrice).filter(Boolean);
+  if (prices.length > 0) facts.push({ label: '价格区间', value: `${prices[0]} - ${prices[prices.length - 1]}` });
+}
+
+// Get only yearly plans for chart
+const yearlyPlans = brand.pricing?.filter(p => p.period === '年付') || [];
+---
+{facts.length > 0 && (
+  <div class="mb-12">
+    <h2 class="text-2xl font-bold text-white mb-6 pb-4 border-b border-white/10 flex items-center">
+      <span class="w-1.5 h-6 bg-brand-neon mr-3 rounded-sm"></span>
+      {brand.name} 快速数据
+    </h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {facts.map(fact => (
+        <div class="bg-brand-dark/50 border border-white/10 p-4 rounded-lg flex flex-col items-center justify-center text-center hover:border-brand-neon/50 transition-colors">
+          <span class="text-xs text-slate-400 uppercase tracking-widest mb-1">{fact.label}</span>
+          <span class="text-brand-neon font-bold font-mono">{fact.value}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+{yearlyPlans.length > 0 && (
+  <div class="mb-12">
+    <h3 class="text-xl font-bold text-white mb-6">年付价格对比</h3>
+    <div class="space-y-4">
+      {yearlyPlans.map(plan => {
+        // Extract numbers for visual bar width
+        const priceNum = parseFloat(plan.originalPrice?.replace(/[^0-9.]/g, '') || '0');
+        const maxPrice = Math.max(...yearlyPlans.map(p => parseFloat(p.originalPrice?.replace(/[^0-9.]/g, '') || '0')));
+        const width = maxPrice > 0 ? (priceNum / maxPrice) * 100 : 0;
+        
+        return (
+          <div class="flex items-center space-x-4">
+            <div class="w-24 shrink-0 text-sm font-bold text-slate-300">{plan.name}</div>
+            <div class="flex-grow flex items-center h-8 bg-brand-dark/30 rounded-r overflow-hidden border-l-2 border-brand-accent">
+              <div class="h-full bg-brand-accent/20 flex items-center pl-3" style={`width: ${width}%`}>
+                <span class="text-xs font-mono font-bold text-brand-accent whitespace-nowrap">{plan.originalPrice}</span>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}

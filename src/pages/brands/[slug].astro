@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
+import BrandDataDashboard from '../../components/BrandDataDashboard.astro';
 
 export async function getStaticPaths() {
   const brandEntries = await getCollection('brands');
@@ -142,6 +143,8 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
       
       <!-- Main Content -->
       <div class="md:col-span-2 space-y-12">
+        <BrandDataDashboard brand={brand} />
+
         <div>
           <h2 class="text-2xl font-bold text-white mb-6 pb-4 border-b border-white/10 flex items-center">
             <span class="w-1.5 h-6 bg-brand-neon mr-3 rounded-sm"></span>
