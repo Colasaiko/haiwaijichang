@@ -178,7 +178,7 @@ import BrandCard from '../components/BrandCard.astro';
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="featured-grid">
-        {brands.filter(b => ["微风网络", "飞猫云", "萤火虫 (FireFly)", "无忧链接", "跨界云", "灵猫", "闪跃"].includes(b.name)).map(b => (
+        {brands.filter(b => ["微风网络", "飞猫云", "萤火虫 (FireFly)", "无忧链接", "跨界云", "灵猫", "闪跃", "九云", "宝云", "神行加速"].includes(b.name)).map(b => (
           <BrandCard brand={b} featured={true} />
         ))}
       </div>
@@ -194,7 +194,7 @@ import BrandCard from '../components/BrandCard.astro';
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="more-grid">
-        {brands.filter(b => !["微风网络", "飞猫云", "萤火虫 (FireFly)", "无忧链接", "跨界云", "灵猫", "闪跃"].includes(b.name)).map(b => (
+        {brands.filter(b => !["微风网络", "飞猫云", "萤火虫 (FireFly)", "无忧链接", "跨界云", "灵猫", "闪跃", "九云", "宝云", "神行加速"].includes(b.name)).map(b => (
           <BrandCard brand={b} featured={false} />
         ))}
       </div>
