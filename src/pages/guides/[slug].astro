@@ -1,0 +1,28 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const guideEntries = await getCollection('guides');
+  return guideEntries.map(entry => ({
+    params: { slug: entry.slug || entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+<Layout title={entry.data.title} description={entry.data.description} keywords={entry.data.keywords}>
+  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5 relative overflow-hidden">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <h1 class="text-3xl md:text-5xl font-bold tracking-tight mb-6 text-white">{entry.data.title}</h1>
+      <p class="text-lg text-slate-400">{entry.data.description}</p>
+    </div>
+  </section>
+  <section class="py-16 bg-brand-dark">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-invert prose-brand max-w-none brand-content-rendered">
+      <Content />
+    </div>
+  </section>
+</Layout>

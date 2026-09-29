@@ -1,177 +1,97 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getEntry, getCollection } from 'astro:content';
 
-const guideCategories = [
-  {
-    id: "getting-started",
-    name: "新手入门",
-    desc: "从零开始，快速理解跨境网络的基础概念与术语。",
-    icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
-    articles: ["VPN 是什么", "机场是什么", "订阅链接是什么", "第一次使用代理工具要知道什么", "节点、线路、协议分别是什么意思"]
-  },
-  {
-    id: "client-guides",
-    name: "客户端教程",
-    desc: "各主流操作系统的软件下载、导入配置与使用向导。",
-    icon: "M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z",
-    articles: ["Windows 使用教程", "macOS 使用教程", "Android 使用教程", "iOS 使用教程", "Linux 使用教程", "路由器使用教程"]
-  },
-  {
-    id: "clash",
-    name: "Clash 系列",
-    desc: "彻底玩转最受欢迎的代理核心及其分流规则。",
-    icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z",
-    articles: ["Clash 是什么", "Clash 配置怎么导入", "Rule / Global / Direct 有什么区别", "TUN 模式是什么", "系统代理是什么", "如何更新订阅"]
-  },
-  {
-    id: "network",
-    name: "网络知识底层",
-    desc: "看懂底层原理，不再盲目追求测速截图。",
-    icon: "M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9",
-    articles: ["延迟是什么意思", "丢包是什么", "带宽怎么看", "为什么测速快但网页慢", "IPLC / IEPL 是什么", "公网、中转、专线有什么区别", "VLESS、Trojan、Shadowsocks 区别"]
-  },
-  {
-    id: "use-cases",
-    name: "使用场景指南",
-    desc: "针对不同网络用途，选择最适合的线路和配置策略。",
-    icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10",
-    articles: ["AI 工具怎么选择线路", "看视频应该关注什么", "GitHub / npm / Docker 网络问题", "远程办公网络怎么选", "游戏为什么需要低延迟和低抖动"]
-  },
-  {
-    id: "troubleshooting",
-    name: "排错型长教程",
-    desc: "深入排查疑难杂症，图文并茂的终极修复指南。",
-    icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
-    articles: ["节点 Timeout 怎么排查", "订阅更新失败怎么办", "已连接但打不开网页", "DNS 问题怎么判断", "客户端无法启动怎么办"]
-  }
-];
+const page = await getEntry('pages', 'guides');
+const { title, description, keywords, h1, heroSubtitle, searchPlaceholder, bottomCta, categories } = page.data;
+const allGuides = await getCollection('guides');
 ---
 
 <Layout 
-  title="出境指南与知识库 (Guides) - 科学上网工具与客户端配置教程 | 海外机场"
-  description="系统的出境指南与科学上网知识库。包含新手梯子推荐、各大平台客户端教程 (Clash、小火箭)、底层网络知识科普以及详尽的排错长文。"
-  keywords="好用的梯子推荐, 手机梯子推荐, 电脑梯子推荐, 梯子软件推荐, 科学上网软件推荐, Clash 机场推荐, 小火箭机场推荐"
+  title={title}
+  description={description}
+  keywords={keywords}
 >
-  <!-- 1. Hero & Search -->
   <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5 relative overflow-hidden">
-    <!-- Subtle Background Graphic -->
     <div class="absolute inset-0 z-0 flex items-center justify-center opacity-10 pointer-events-none">
-      <svg class="w-full max-w-5xl" viewBox="0 0 1000 400" fill="none" stroke="currentColor">
-        <path d="M 100 200 Q 250 50 500 200 T 900 200" stroke-width="2" stroke-dasharray="6 4" class="text-brand-neon" />
-        <circle cx="500" cy="200" r="4" fill="var(--color-brand-neon)" class="animate-pulse-slow" />
-      </svg>
+      <div class="w-[800px] h-[800px] border-[40px] border-brand-neon rounded-full blur-[120px]"></div>
     </div>
     
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-      <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8">
-        <svg class="w-4 h-4 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-        <span class="text-xs font-mono tracking-[0.2em] text-slate-300 uppercase">Travel Guide / 出境指南</span>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center max-w-3xl mx-auto mb-10">
+        <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-6 text-white uppercase">
+          {h1}
+        </h1>
+        <p class="text-lg text-slate-400">
+          {heroSubtitle}
+        </p>
       </div>
-      
-      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 text-white">
-        海外指南 <br class="hidden sm:block md:hidden"/>
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-neon to-brand-accent">GUIDES & KNOWLEDGE</span>
-      </h1>
-      
-      <p class="text-lg text-slate-400 mb-10 max-w-2xl mx-auto">
-        从第一次连接，到理解线路与协议。系统性掌握跨境网络知识。
-      </p>
 
-      <!-- Search Bar -->
-      <div class="relative max-w-2xl mx-auto mb-10">
+      <!-- Search -->
+      <div class="max-w-2xl mx-auto relative group">
         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <svg class="h-5 w-5 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
         </div>
         <input 
           type="text" 
-          class="block w-full pl-12 pr-4 py-4 bg-black/50 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-neon focus:border-transparent transition-all shadow-xl"
-          placeholder="搜索知识库：如 Clash 配置、IPLC、Timeout 修复..." 
+          placeholder={searchPlaceholder}
+          class="block w-full pl-12 pr-4 py-4 bg-brand-dark/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-all shadow-[0_0_15px_rgba(56,189,248,0.1)] group-hover:shadow-[0_0_20px_rgba(56,189,248,0.2)]"
         />
-      </div>
-
-      <!-- Category Filter Tags -->
-      <div class="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
-        <a href="#all" class="px-4 py-2 bg-brand-neon text-brand-dark font-bold rounded-full text-sm transition-colors">全部指南</a>
-        {guideCategories.map(cat => (
-          <a href={`#${cat.id}`} class="px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-full text-sm text-slate-300 hover:text-white transition-colors">
-            {cat.name}
-          </a>
-        ))}
+        <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
+          <kbd class="hidden sm:inline-flex items-center px-2 py-0.5 border border-white/10 rounded text-xs font-mono text-slate-500">⌘K</kbd>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 2. Content Matrix -->
-  <section class="py-16 bg-brand-dark relative z-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
-      
-      {guideCategories.map(category => (
-        <div id={category.id} class="scroll-mt-24">
-          <!-- Section Header -->
-          <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center text-brand-neon">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={category.icon} /></svg>
+  <!-- Content -->
+  <section class="py-16 bg-brand-dark min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      {categories.map((category) => {
+        const categoryGuides = allGuides.filter(g => g.data.category === category.id || (!g.data.category && category.id === 'clash')); // Just map clash-what-is to clash for now if missing
+        if(categoryGuides.length === 0) return null; // DO NOT RENDER EMPTY CATEGORIES
+        return (
+        <div>
+          <div class="flex items-end justify-between mb-8 pb-4 border-b border-white/5">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-lg bg-brand-navy border border-brand-neon/20 flex items-center justify-center mr-4">
+                <svg class="w-5 h-5 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={category.icon} /></svg>
               </div>
               <div>
                 <h2 class="text-2xl font-bold text-white">{category.name}</h2>
                 <p class="text-sm text-slate-400 mt-1">{category.desc}</p>
               </div>
             </div>
-            <a href={`/guides/${category.id}`} class="hidden sm:flex items-center text-sm font-bold text-brand-neon hover:text-white transition-colors">
-              查看全部 <span class="ml-1">&rarr;</span>
-            </a>
-          </div>
-
-          <!-- Articles Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {category.articles.map(article => (
-              <div class="opacity-75 cursor-not-allowed group bg-brand-navy border border-white/10 rounded-xl p-6 hover:border-brand-neon/50 hover:bg-white/5 transition-all flex flex-col h-full relative overflow-hidden" title="内容建设中，敬请期待">
-                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <svg class="w-12 h-12 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                </div>
-                
-                <h3 class="text-lg font-bold text-slate-200 group-hover:text-white mb-4 pr-8 line-clamp-2">{article}</h3>
-                
-                <div class="mt-auto pt-4 flex items-center justify-between text-xs text-slate-500 font-mono border-t border-white/5">
-                  <span class="flex items-center">
-                    <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    {Math.floor(Math.random() * 5) + 3} min read
-                  </span>
-                  <span class="text-brand-neon group-hover:translate-x-1 transition-transform">
-                    &rarr;
-                  </span>
-                </div>
-              </div>
-            ))}
           </div>
           
-          <!-- Mobile "View All" -->
-          <div class="mt-6 sm:hidden text-center">
-            <a href={`/guides/${category.id}`} class="inline-flex items-center text-sm font-bold text-brand-neon hover:text-white transition-colors">
-              查看 {category.name} 下的全部文章 &rarr;
-            </a>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {categoryGuides.map((guide) => (
+              <a href={"/guides/" + guide.slug} class="group bg-brand-navy border border-white/5 rounded-xl p-6 hover:border-brand-neon/30 transition-all hover:-translate-y-1 block">
+                <h3 class="text-base font-bold text-slate-300 group-hover:text-brand-neon transition-colors mb-2 line-clamp-2">{guide.data.title}</h3>
+                <p class="text-sm text-slate-500 line-clamp-2">{guide.data.description}</p>
+                <div class="mt-4 flex items-center text-xs font-mono text-brand-neon/70 group-hover:text-brand-neon">
+                  <span>阅读教程</span>
+                  <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </div>
+              </a>
+            ))}
           </div>
         </div>
-      ))}
-      
+      )})}
     </div>
   </section>
 
-  <!-- 3. Bottom CTA -->
-  <section class="py-24 bg-brand-navy border-t border-white/5">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h2 class="text-3xl font-bold mb-6">没找到您想了解的内容？</h2>
-      <p class="text-slate-400 mb-10 max-w-2xl mx-auto">
-        如果您遇到了具体的技术问题，可以前往我们的服务台进行排障。如果有特定的使用教程需求，请向我们提交反馈。
-      </p>
-      <div class="flex flex-col sm:flex-row justify-center gap-4">
-        <a href="/help" class="inline-flex items-center justify-center px-8 py-3.5 bg-white/10 text-white font-bold rounded-sm hover:bg-white/20 transition-colors border border-white/20 uppercase tracking-widest">
-          <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          进入机场服务台
-        </a>
-      </div>
+  <!-- CTA -->
+  <section class="py-16 bg-brand-navy relative overflow-hidden border-t border-white/5">
+    <div class="absolute inset-0 bg-[url('/noise.png')] opacity-5 mix-blend-overlay"></div>
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      <h2 class="text-2xl font-bold text-white mb-4">{bottomCta.title}</h2>
+      <p class="text-slate-400 mb-8">{bottomCta.desc}</p>
+      <a href={bottomCta.buttonLink} class="inline-flex items-center px-8 py-3 bg-brand-neon/10 text-brand-neon border border-brand-neon/30 rounded-full font-bold hover:bg-brand-neon hover:text-brand-dark transition-all shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+        {bottomCta.buttonText}
+      </a>
     </div>
   </section>
-
 </Layout>

@@ -33,23 +33,19 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
 <Layout title={title} description={description} keywords={`${brand.name}, ${brand.name}怎么样, ${brand.name}机场, ${brand.name}优惠码, ${brand.name}专线, ${brand.name}教程`}>
   
   <!-- Schema.org for Brand/Service -->
+  
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Product",
     "name": brand.name,
-    "description": description,
-    "category": "Network Service",
-    "offers": {
+    "description": brand.description || brand.heroDescription || `查看 ${brand.name} 详情`,
+    "offers": brand.schemaPrice ? {
       "@type": "Offer",
-      "priceCurrency": "CNY",
-      "price": "10.00",
-      "availability": "https://schema.org/InStock"
-    },
-    "brand": {
-      "@type": "Brand",
-      "name": brand.name
-    }
+      "price": brand.schemaPrice.value,
+      "priceCurrency": brand.schemaPrice.currency
+    } : undefined
   })} />
+
 
   <!-- Breadcrumb -->
   <script type="application/ld+json" set:html={JSON.stringify({
@@ -98,7 +94,7 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
               购买入口待补充
             </span>
           )}
-          {brand.discount && brand.discount !== '(暂无优惠）' && (
+          {brand.coupon || (brand.discount && brand.discount !== '(暂无优惠）') && (
             <div class="mt-4 text-center">
               <span class="text-xs text-slate-400">专属优惠码:</span>
               <div class="mt-1 font-mono font-bold text-brand-accent bg-white/5 border border-white/10 px-3 py-1.5 rounded inline-block">
@@ -139,73 +135,25 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
           </h2>
           <div class="prose prose-invert prose-brand max-w-none brand-content-rendered"><Content /></div>
           
-          <h3>已知服务特性</h3>
-          <p>
-            基于当前数据采集，我们了解到 {brand.name} 具备以下特征：
-          </p>
-          <ul>
-            {hasIPLC ? <li><strong>线路类型：</strong> 资料显示支持 IPLC 或其他专线网络，理论上在晚高峰时能提供较低的物理延迟。</li> : <li><strong>线路类型：</strong> 暂无明确的专线网络标记，通常可能是直连或中转线路，建议结合个人网络测试。</li>}
-            {brand.protocols && <li><strong>支持协议：</strong> {brand.protocols}</li>}
-            {brand.nodes && <li><strong>节点覆盖：</strong> {brand.nodes}</li>}
-            {brand.established && <li><strong>品牌背景：</strong> {brand.established}</li>}
-            {brand.payment && <li><strong>付款方式：</strong> {brand.payment}</li>}
-            {brand.telegram && <li><strong>官方频道：</strong> <a href={brand.telegram} target="_blank" class="text-brand-neon hover:underline break-all">{brand.telegram}</a></li>}
-            {hasNetflix ? <li><strong>流媒体解锁：</strong> 具备流媒体解锁能力，可以满足 Netflix、Disney+ 等海外视频平台的需求。</li> : <li><strong>流媒体解锁：</strong> 暂未收录针对原生 IP 库的详细流媒体解锁测试资料。</li>}
-            {hasAI ? <li><strong>AI 支持：</strong> 明确标记了对 ChatGPT、Claude 等 AI 工具的 IP 纯净度支持。</li> : <li><strong>AI 支持：</strong> 未明确说明，可能在访问特定严格风控的 AI 工具时遇到 Access Denied。</li>}
-            <li><strong>套餐价格：</strong> {brand.pricing && brand.pricing.length > 0 ? (
-  <div class="mt-6 mb-4 overflow-x-auto w-full border border-white/10 rounded-lg">
-    <table class="min-w-full text-sm text-left text-slate-300 border-collapse">
-      <thead class="text-xs uppercase bg-white/5 text-slate-400 border-b border-white/10">
-        <tr>
-          <th class="px-5 py-4 font-bold tracking-wider">套餐名称</th>
-          <th class="px-5 py-4 font-bold tracking-wider">包含流量</th>
-          <th class="px-5 py-4 font-bold tracking-wider">参考价格</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-white/5 bg-brand-dark/30">
-        {brand.pricing.map((p) => (
-          <tr class="hover:bg-white/5 transition-colors">
-            <td class="px-5 py-4 font-bold text-white align-middle">{p.name || '未知'}</td>
-            <td class="px-5 py-4 align-middle">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-neon/10 text-brand-neon border border-brand-neon/20">
-                {p.traffic || '-'}
-              </span>
-            </td>
-            <td class="px-5 py-3 align-middle">
-              <div class="flex flex-wrap gap-2">
-                {p.price ? p.price.split('|').map((pricePart: string) => (
-                  <span class="inline-block bg-white/10 border border-white/20 rounded px-3 py-1.5 text-xs text-brand-neon font-mono shadow-sm">
-                    {pricePart.trim()}
-                  </span>
-                )) : '-'}
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-) : "暂无可靠的套餐价格资料，以官网实时标注为准。"}</li>
-            <li><strong>客户端兼容：</strong> 支持主流系统环境下的 Clash、v2rayN、Shadowrocket 等代理协议。</li>
-          </ul>
-
           <h3>使用建议与支持</h3>
           <p>
             如果你是新手，建议先参考我们的 <a href="/blog/what-is-airport-subscription" class="text-brand-neon hover:underline">机场订阅是什么？新手指南</a>。购买 {brand.name} 的服务后，将获取到的订阅链接导入本地客户端即可开始使用。如遇连接异常，请优先参考我们的<a href="/help">帮助中心故障排查</a>。
           </p>
-          <div class="mt-8 pt-8 border-t border-white/10">
-            <h3 class="text-xl font-bold text-white mb-4">准备好体验 {brand.name} 了吗？</h3>
-            {(brand.purchase?.url || brand.aff) ? (
-              <a href={brand.purchase?.url || brand.aff} data-departure-link class="inline-flex items-center justify-center px-8 py-3 bg-brand-neon text-brand-dark font-bold rounded-sm hover:bg-white transition-all tracking-widest shadow-[0_0_15px_rgba(56,189,248,0.2)]">
-                前往购买
-              </a>
-            ) : (
-              <span class="inline-flex items-center justify-center px-8 py-3 bg-white/10 text-slate-400 font-bold rounded-sm cursor-not-allowed tracking-widest">
-                购买入口待补充
-              </span>
-            )}
-          </div>
-        </div>
+          
+  </div>
+  <div class="mt-8 pt-8 border-t border-white/10">
+    <h3 class="text-xl font-bold text-white mb-4">准备好体验 {brand.name} 了吗？</h3>
+    {(brand.purchase?.url || brand.aff) ? (
+      <a href={brand.purchase?.url || brand.aff} data-departure-link={brand.purchase?.cloaked !== false ? 'true' : undefined} class="inline-flex items-center justify-center px-8 py-3 bg-brand-neon text-brand-dark font-bold rounded-sm hover:bg-white transition-all tracking-widest shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+        {brand.purchase?.label || '前往购买'}
+      </a>
+    ) : (
+      <span class="inline-flex items-center justify-center px-8 py-3 bg-white/10 text-slate-400 font-bold rounded-sm cursor-not-allowed tracking-widest">
+        购买入口待补充
+      </span>
+    )}
+  </div>
+
       </div>
 
       <!-- Sidebar -->
