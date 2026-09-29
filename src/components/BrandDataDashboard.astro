@@ -6,11 +6,12 @@ import AnnualPriceChart from './charts/AnnualPriceChart.astro';
 import CouponComparison from './charts/CouponComparison.astro';
 import NodeStatusChart from './charts/NodeStatusChart.astro';
 import GlobalRouteCoverage from './charts/GlobalRouteCoverage.astro';
+import UnlimitedTrafficChart from './charts/UnlimitedTrafficChart.astro';
 
 const { brand } = Astro.props;
 
-if (!brand || brand.slug !== 'feimao') {
-  return null; // Only feimao has this data for now based on instructions
+if (!brand || (brand.slug !== 'feimao' && brand.slug !== 'weifeng')) {
+  return null;
 }
 ---
 
@@ -20,6 +21,7 @@ if (!brand || brand.slug !== 'feimao') {
   <PlanTrafficChart brand={brand} />
   <AnnualPriceChart brand={brand} />
   <CouponComparison brand={brand} />
+  <UnlimitedTrafficChart brand={brand} />
   <NodeStatusChart brand={brand} />
   <GlobalRouteCoverage brand={brand} />
 </div>
