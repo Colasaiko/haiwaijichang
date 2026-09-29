@@ -1,21 +1,19 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import fs from 'node:fs';
-import path from 'node:path';
+import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
-  const brandsPath = path.resolve(process.cwd(), 'src/data/brands.json');
-  const brands = JSON.parse(fs.readFileSync(brandsPath, 'utf8'));
-  
-  return brands.map((brand) => {
-    return {
-      params: { slug: brand.slug },
-      props: { brand, allBrands: brands }
-    };
-  });
+  const brandEntries = await getCollection('brands');
+  return brandEntries.map(entry => ({
+    params: { slug: entry.data.slug || entry.id },
+    props: { entry, allEntries: brandEntries },
+  }));
 }
 
-const { brand, allBrands } = Astro.props;
+const { entry, allEntries } = Astro.props;
+const brand = entry.data;
+const allBrands = allEntries.map(e => ({ id: e.id, ...e.data }));
+const { Content } = await render(entry);
 
 // Determine tags/features
 const hasIPLC = brand.features.some(f => f.toLowerCase().includes('iplc') || f.includes('专线'));
@@ -90,8 +88,8 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
         </div>
         
         <div class="shrink-0">
-          {brand.aff ? (
-            <a href={brand.aff} data-departure-link class="inline-flex items-center justify-center px-8 py-4 bg-brand-neon text-brand-dark font-bold text-lg rounded-sm hover:bg-white transition-all uppercase tracking-widest shadow-[0_0_20px_rgba(56,189,248,0.3)] w-full md:w-auto">
+          {(brand.purchase?.url || brand.aff) ? (
+            <a href={brand.purchase?.url || brand.aff} data-departure-link class="inline-flex items-center justify-center px-8 py-4 bg-brand-neon text-brand-dark font-bold text-lg rounded-sm hover:bg-white transition-all uppercase tracking-widest shadow-[0_0_20px_rgba(56,189,248,0.3)] w-full md:w-auto">
               快速购买
             </a>
           ) : (
@@ -138,13 +136,7 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
             <span class="w-1.5 h-6 bg-brand-neon mr-3 rounded-sm"></span>
             关于 {brand.name} 的线路与服务信息
           </h2>
-          {brand.intro ? (
-            <div class="space-y-4" set:html={brand.intro} />
-          ) : (
-            <p>
-              根据当前收录的官方品牌资料，<strong>{brand.name}</strong> 提供了适合不同需求用户的网络加速方案。请注意，目前站内对该品牌的独立测试数据仍在完善中，实际体验可能受限于您所在地区的网络环境和运营商（如电信、联通、移动）的路由差异。
-            </p>
-          )}
+          <div class="prose prose-invert prose-brand max-w-none brand-content-rendered"><Content /></div>
           
           <h3>已知服务特性</h3>
           <p>
@@ -202,8 +194,8 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
           </p>
           <div class="mt-8 pt-8 border-t border-white/10">
             <h3 class="text-xl font-bold text-white mb-4">准备好体验 {brand.name} 了吗？</h3>
-            {brand.aff ? (
-              <a href={brand.aff} data-departure-link class="inline-flex items-center justify-center px-8 py-3 bg-brand-neon text-brand-dark font-bold rounded-sm hover:bg-white transition-all tracking-widest shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+            {(brand.purchase?.url || brand.aff) ? (
+              <a href={brand.purchase?.url || brand.aff} data-departure-link class="inline-flex items-center justify-center px-8 py-3 bg-brand-neon text-brand-dark font-bold rounded-sm hover:bg-white transition-all tracking-widest shadow-[0_0_15px_rgba(56,189,248,0.2)]">
                 前往购买
               </a>
             ) : (

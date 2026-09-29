@@ -1,16 +1,19 @@
 ---
+import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
-import fs from 'node:fs';
-import path from 'node:path';
 
-// Read brands data
-const brandsPath = path.resolve(process.cwd(), 'src/data/brands.json');
-const brands = JSON.parse(fs.readFileSync(brandsPath, 'utf8'));
+
+
+
+
+
 
 const title = "全球机场与 VPN 品牌大全 | 2026 稳定网络服务评测与推荐";
 const description = "探索最新、最全的海外机场和梯子品牌数据库。根据专线、流媒体解锁、AI 支持等场景，帮您筛选出最合适的科学上网工具。";
 const currentUrl = Astro.url.href;
 const siteUrl = Astro.site?.toString() || Astro.url.origin;
+const brandEntries = await getCollection('brands');
+const brands = brandEntries.map(e => ({ id: e.id, ...e.data }));
 ---
 
 <Layout title={title} description={description}>

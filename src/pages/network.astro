@@ -1,7 +1,10 @@
 ---
+import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import brands from '../data/brands.json';
 
+
+const brandEntries = await getCollection('brands');
+const brands = brandEntries.map(e => ({ id: e.id, ...e.data }));
 // Get top 5 brands for the featured cards
 const featuredBrands = brands.slice(0, 5);
 ---

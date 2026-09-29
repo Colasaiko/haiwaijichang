@@ -3,8 +3,9 @@ import Layout from '../layouts/Layout.astro';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const brandsPath = path.resolve(process.cwd(), 'src/data/brands.json');
-const brands = JSON.parse(fs.readFileSync(brandsPath, 'utf8'));
+import { getCollection } from 'astro:content';
+const brandEntries = await getCollection('brands');
+const brands = brandEntries.map(e => ({ id: e.id, ...e.data }));
 
 // Filter brands relevant to this topic
 const matchedBrands = '' 

@@ -1,9 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import brands from '../data/brands.json';
-const blogs = (await getCollection('blog')).slice(0, 3);
+
 import { getCollection } from 'astro:content';
 import BrandCard from '../components/BrandCard.astro';
+const brandEntries = await getCollection('brands');
+const brands = brandEntries.map(e => ({ id: e.id, ...e.data }));
+const blogs = (await getCollection('blog')).slice(0, 3);
 ---
 
 <Layout 
