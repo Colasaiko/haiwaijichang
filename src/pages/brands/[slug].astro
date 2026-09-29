@@ -16,6 +16,19 @@ const brand = entry.data;
 const allBrands = allEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (a.order || 999) - (b.order || 999));
 const { Content, headings } = await render(entry);
 
+const tocTree = [];
+let currentH2 = null;
+headings.filter(h => h.depth <= 3).forEach(h => {
+  if (h.depth === 2 || h.depth === 1) {
+    currentH2 = { ...h, children: [] };
+    tocTree.push(currentH2);
+  } else if (h.depth === 3 && currentH2) {
+    currentH2.children.push(h);
+  } else {
+    tocTree.push({ ...h, children: [] });
+  }
+});
+
 // Determine tags/features
 const hasIPLC = brand.features.some(f => f.toLowerCase().includes('iplc') || f.includes('专线'));
 const hasNetflix = brand.features.some(f => f.toLowerCase().includes('netflix') || f.includes('流媒体'));
