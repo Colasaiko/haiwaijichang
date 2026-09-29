@@ -1,66 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const faqCategories = [
-  {
-    id: "basics",
-    name: "基础概念与术语",
-    faqs: [
-      { q: "机场是什么？和 VPN 有什么区别？", a: "海外机场是一个提供全球网络加速与安全连接的服务平台。传统的 VPN 通常使用单一的加密协议，而“机场”通常指支持多种现代代理协议（如 Shadowsocks、Vmess、Trojan 等）的服务端集合，能够通过智能分流提供更稳定、更快速的体验。" },
-      { q: "科学上网工具/魔法上网工具是什么意思？", a: "科学上网或魔法上网是国内网友对于突破网络封锁、访问国际互联网（如 Google、YouTube）的通俗说法。梯子、机场、代理工具通常都是指实现这一目的的软件和网络服务。" },
-      { q: "机场推荐应该看哪些因素？", a: "选择机场时，建议综合考量以下指标：1. 线路质量（是否包含 IPLC/IEPL 专线）；2. 带宽冗余（晚高峰是否卡顿）；3. 运营时间（老牌机场跑路风险低）；4. 流媒体/AI 解锁能力；5. 客服响应速度。" },
-      { q: "机场节点是什么意思？", a: "节点就是海外机场部署在世界各地的代理服务器。您连接到某个节点（如日本节点），您的网络流量就会从该节点发出，目标网站会认为您的访问来自日本。" },
-      { q: "机场能长期使用吗？", a: "如果您选择的是信誉良好的老牌高性价比服务商，是可以长期使用的。建议初期先购买月付或季付套餐进行测试，确认在您的网络环境下稳定后再考虑年付以获取优惠。" }
-    ]
-  },
-  {
-    id: "clients",
-    name: "客户端与使用设置",
-    faqs: [
-      { q: "机场订阅链接是什么？", a: "订阅链接是一串包含您专属节点配置信息的网址。将它复制并导入到客户端软件（如 Clash、Shadowrocket）中，软件就会自动下载并更新所有节点列表，无需手动一个个添加。" },
-      { q: "Windows 电脑怎么用机场？", a: "Windows 系统下最推荐使用 Clash Verge 或 v2rayN。您只需下载安装客户端，复制您的机场订阅链接并在软件中导入，然后开启系统代理即可科学上网。" },
-      { q: "iPhone 用什么机场客户端？", a: "iOS 推荐使用 Shadowrocket (小火箭)、Quantumult X (圈 X) 或 Surge。这些软件需要使用非中国大陆区的 Apple ID 在 App Store 下载。" },
-      { q: "安卓手机用什么机场客户端？", a: "Android 用户推荐使用 Clash Meta for Android (也叫 Clash.Meta)、v2rayNG 或 sing-box，这些软件开源且免费，支持分应用代理。" },
-      { q: "Clash 导入订阅失败怎么办？", a: "首先检查您复制的订阅链接是否完整，然后确认您的本地网络是否正常。如果依然失败，请尝试在浏览器中打开该订阅链接，如果无法访问，可能是机场域名被墙，请联系客服获取备用订阅地址。" }
-    ]
-  },
-  {
-    id: "tech",
-    name: "线路技术与质量",
-    faqs: [
-      { q: "专线机场是什么意思？和中转机场哪个好？", a: "专线机场（如 IPLC / IEPL）使用的是点对点的跨境物理专线，数据不经过拥堵的公网出口，因此延迟极低且晚高峰极其稳定，但价格较贵。中转机场性价比高，适合日常浏览和看视频，而专线适合打游戏和高要求的远程办公。" },
-      { q: "机场晚高峰卡顿正常吗？白天快晚上慢？", a: "在普通的直连或廉价中转线路上，这是正常的。晚上 8 点到 11 点是国内网民上网高峰期，国际出口带宽拥堵。如果您对晚高峰稳定性要求高，强烈建议购买提供 IPLC 专线或 BGP 多线接入的套餐。" },
-      { q: "机场原生 IP 是什么意思？有什么用？", a: "原生 IP 指的是 IP 地址的注册地与服务器物理所在地一致的 IP。它通常能完美解锁当地的流媒体（如 Netflix、Disney+）、AI 工具（ChatGPT）以及严格风控的游戏外服，不容易被封号。" },
-      { q: "机场节点延迟怎么看？延迟低就一定快吗？", a: "在客户端中测试的 Ping 延迟反映的是数据包往返的时间。延迟低代表网页响应快、游戏不卡，但不代表下载速度快。看视频是否流畅主要取决于线路的带宽和丢包率，一条高带宽但延迟稍高的线路看 4K 视频一样丝滑。" }
-    ]
-  },
-  {
-    id: "scenarios",
-    name: "场景与流媒体解锁",
-    faqs: [
-      { q: "机场能用 ChatGPT 吗？ChatGPT 机场怎么选？", a: "能。但由于 OpenAI 封锁了大量代理 IP，您需要选择提供“原生 IP”或明确标明“解锁 AI 工具”的机场。通常建议连接美国、日本或台湾的专线节点。" },
-      { q: "机场能解锁 Netflix 和 Disney+ 吗？", a: "可以。大部分优质的流媒体解锁机场都会通过 DNS 劫持或原生 IP 帮您绕过 Netflix 和 Disney+ 的地区版权限制。您可以根据想看的内容选择对应地区的节点（如日区、美区、新马区）。" },
-      { q: "打游戏能用机场吗？", a: "可以，但普通节点不够稳定。游戏对丢包和网络抖动（Jitter）极度敏感，如果您要打外服游戏，必须选择提供 IPLC / IEPL 专线的游戏级节点，并在客户端开启 UDP 转发（TUN 模式）。" },
-      { q: "机场适合外贸和跨境电商用户吗？", a: "适合。外贸用户（尤其是运营 TikTok 矩阵或独立站）需要极度纯净且稳定的 IP 以避免账号被风控。对于此类需求，建议选择提供独立静态住宅 IP 或高信誉原生 IP 的服务商。" }
-    ]
-  },
-  {
-    id: "pricing",
-    name: "价格与套餐建议",
-    faqs: [
-      { q: "便宜机场靠谱吗？一元试用安全吗？", a: "极度低价（如几块钱一个月提供几千G）的机场往往伴随着严重的超售、随时跑路的风险以及晚高峰无法使用的情况。一元试用可以用来测试节点，但建议不要一次性购买长期的极低价套餐。" },
-      { q: "按量计费机场适合哪些人？", a: "按量计费（不限时套餐）非常适合偶尔需要查外文资料、平时不经常翻墙的轻度用户，或者是将其作为备用机场（防失联）的用户。买多少用多少，流量不过期。" },
-      { q: "机场买月付还是年付？", a: "如果您是第一次接触某家机场，强烈建议先买月付！测试其在您当地网络（电信/联通/移动）下晚高峰的表现。如果体验稳定且该机场运营时间较长，再考虑购买年付以享受更高的折扣。" },
-      { q: "机场限制设备数量吗？可以多人共用吗？", a: "绝大多数机场都会限制同时在线的设备数量（通常在 3-5 台左右）。您可以分享给家人共用，但严禁将订阅链接公开分享到网络上，这会导致您的账号被系统判定为滥用并直接封禁。" }
-    ]
-  }
-];
+import { getEntry } from 'astro:content';
+const page = await getEntry('pages', 'faq');
+const { title, description, keywords, h1, h1Highlight, badge, heroText, cta, faqCategories } = page.data;
 ---
 
 <Layout 
-  title="海外机场 FAQ | 2026 最全科学上网与梯子使用常见问题解答"
-  description="收录了有关海外机场、VPN、梯子推荐、Clash使用、节点线路、流媒体解锁以及按量计费等上百个常见问题解答，帮您避坑选对服务。"
-  keywords="机场推荐, 梯子推荐, 科学上网工具, Clash 机场推荐, 便宜机场推荐, IPLC 机场推荐, ChatGPT 机场推荐, 机场是什么, 机场常见问题"
+  title={title}
+  description={description}
+  keywords={keywords}
 >
   <!-- SEO: FAQ Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
@@ -85,16 +34,16 @@ const faqCategories = [
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
       <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8">
         <svg class="w-4 h-4 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        <span class="text-xs font-mono tracking-[0.2em] text-slate-300 uppercase">Knowledge Base / 常见问题</span>
+        <span class="text-xs font-mono tracking-[0.2em] text-slate-300 uppercase">{badge}</span>
       </div>
       
       <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-white">
-        机场与专线网络<br class="hidden sm:block md:hidden"/>
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-neon to-brand-accent">全景解答指南</span>
+        {h1}<br class="hidden sm:block md:hidden"/>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-neon to-brand-accent">{h1Highlight}</span>
       </h1>
       
       <p class="text-lg text-slate-400 max-w-2xl mx-auto">
-        从“机场是什么”到“如何导入 Clash 配置”，再到“IPLC 专线原理解析”，我们整理了数百个用户最关心的问题，助您快速排坑。
+        {heroText}
       </p>
     </div>
   </section>
@@ -145,10 +94,10 @@ const faqCategories = [
   <!-- CTA -->
   <section class="py-24 bg-brand-navy border-t border-white/5 text-center">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 class="text-3xl font-bold mb-6">没找到您的答案？</h2>
-      <p class="text-slate-400 mb-10">如果您遇到的问题没有在这里列出，或者您需要针对性的技术排障，请前往我们的服务台获取更详细的图文教程。</p>
+      <h2 class="text-3xl font-bold mb-6">{cta.title}</h2>
+      <p class="text-slate-400 mb-10">{cta.desc}</p>
       <a href="/help" class="inline-flex items-center justify-center px-8 py-3.5 bg-brand-neon text-brand-dark font-bold rounded-sm hover:bg-brand-neon/90 transition-colors uppercase tracking-widest">
-        前往帮助中心服务台
+        {cta.buttonText}
       </a>
     </div>
   </section>

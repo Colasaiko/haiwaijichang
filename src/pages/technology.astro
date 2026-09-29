@@ -1,21 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getEntry } from 'astro:content';
 
-// We can define some structured data for SEO (FAQ)
-const faqs = [
-  { q: "延迟越低越好吗？", a: "不完全是。延迟低对于打游戏和语音通话非常关键，但如果是看 4K 视频或下载大文件，带宽高且不丢包（稳定性）反而比绝对的低延迟更重要。" },
-  { q: "IPLC 是什么？", a: "IPLC (International Private Leased Circuit) 是一种国际专线。它不经过拥堵的公网出口，而是直接点对点传输，因此延迟极低且极度稳定，是目前最高端的跨境网络方案。" },
-  { q: "Clash 是协议吗？", a: "不是。Clash 是一个网络代理客户端软件（控制台），它本身不负责加密，而是通过内置支持 Shadowsocks、Trojan、Vmess 等各种协议来连接到服务器。这就好比 Clash 是浏览器，而协议是 HTTP 网址。" },
-  { q: "VLESS 和 Trojan 有什么区别？", a: "两者都是现代主流的代理协议。Trojan 的设计初衷是完全伪装成正常的 HTTPS 流量；而 VLESS 是 V2Ray 框架下的轻量级协议，性能更高。在实际使用中，两者的速度和安全性都很优秀。" },
-  { q: "为什么晚上速度会变慢？", a: "晚上 8:00 - 11:00 是互联网的“晚高峰”，所有人都在上网，国际公网出口带宽会被挤占（类似晚高峰堵车）。使用 IPLC 专线或优质中转线路可以完美避开这种拥堵。" },
-  { q: "为什么测速很快，但看视频还是卡？", a: "测速节点通常离您很近，能测出您宽带的极限速度；但视频服务器可能在海外。如果中间经过的跨境路由质量差、丢包严重，哪怕测速很快，实际看视频依然会卡顿。" }
-];
+const page = await getEntry('pages', 'technology');
+const { title, description, keywords, h1, h2, heroText, workflowTitle, workflowSubtitle, workflowSteps, faqs } = page.data;
 ---
 
 <Layout 
-  title="专线机场推荐 - IPLC、IEPL、CN2 线路技术与原理解析 | 海外机场"
-  description="了解海外机场底层的网络路由与连接协议。为您解析 IPLC、IEPL、中转、BGP 与 CN2 专线机场的差异，帮助您找到低延迟、晚高峰稳定的优质原生 IP 节点。"
-  keywords="专线机场推荐, IEPL 机场推荐, IPLC 机场推荐, 中转机场推荐, 直连机场推荐, BGP 机场推荐, CN2 机场推荐, 原生 IP 机场推荐, 低延迟机场推荐, 晚高峰稳定机场"
+  title={title}
+  description={description}
+  keywords={keywords}
 >
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
@@ -41,15 +35,12 @@ const faqs = [
           <span class="text-xs font-mono tracking-[0.2em] text-slate-300 uppercase">Flight Control Center</span>
         </div>
         
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-          不同目的地，<br />
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-neon to-brand-accent">需要不同的航线。</span>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6" set:html={h1}>
         </h1>
         
-        <h2 class="text-xl font-mono text-brand-accent tracking-widest mb-6">ROUTE TECHNOLOGY</h2>
+        <h2 class="text-xl font-mono text-brand-accent tracking-widest mb-6">{h2}</h2>
         
-        <p class="text-lg text-slate-400 mb-8 leading-relaxed">
-          全球连接并不是按下按钮就能瞬间“瞬移”。这是一段复杂的数据旅程。<br/>在这里，我们为您揭开网络底层的面纱，将晦涩的“协议、路由、专线”用最简单的方式解释清楚。
+        <p class="text-lg text-slate-400 mb-8 leading-relaxed" set:html={heroText}>
         </p>
       </div>
 
@@ -98,21 +89,15 @@ const faqs = [
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-16">
         <h2 class="text-sm font-mono tracking-widest text-brand-neon uppercase mb-2">Connection Workflow</h2>
-        <h3 class="text-3xl font-bold">一条连接是如何工作的？</h3>
-        <p class="text-slate-400 mt-4">数据包的跨国旅行就像一次航班，必须经过层层安检和中转。</p>
+        <h3 class="text-3xl font-bold">{workflowTitle}</h3>
+        <p class="text-slate-400 mt-4">{workflowSubtitle}</p>
       </div>
 
       <div class="flex flex-col md:flex-row justify-between items-center relative">
         <!-- Connecting Line -->
         <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-white/10 -z-10"></div>
         
-        {[
-          { step: "1. 设备起飞", icon: "M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z", title: "你的设备", desc: "客户端接管请求" },
-          { step: "2. 本地安检", icon: "M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9", title: "ISP 运营商", desc: "接入本地网络入口" },
-          { step: "3. 航线加密", icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z", title: "加密协议", desc: "数据封装混淆" },
-          { step: "4. 国际航线", icon: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z", title: "中转与专线", desc: "跨境骨干网传输" },
-          { step: "5. 落地到达", icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4", title: "海外服务", desc: "目标服务器响应" }
-        ].map((item, index) => (
+        {workflowSteps.map((item, index) => (
           <div class="flex flex-col items-center bg-brand-navy border border-white/5 p-6 rounded-lg shadow-lg relative w-full md:w-48 mb-8 md:mb-0 z-10 group hover:border-brand-neon transition-colors">
             <div class="text-[10px] font-mono text-brand-neon mb-4 uppercase tracking-widest">{item.step}</div>
             <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-4 group-hover:text-brand-accent transition-colors">

@@ -1,55 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getEntry } from 'astro:content';
 
-// Data Mockup
-const coreServices = [
-  { id: "OA-WEB", name: "Website / 官网", status: "OPERATIONAL", color: "text-green-400", bg: "bg-green-500/10" },
-  { id: "OA-SUB", name: "Subscription / 订阅分发", status: "OPERATIONAL", color: "text-green-400", bg: "bg-green-500/10" },
-  { id: "OA-API", name: "API / 后端接口", status: "OPERATIONAL", color: "text-green-400", bg: "bg-green-500/10" },
-  { id: "OA-AUTH", name: "Authentication / 登录系统", status: "OPERATIONAL", color: "text-green-400", bg: "bg-green-500/10" },
-  { id: "OA-PAY", name: "Payment / 支付网关", status: "OPERATIONAL", color: "text-green-400", bg: "bg-green-500/10" },
-  { id: "OA-SUP", name: "Support / 客服中心", status: "AVAILABLE", color: "text-green-400", bg: "bg-green-500/10" }
-];
-
-const regionalNetworks = [
-  { id: "OA-ASIA", name: "Asia Network / 亚洲网络", status: "OPERATIONAL", color: "text-green-400" },
-  { id: "OA-US", name: "North America / 北美网络", status: "MAINTENANCE", color: "text-brand-accent" },
-  { id: "OA-EUR", name: "Europe Network / 欧洲网络", status: "OPERATIONAL", color: "text-green-400" },
-  { id: "OA-OCE", name: "Oceania Network / 大洋洲", status: "OPERATIONAL", color: "text-green-400" }
-];
-
-const incidents = [
-  {
-    date: "2026-09-25",
-    title: "订阅更新异常 (已解决)",
-    status: "RESOLVED",
-    time: "08:00 - 09:30 UTC+8",
-    desc: "由于 CDN 边缘节点缓存策略异常，部分用户无法更新订阅。已于 09:30 完全修复并刷新缓存。"
-  },
-  {
-    date: "2026-09-20",
-    title: "亚洲骨干网升级维护",
-    status: "COMPLETED",
-    time: "02:00 - 04:00 UTC+8",
-    desc: "进行了亚洲区域核心路由设备的硬件扩容，期间部分香港与日本航班发生短时间(约3分钟)闪断。"
-  },
-  {
-    date: "2026-09-15",
-    title: "官网控制面板访问缓慢",
-    status: "RESOLVED",
-    time: "20:00 - 21:15 UTC+8",
-    desc: "遭受突发性大流量 CC 攻击，已及时接入高级清洗策略，面板恢复正常访问。"
-  }
-];
-
-const scheduled = [
-  {
-    date: "2026-10-01",
-    title: "北美航线 BGP 路由优化",
-    time: "凌晨 03:00 - 05:00 UTC+8",
-    desc: "计划内网割接，将为您提供更低延迟的北美访问体验。期间 OA-US 航班可能会有短暂的不可用状态。"
-  }
-];
+const page = await getEntry('pages', 'status');
+const { title, description, h1, heroText, coreServices, regionalNetworks, incidents, scheduled, footerNote } = page.data;
 
 // Generate 90 days uptime array (1 = green, 0 = yellow)
 const uptimeDays = Array.from({ length: 90 }, (_, i) => {
@@ -59,8 +13,8 @@ const uptimeDays = Array.from({ length: 90 }, (_, i) => {
 ---
 
 <Layout 
-  title="服务状态中心 (Status) | 海外机场"
-  description="查看海外机场官网、订阅服务、API 以及各区域航班网络的实时运行状态与维护公告。"
+  title={title}
+  description={description}
 >
   <!-- 1. Hero / Overall Status -->
   <section class="pt-32 pb-12 bg-brand-navy border-b border-white/5 relative overflow-hidden">
@@ -73,7 +27,7 @@ const uptimeDays = Array.from({ length: 90 }, (_, i) => {
       </div>
       
       <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-white uppercase font-mono">
-        FLIGHT OPERATIONS STATUS
+        {h1}
       </h1>
       
       <!-- Big Status Banner -->
@@ -81,7 +35,7 @@ const uptimeDays = Array.from({ length: 90 }, (_, i) => {
         <svg class="w-10 h-10 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         <div class="text-center sm:text-left">
           <h2 class="text-2xl font-bold text-green-400 tracking-wider">ALL SYSTEMS OPERATIONAL</h2>
-          <p class="text-sm text-green-400/70 font-mono mt-1">Last updated: Just now</p>
+          <p class="text-sm text-green-400/70 font-mono mt-1">{heroText}</p>
         </div>
       </div>
     </div>
@@ -229,7 +183,7 @@ const uptimeDays = Array.from({ length: 90 }, (_, i) => {
   <section class="py-8 bg-brand-navy border-t border-white/5">
     <div class="max-w-4xl mx-auto px-4 text-center">
       <p class="text-xs text-slate-500 font-mono">
-        状态信息由后台系统手动维护。受地理位置、本地 ISP 运营商策略（如长城宽带、移动墙中墙）等因素影响，实时网络情况可能与本页显示存在差异。
+        {footerNote}
       </p>
     </div>
   </section>

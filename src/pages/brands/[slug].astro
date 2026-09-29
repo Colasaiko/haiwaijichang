@@ -20,8 +20,9 @@ const hasIPLC = brand.features.some(f => f.toLowerCase().includes('iplc') || f.i
 const hasNetflix = brand.features.some(f => f.toLowerCase().includes('netflix') || f.includes('流媒体'));
 const hasAI = brand.features.some(f => f.toLowerCase().includes('chatgpt') || f.toLowerCase().includes('ai') || f.toLowerCase().includes('claude'));
 
-const title = `${brand.name} 怎么样？线路评测、套餐价格与使用教程 - 海外机场`;
-const description = `详细了解 ${brand.name} 的线路质量、套餐价格、流媒体及 ChatGPT 解锁能力。为您提供最新优惠信息及真实使用评价，帮您判断 ${brand.name} 是否适合您。`;
+const title = brand.seoTitle || brand.title || `${brand.name} 怎么样？线路评测、套餐价格与使用教程 - 海外机场`;
+const description = brand.seoDescription || brand.description || `详细了解 ${brand.name} 的线路质量、套餐价格、流媒体及 ChatGPT 解锁能力。为您提供最新优惠信息及真实使用评价，帮您判断 ${brand.name} 是否适合您。`;
+const h1 = brand.h1 || brand.name;
 const currentUrl = Astro.url.href;
 const siteUrl = Astro.site?.toString() || Astro.url.origin;
 
@@ -75,7 +76,7 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
       <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
         <div>
           <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
-            {brand.name}
+            {brand.h1 || brand.name}
           </h1>
           <div class="flex flex-wrap gap-2 mb-6">
             {hasIPLC && <span class="text-[0.7rem] font-bold tracking-widest bg-brand-accent text-brand-dark px-3 py-1 rounded-sm uppercase">IPLC 专线</span>}

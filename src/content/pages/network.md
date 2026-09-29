@@ -1,8 +1,98 @@
 ---
-title: "Network - 海外机场推荐"
-description: "这是 network 页面的内容文件。"
+title: "全球网络 - 便宜稳定与高性价比机场推荐 | 海外机场"
+description: "了解海外机场的全球网络覆盖情况与优惠活动，为您精选便宜稳定机场、按量计费机场，并提供最新机场优惠码，助您选择最合适的网络航线。"
+keywords: "便宜机场推荐, 按量计费机场, 免费试用机场, 机场优惠码, 高性价比机场推荐, 便宜稳定机场"
+faqSchema:
+  - question: "哪个服务比较适合我？"
+    answer: "这取决于您的主要用途。如果注重低延迟（如游戏、日常浏览），建议选择主打专线的航班；如果需要大流量（如看视频），请选择提供高性价比大流量包的服务。"
+hero:
+  tagline: "Global Network"
+  h1: "全球网络，"
+  h1Span: "连接你的每一站"
+  description: "打破地域限制，构建属于你的专属数字航线。从亚洲到北美，从欧洲到大洋洲，让每一次访问都畅通无阻。"
+  primaryButton: "选择你的目的地"
+routeBoard:
+  tagline: "DEPARTURES INFO"
+  title: "Network Route Board"
+  columns:
+    - "BRAND / 航班"
+    - "FEATURES / 特性"
+    - "PROMO / 优惠"
+    - "STATUS"
+featuredRoutes:
+  title: "精选主力航线"
+  description: "覆盖全球主要核心骨干节点，为您提供优质、低延迟的国际连接体验。"
+  labels:
+    mainUsage: "主要用途："
+    startingPrice: "起步价格："
+    coreFeatures: "核心特性："
+howToChoose:
+  tagline: "How to Choose"
+  title: "线路应该怎么选？"
+  tip: "不同用途不一定需要同一条线路。最好的方式是利用客户端的“规则分流”功能。"
+  items:
+    - title: "日常浏览"
+      icon: "M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+      desc: "如 Google 搜索、浏览维基百科、刷推特。建议选择延迟最低的亚洲节点（如日本、香港），响应速度最快。"
+    - title: "AI 工具"
+      icon: "M13 10V3L4 14h7v7l9-11h-7z"
+      desc: "由于 OpenAI (ChatGPT)、Claude 等对 IP 归属地有严格限制，强烈建议固定使用北美节点或专属解锁线路。"
+    - title: "流媒体"
+      icon: "M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+      desc: "想看美区 Netflix 就选美国节点，想看日区动漫就选日本节点。主要看重带宽而非极致延迟。"
+    - title: "游戏联机"
+      icon: "M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      desc: "对网络抖动（Jitter）极度敏感。必须选择地理位置近、专线路由的节点，并且建议开启 UDP 转发。"
+    - title: "开发者服务"
+      icon: "M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+      desc: "Pull/Push 代码、拉取 Docker 镜像。推荐北美节点，因为大部分开发者服务（如 GitHub）的核心服务器在美国。"
+    - title: "远程办公"
+      icon: "M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+      desc: "跨国视频会议（如 Zoom、Google Meet）。需要兼顾延迟和稳定性，优先选择丢包率最低的企业级线路。"
+coreTechnology:
+  tagline: "Core Technology"
+  title: "网络技术与指标解析"
+  description: "了解影响网络体验的关键因素。我们不断优化这些底层指标，以确保您的航班平稳运行。"
+  viewMore: "查看详细技术白皮书 &rarr;"
+  items:
+    - key: "Routing"
+      name: "路由"
+      desc: "数据包从您的设备到达目标服务器所经过的路径。智能路由能减少中转节点，避免数据包绕路。"
+    - key: "Latency"
+      name: "延迟 (Ping)"
+      desc: "数据发送后收到回应的时间（毫秒）。优质的底层线路尽可能将其降至最低。"
+    - key: "Bandwidth"
+      name: "带宽"
+      desc: "网络通道的宽度。带宽越大，单位时间内能传输的数据越多，决定了看4K视频是否卡顿。"
+    - key: "Stability"
+      name: "稳定性"
+      desc: "数据在传输过程中丢失的比例。0%丢包率是理想状态，对于视频通话和游戏至关重要。"
+    - key: "Protocol"
+      name: "协议"
+      desc: "封装和加密数据的方式。先进的混淆与加密协议能有效应对复杂网络环境下的特征识别。"
+    - key: "Congestion"
+      name: "网络拥堵"
+      desc: "在晚高峰时期骨干网流量暴增导致的排队现象。冗余线路和负载均衡技术能有效分流。"
+deviceCompatibility:
+  title: "全平台设备支持"
+  viewTutorial: "查看各设备配置教程"
+networkStatus:
+  tagline: "Live Metrics"
+  title: "Network Status"
+  systemStatus: "SYSTEM STATUS"
+  operational: "ALL SYSTEMS OPERATIONAL"
+  serviceOperational: "Operational"
+faq:
+  title: "常见问题"
+  items:
+    - q: "我应该选择哪家服务？"
+      a: "这取决于您的主要用途。如果注重低延迟（如游戏、日常浏览），建议选择主打专线的航班；如果需要大流量（如看视频），请选择提供高性价比大流量包的服务。"
+    - q: "为什么不同地区速度不同？"
+      a: "速度差异主要来源于物理距离（光缆传输耗时）、国际出口带宽容量、目标地区服务器的性能，以及路由跳转的节点数量。物理距离越远，通常基础延迟越高。"
+    - q: "延迟越低是不是一定越好？"
+      a: "延迟低对于游戏和实时通话非常重要，但对于看视频或下载大文件，带宽容量和丢包率往往比单纯的低延迟更重要。一条延迟 150ms 但带宽高、不丢包的线路，看 4K 视频会比延迟 50ms 但经常丢包的线路流畅得多。"
+    - q: "为什么同一条线路不同时间速度不同？"
+      a: "互联网是共享网络。在晚上 8:00 - 11:00 的“晚高峰”时段，国际出口总带宽会被大量用户挤占，导致物理通道拥堵，从而出现速度变慢或延迟波动。优质服务会通过冗余带宽来缓解这一问题。"
+    - q: "我应该选择哪个协议？"
+      a: "建议交给现代客户端（如 Clash, V2ray）自动处理。通常，您只需导入订阅链接，客户端默认使用的协议（如 Trojan, ShadowsocksR, Vmess/Vless 等）已经在安全性与速度间做好了平衡。"
 ---
-
-# Network
-
-这里是页面正文，此页面内容可以随时在此 Markdown 文件中修改，不会影响网站的 UI 模板结构。

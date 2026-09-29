@@ -1,8 +1,46 @@
 ---
-title: "Help - 海外机场推荐"
-description: "这是 help 页面的内容文件。"
+title: "服务台与支持 | 海外机场技术工单与教程"
+description: "全平台客户端下载指引、多场景翻墙配置建议以及标准故障排查流程（Troubleshooting）。"
+keywords: "机场服务台, 机场客服, 梯子教程, 翻墙故障排查, Clash 下载, V2ray 下载, Shadowrocket 下载"
+h1: "服务台与支持中心"
+badge: "Support Desk / 服务台"
+heroText: "在这里，您可以找到全平台的客户端下载指南，或是按场景浏览具体的配置建议。"
+routeHelpLinkText: "前往技术与原理解析 &rarr;"
+scenarioHelpLinkText: "浏览场景与目的地大厅 &rarr;"
+troubleshooting:
+  badge: "Troubleshooting"
+  title: "如何进行标准故障排查？"
+  desc: "当您遇到“已连接但打不开网页”时，请不要立刻重装软件，尝试遵循以下机场地勤排查步骤："
+  steps:
+    - step: "Step 1"
+      title: "本地网络"
+      desc: "检查您的宽带或WiFi是否本身断网"
+    - step: "Step 2"
+      title: "更新订阅"
+      desc: "在客户端中点击更新，获取最新可用节点"
+    - step: "Step 3"
+      title: "更换线路"
+      desc: "切换到不同国家或不同标识的备用节点"
+    - step: "Step 4"
+      title: "重启应用"
+      desc: "完全退出客户端并重新以管理员身份运行"
+    - step: "Step 5"
+      title: "系统代理"
+      desc: "检查操作系统的代理设置是否被正确接管"
+contact:
+  title: "商业合作与联系"
+  desc: "如果您有任何商业合作意向、资源对接需求或品牌建议，欢迎随时通过以下方式与我们取得联系。期待与您的合作！"
+  telegram: "Telegram: @ColaSaiko15"
+  email: "Email: colasaiko15@gmail.com"
+categories: [{"enTitle":"START HERE","zhTitle":"快速开始","icon":"M13 10V3L4 14h7v7l9-11h-7z","links":[{"name":"第一次使用怎么开始？","href":"/help/getting-started"},{"name":"如何获取订阅链接？","href":"/help/how-to-get-subscription"},{"name":"如何导入客户端配置？","href":"/help/how-to-import-config"},{"name":"如何选择合适的线路？","href":"/help/how-to-change-nodes"},{"name":"如何测试连接是否成功？","href":"/help/how-to-test-connection"},{"name":"如何更换及测速节点？","href":"/help/how-to-change-nodes"}]},{"enTitle":"DEVICE SUPPORT","zhTitle":"客户端下载与设置","icon":"M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z","isDevice":true,"links":[{"name":"Windows","desc":"Clash Verge / v2rayN","href":"/help/windows-guide"},{"name":"macOS","desc":"ClashX / Surge","href":"/help/macos-guide"},{"name":"Android","desc":"Clash for Android / v2rayNG","href":"/help/android-guide"},{"name":"iOS","desc":"Shadowrocket / Quantumult X","href":"/help/ios-guide"},{"name":"Router","desc":"OpenWrt / Merlin","href":"/help/router-guide"}]},{"enTitle":"CONNECTION ISSUES","zhTitle":"常见故障排查","icon":"M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z","links":[{"name":"已连接但打不开网页","href":"/help/connected-but-no-internet"},{"name":"节点全部显示 Timeout","href":"/help/nodes-timeout"},{"name":"订阅链接更新失败","href":"/help/subscription-update-failed"},{"name":"手机有网络但 VPN 无法使用","href":"/help/mobile-vpn-no-internet"},{"name":"速度突然变慢或晚上延迟变高","href":"/help/slow-speed-high-ping"},{"name":"更换节点后还是无法连接","href":"/help/still-cannot-connect-after-changing-nodes"}]},{"enTitle":"SUBSCRIPTION","zhTitle":"账号与订阅帮助","icon":"M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z","links":[{"name":"如何查看当前套餐状态？","href":"/help/how-to-check-plan-status"},{"name":"如何进行套餐续费与升级？","href":"/help/how-to-renew-upgrade"},{"name":"我的订阅链接在哪里看？","href":"/help/where-is-my-subscription-link"},{"name":"订阅是否可以多设备同时使用？","href":"/help/multi-device-usage"},{"name":"更换设备后怎么办？","href":"/help/what-to-do-when-changing-devices"},{"name":"流量是如何计算与重置的？","href":"/help/how-traffic-is-calculated"}]},{"enTitle":"ROUTE HELP","zhTitle":"线路问题解答","icon":"M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9","links":[{"name":"面对上百个节点该怎么选？","href":"/help/how-to-change-nodes"},{"name":"延迟高低代表什么意思？","href":"/help/what-does-ping-mean"},{"name":"为什么测速极快但网页打开慢？","href":"/help/fast-speed-test-slow-browsing"},{"name":"为什么某些专线节点突然不可用？","href":"/help/why-special-nodes-unavailable"},{"name":"是否需要一直手动选择最低延迟节点？","href":"/help/should-i-always-choose-lowest-ping"}]},{"enTitle":"SCENARIO HELP","zhTitle":"场景使用帮助","icon":"M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z","links":[{"name":"AI 工具 (ChatGPT) 网页报错或风控","href":"/help/ai-tools-access"},{"name":"Netflix/Disney+ 提示所在区域不可用","href":"/help/streaming-region-locked"},{"name":"GitHub/Docker 终端连接超时","href":"/help/developer-terminal-timeout"},{"name":"跨国游戏网络延迟与丢包问题","href":"/help/gaming-latency-packet-loss"},{"name":"Zoom 远程会议频繁断线","href":"/help/remote-work-meeting-drops"}]}]
+quickLinks:
+  - name: "常见问题解答 (FAQ)"
+    icon: "M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+    href: "/faq"
+  - name: "测速与评测博客"
+    icon: "M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+    href: "/blog"
+  - name: "TG 交流群组"
+    icon: "M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
+    href: "#"
 ---
-
-# Help
-
-这里是页面正文，此页面内容可以随时在此 Markdown 文件中修改，不会影响网站的 UI 模板结构。

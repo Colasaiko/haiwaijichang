@@ -1,40 +1,33 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import BrandCard from '../components/BrandCard.astro';
 const brandEntries = await getCollection('brands');
 const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (a.order || 999) - (b.order || 999));
 const blogs = (await getCollection('blog')).slice(0, 3);
+
+const page = await getEntry('pages', 'home');
+const { title, description, keywords, faqSchema, hero, seoSection, fastPick, featuredBrands, moreBrands, scenarios, blog } = page.data;
 ---
 
 <Layout 
-  title="海外机场推荐 2026 - 稳定专线与优质 VPN 梯子排行榜 | Overseas Airport"
-  description="2026 稳定便宜机场推荐，海外机场为您精选高性价比、专线网络与低延迟的全球节点。提供流媒体解锁、AI 工具访问、科学上网梯子推荐及各平台 VPN 客户端配置教程。"
-  keywords="机场推荐, 机场推荐 2026, 稳定机场推荐, 便宜机场推荐, 专线机场推荐, 机场排行榜, 2026 机场排行榜, 梯子推荐, 翻墙梯子推荐, 科学上网梯子推荐"
+  title={title}
+  description={description}
+  keywords={keywords}
 >
   <!-- SEO: FAQ Schema -->
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "海外机场是什么？",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "海外机场是一个提供全球网络加速与安全连接的服务平台，致力于为您在访问海外网站、使用 AI 工具、流媒体娱乐及远程办公时，提供更稳定顺畅的网络体验。"
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "适合哪些使用场景？",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "主要适用于需要访问国际网络资源的用户，例如使用海外 AI 工具、观看跨国流媒体、参与跨国远程会议及开发者进行跨区域代码部署等场景。"
-        }
+    "mainEntity": faqSchema.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
       }
-    ]
+    }))
   })} />
 
   <!-- 1. Hero Section -->
@@ -47,24 +40,24 @@ const blogs = (await getCollection('blog')).slice(0, 3);
       <div>
         <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-brand-neon/10 border border-brand-neon/20 mb-6">
           <span class="w-2 h-2 rounded-full bg-brand-neon animate-pulse-slow"></span>
-          <span class="text-xs font-mono tracking-widest text-brand-neon">OVERSEAS AIRPORT · GLOBAL NETWORK</span>
+          <span class="text-xs font-mono tracking-widest text-brand-neon">{hero.tagline}</span>
         </div>
         
         <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
-          海外机场<br />
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">连接你的下一站</span>
+          {hero.h1}<br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">{hero.h1Span}</span>
         </h1>
         
         <p class="text-lg text-slate-400 mb-8 max-w-xl leading-relaxed">
-          为海外网站、流媒体、AI 工具、远程办公与日常网络访问场景，提供更顺畅的全球网络连接体验。
+          {hero.description}
         </p>
         
         <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-10">
           <a href="#board" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-bold text-brand-dark bg-brand-accent hover:bg-yellow-400 rounded-sm transition-colors uppercase tracking-wider">
-            立即登机
+            {hero.primaryButton}
           </a>
           <a href="#destinations" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-medium text-white border border-white/20 hover:bg-white/5 rounded-sm transition-colors uppercase tracking-wider">
-            查看全球航线
+            {hero.secondaryButton}
           </a>
         </div>
         
@@ -138,25 +131,21 @@ const blogs = (await getCollection('blog')).slice(0, 3);
   <section class="py-16 bg-brand-navy border-t border-white/5 relative z-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="max-w-4xl prose prose-invert prose-brand">
-        <h2 class="text-3xl font-bold text-white mb-6">2026机场推荐与科学上网选择指南</h2>
-        <p class="text-lg text-slate-400">
-          在寻找 <strong>2026机场推荐</strong> 或 <strong>梯子推荐</strong> 时，我们往往会面临无数复杂的选择。不要盲目相信跑满带宽的测速截图，因为 <strong>稳定机场</strong> 的核心在于底层的 <strong>专线机场</strong> 架构（如 IPLC/IEPL）以及应对晚高峰网络拥堵的路由优化策略。
-        </p>
-        <p class="text-slate-400">
-          对于预算有限的用户，高性价比的 <strong>便宜机场</strong> 同样可以满足轻度浏览需求；而如果你是重度使用者，支持 <strong>Clash机场</strong> 配置、提供原生 IP 的 <strong>流媒体机场</strong> 甚至是 <strong>ChatGPT机场</strong> 则显得尤为重要。你可以通过我们的 <a href="/ranking" class="text-brand-neon hover:underline">机场天梯榜</a> 根据自身真实场景（而不是虚假的绝对分数）进行选择。
-        </p>
+        <h2 class="text-3xl font-bold text-white mb-6">{seoSection.title}</h2>
+        <p class="text-lg text-slate-400" set:html={seoSection.p1.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>')} />
+        <p class="text-slate-400" set:html={seoSection.p2.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>').replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" class="text-brand-neon hover:underline">$1</a>')} />
       </div>
     </div>
   </section>
 
 
-  <!-- FAST PICK -->
+  <!-- {fastPick.tagline} -->
   <section class="py-20 bg-brand-dark border-y border-white/5 relative z-10" id="fast-pick">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <div class="mb-12">
-        <h2 class="text-brand-accent font-mono tracking-[0.3em] text-sm mb-2">FAST PICK</h2>
-        <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">不知道选哪个？按需求直接选。</h3>
-        <p class="text-slate-400">不用研究几十个参数，根据你的主要用途快速找到合适品牌。</p>
+        <h2 class="text-brand-accent font-mono tracking-[0.3em] text-sm mb-2">{fastPick.tagline}</h2>
+        <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">{fastPick.title}</h3>
+        <p class="text-slate-400">{fastPick.description}</p>
       </div>
 
       <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto mb-16">
@@ -171,12 +160,12 @@ const blogs = (await getCollection('blog')).slice(0, 3);
     </div>
   </section>
 
-  <!-- FEATURED DEPARTURES -->
+  <!-- {featuredBrands.tagline} -->
   <section class="py-20 bg-brand-navy relative" id="featured">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="mb-12">
-        <h2 class="text-brand-accent font-mono tracking-[0.3em] text-sm mb-2">FEATURED DEPARTURES</h2>
-        <h3 class="text-3xl font-bold text-white">精选品牌</h3>
+        <h2 class="text-brand-accent font-mono tracking-[0.3em] text-sm mb-2">{featuredBrands.tagline}</h2>
+        <h3 class="text-3xl font-bold text-white">{featuredBrands.title}</h3>
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="featured-grid">
@@ -187,12 +176,12 @@ const blogs = (await getCollection('blog')).slice(0, 3);
     </div>
   </section>
 
-  <!-- MORE BRANDS -->
+  <!-- {moreBrands.tagline} -->
   <section class="py-20 bg-brand-dark border-y border-white/5 relative" id="more">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="mb-12">
-        <h2 class="text-brand-accent font-mono tracking-[0.3em] text-sm mb-2">MORE BRANDS</h2>
-        <h3 class="text-3xl font-bold text-white">更多品牌</h3>
+        <h2 class="text-brand-accent font-mono tracking-[0.3em] text-sm mb-2">{moreBrands.tagline}</h2>
+        <h3 class="text-3xl font-bold text-white">{moreBrands.title}</h3>
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="more-grid">
@@ -202,7 +191,7 @@ const blogs = (await getCollection('blog')).slice(0, 3);
       </div>
       
       <div id="no-results" class="hidden text-center py-20">
-        <p class="text-slate-400 text-lg">暂无完整匹配该标签的资料，请尝试其他分类。</p>
+        <p class="text-slate-400 text-lg">{moreBrands.noResults}</p>
       </div>
     </div>
   </section>
@@ -250,7 +239,7 @@ const blogs = (await getCollection('blog')).slice(0, 3);
           if (filter === '价格' || visibleCount === 0) {
             if(noResults) noResults.style.display = 'block';
             if(filter === '价格' && noResults) noResults.innerHTML = '<p class="text-slate-400 text-lg">暂无完整价格资料结构进行筛选，请进入品牌中心查看详情。</p>';
-            else if (noResults) noResults.innerHTML = '<p class="text-slate-400 text-lg">暂无完整匹配该标签的资料，请尝试其他分类。</p>';
+            else if (noResults) noResults.innerHTML = '<p class="text-slate-400 text-lg">{moreBrands.noResults}</p>';
           } else {
             if(noResults) noResults.style.display = 'none';
           }
@@ -263,21 +252,21 @@ const blogs = (await getCollection('blog')).slice(0, 3);
   <section class="py-20 bg-brand-navy relative border-y border-white/5">
     <div class="max-w-7xl mx-auto px-4">
       <div class="text-center mb-12">
-        <h2 class="text-brand-accent font-mono tracking-widest text-sm mb-2">SCENARIOS</h2>
-        <h3 class="text-3xl font-bold text-white">常用网络环境与场景支持</h3>
+        <h2 class="text-brand-accent font-mono tracking-widest text-sm mb-2">{scenarios.tagline}</h2>
+        <h3 class="text-3xl font-bold text-white">{scenarios.title}</h3>
       </div>
       <div class="grid md:grid-cols-3 gap-6">
-        <a href="/use-cases" class="block p-8 bg-brand-dark rounded-xl border border-white/5 hover:border-brand-neon/50 transition-colors group">
-          <h4 class="text-xl font-bold text-white mb-3 group-hover:text-brand-neon">AI 工具与开发</h4>
-          <p class="text-sm text-slate-400">稳定解锁 ChatGPT, Claude, Midjourney，告别 IP 纯净度低导致的封号风控。</p>
+        <a href={scenarios.cards[0].link}  class="block p-8 bg-brand-dark rounded-xl border border-white/5 hover:border-brand-neon/50 transition-colors group">
+          <h4  class="text-xl font-bold text-white mb-3 group-hover:text-brand-neon">{scenarios.cards[0].title}</h4>
+          <p  class="text-sm text-slate-400">{scenarios.cards[0].desc}</p>
         </a>
-        <a href="/use-cases" class="block p-8 bg-brand-dark rounded-xl border border-white/5 hover:border-brand-neon/50 transition-colors group">
-          <h4 class="text-xl font-bold text-white mb-3 group-hover:text-brand-neon">全球流媒体</h4>
-          <p class="text-sm text-slate-400">支持 Netflix, Disney+, Hulu 原生 IP，享受 4K 高清且无需缓冲的观影体验。</p>
+        <a href={scenarios.cards[1].link}  class="block p-8 bg-brand-dark rounded-xl border border-white/5 hover:border-brand-neon/50 transition-colors group">
+          <h4  class="text-xl font-bold text-white mb-3 group-hover:text-brand-neon">{scenarios.cards[1].title}</h4>
+          <p  class="text-sm text-slate-400">{scenarios.cards[1].desc}</p>
         </a>
-        <a href="/use-cases" class="block p-8 bg-brand-dark rounded-xl border border-white/5 hover:border-brand-neon/50 transition-colors group">
-          <h4 class="text-xl font-bold text-white mb-3 group-hover:text-brand-neon">跨平台设备</h4>
-          <p class="text-sm text-slate-400">兼容 Windows, macOS, iOS, Android, 甚至软路由设备，一键导入节点，全设备在线。</p>
+        <a href={scenarios.cards[2].link}  class="block p-8 bg-brand-dark rounded-xl border border-white/5 hover:border-brand-neon/50 transition-colors group">
+          <h4  class="text-xl font-bold text-white mb-3 group-hover:text-brand-neon">{scenarios.cards[2].title}</h4>
+          <p  class="text-sm text-slate-400">{scenarios.cards[2].desc}</p>
         </a>
       </div>
     </div>
@@ -288,11 +277,11 @@ const blogs = (await getCollection('blog')).slice(0, 3);
     <div class="max-w-7xl mx-auto px-4">
       <div class="flex justify-between items-end mb-12">
         <div>
-          <h2 class="text-brand-accent font-mono tracking-widest text-sm mb-2">OFFICIAL BLOG</h2>
-          <h3 class="text-3xl font-bold text-white">最新深度评测与指南</h3>
+          <h2 class="text-brand-accent font-mono tracking-widest text-sm mb-2">{blog.tagline}</h2>
+          <h3 class="text-3xl font-bold text-white">{blog.title}</h3>
         </div>
         <a href="/blog" class="hidden md:inline-flex text-brand-neon hover:text-white transition-colors text-sm font-bold items-center">
-          查看全部文章 <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+          {blog.viewAll} <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
         </a>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -306,7 +295,7 @@ const blogs = (await getCollection('blog')).slice(0, 3);
       </div>
       <div class="mt-8 text-center md:hidden">
         <a href="/blog" class="inline-flex text-brand-neon hover:text-white transition-colors text-sm font-bold items-center">
-          查看全部文章 <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+          {blog.viewAll} <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
         </a>
       </div>
     </div>

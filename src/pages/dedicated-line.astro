@@ -3,7 +3,10 @@ import Layout from '../layouts/Layout.astro';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { getCollection } from 'astro:content';
+import { getEntry, getCollection } from 'astro:content';
+const page = await getEntry('pages', 'dedicated-line');
+const { title, description, h1, heroText, sections, gridText } = page.data;
+
 const brandEntries = await getCollection('brands');
 const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (a.order || 999) - (b.order || 999));
 
@@ -13,34 +16,34 @@ const matchedBrands = 'iplc'
   : brands.slice(0, 6);
 
 ---
-<Layout title="IPLC/IEPL 专线机场推荐：低延迟与晚高峰稳定之选" description="深入讲解 IPLC 与 IEPL 专线的区别。为您推荐配备真实物理专线的海外网络加速服务。">
+<Layout title={title} description={description}>
   <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5">
     <div class="max-w-4xl mx-auto px-4 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">专线机场推荐 (IPLC / IEPL)</h1>
-      <p class="text-lg text-slate-400">深入讲解 IPLC 与 IEPL 专线的区别。为您推荐配备真实物理专线的海外网络加速服务。</p>
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">{h1}</h1>
+      <p class="text-lg text-slate-400">{heroText}</p>
     </div>
   </section>
 
   <section class="py-16 bg-brand-dark min-h-screen">
     <div class="max-w-4xl mx-auto px-4 prose prose-invert prose-brand">
-      <h2>为什么要关注这个领域？</h2>
-      <p>在选择网络加速服务时，单纯的“好”与“坏”往往是主观的。真正决定体验的是底层技术是否匹配您的实际需求。例如，游戏玩家需要专线的极低丢包，而流媒体用户则需要大带宽和原生 IP 库。</p>
+      <h2>{sections[0].h2}</h2>
+      <p>{sections[0].p}</p>
       
-      <h2>品牌案例与选择参考</h2>
-      <p>根据当前项目掌握的真实品牌数据，以下服务商在当前分类下有明确的技术或服务特征说明：</p>
+      <h2>{sections[1].h2}</h2>
+      <p>{sections[1].p}</p>
       
       <div class="not-prose grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 mb-12">
         {matchedBrands.length > 0 ? matchedBrands.map(b => (
           <a href={`/brands/${b.slug}`} class="block bg-brand-navy border border-white/10 p-6 rounded-xl hover:border-brand-neon transition-colors">
             <h3 class="text-xl font-bold text-white mb-2">{b.name}</h3>
             <p class="text-sm text-slate-400 line-clamp-2">{b.features[0]}</p>
-            <div class="mt-4 text-xs font-mono text-brand-neon">查看详情 &rarr;</div>
+            <div class="mt-4 text-xs font-mono text-brand-neon" set:html={gridText.viewDetails}></div>
           </a>
-        )) : <p class="text-slate-500">当前资料库中暂无完全匹配该标签的品牌数据。</p>}
+        )) : <p class="text-slate-500">{gridText.noData}</p>}
       </div>
       
-      <h2>常见问题与避坑指南</h2>
-      <p>我们强烈建议用户不要盲目追求虚假的“测速排行榜”，而是通过观察晚高峰实际表现和自身的核心诉求（如跨端设备支持、AI 解锁）来决定。更多深入分析，请访问我们的 <a href="/blog">官方博客</a>。</p>
+      <h2>{sections[2].h2}</h2>
+      <p set:html={sections[2].p}></p>
     </div>
   </section>
 </Layout>
