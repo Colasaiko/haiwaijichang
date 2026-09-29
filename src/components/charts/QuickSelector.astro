@@ -44,9 +44,9 @@ const cards = Array.from(planMap.entries()).map(([name, plans]) => {
     <span class="w-1.5 h-6 bg-brand-neon mr-3 rounded-sm"></span>
     5 秒选套餐
   </h2>
-  <div class="flex overflow-x-auto gap-4 pb-4 snap-x">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {cards.map(card => (
-      <div class="shrink-0 w-[240px] snap-center bg-brand-dark border border-white/10 rounded-xl p-5 flex flex-col hover:border-brand-neon/50 transition-colors shadow-lg relative">
+      <div class="bg-brand-dark border border-white/10 rounded-xl p-5 flex flex-col hover:border-brand-neon/50 transition-colors shadow-lg relative">
         <h3 class="text-lg font-bold text-white mb-1">{card.name}</h3>
         <div class="text-xs text-brand-neon font-mono mb-4">{card.traffic}</div>
         
