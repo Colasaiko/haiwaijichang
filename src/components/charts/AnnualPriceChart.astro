@@ -1,0 +1,50 @@
+---
+const { brand } = Astro.props;
+
+if (!brand || !brand.visualData || !brand.visualData.annualPrice) return null;
+
+const data = brand.visualData.annualPrice;
+const max = Math.max(...data.map(d => d.value));
+
+---
+
+<div class="mb-12 bg-brand-dark p-6 rounded-xl border border-white/5">
+  <div class="mb-6">
+    <h2 class="text-xl font-bold text-white uppercase tracking-wider font-mono flex items-center">
+      <svg class="w-5 h-5 text-brand-accent mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      年付价格对比
+    </h2>
+    <p class="text-xs text-slate-500 mt-1 uppercase tracking-widest font-mono">FARE COMPARISON</p>
+    <p class="text-sm text-slate-400 mt-2">官方年付标价。未包含优惠码折扣情况。</p>
+  </div>
+  
+  <div class="flex items-end h-64 space-x-2 sm:space-x-4 border-b border-l border-white/10 pl-2 pb-2 mt-8 relative">
+    <!-- Grid Lines -->
+    <div class="absolute inset-0 flex flex-col justify-between pb-6 pointer-events-none opacity-20 z-0">
+      {[...Array(4)].map((_, i) => (
+        <div class="w-full border-t border-dashed border-slate-500 flex-grow"></div>
+      ))}
+    </div>
+
+    {data.map(item => {
+      const height = (item.value / max) * 100;
+      const isStudent = item.label.includes('学生');
+      return (
+        <div class="flex flex-col items-center flex-1 group z-10 h-full justify-end">
+          <div 
+            class={`w-full max-w-[3rem] sm:max-w-[4rem] rounded-t-sm transition-all duration-300 relative flex flex-col items-center justify-start pt-2 ${isStudent ? 'bg-slate-700' : 'bg-gradient-to-t from-brand-accent/80 to-brand-accent shadow-[0_0_10px_rgba(250,204,21,0.2)]'}`}
+            style={`height: ${height}%; min-height: 24px;`}
+          >
+            <span class="text-xs sm:text-sm font-mono font-bold text-brand-dark -mt-6 sm:-mt-7 bg-white/90 px-1 rounded shadow-sm">
+              ¥{item.value}
+            </span>
+          </div>
+          <div class="mt-3 text-[10px] sm:text-xs text-center font-bold text-slate-300 h-8 flex flex-col items-center">
+            {item.label}
+            {isStudent && <span class="text-[8px] text-slate-500 scale-90 whitespace-nowrap">无优惠</span>}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</div>

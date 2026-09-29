@@ -1,0 +1,80 @@
+---
+const { brand } = Astro.props;
+
+if (!brand || !brand.visualData || !brand.visualData.traffic || !brand.visualData.annualPrice) return null;
+
+// Build plan cards from pricing.
+const planMap = new Map();
+brand.pricing.forEach(p => {
+  if (!planMap.has(p.name)) planMap.set(p.name, []);
+  planMap.get(p.name).push(p);
+});
+
+const cards = Array.from(planMap.entries()).map(([name, plans]) => {
+  const isStudent = name.includes('学生');
+  const monthPlan = plans.find(p => p.period === '月付' || p.period.includes('月'));
+  const yearPlan = plans.find(p => p.period === '年付' || p.period.includes('年'));
+  
+  let priceStr = '';
+  if (monthPlan) priceStr += `${monthPlan.originalPrice}/月起`;
+  else if (yearPlan) priceStr += `${yearPlan.originalPrice}/年`;
+  
+  let traffic = plans[0].traffic;
+  
+  // Decide some tags
+  let desc = '普通个人使用';
+  if (isStudent) desc = '轻量使用\n学生用户\n偶尔访问';
+  else if (traffic.includes('300')) desc = '中等流量';
+  else if (traffic.includes('600')) desc = '视频 / 多设备';
+  else if (traffic.includes('1.0TB') || traffic.includes('1000')) desc = '大流量使用';
+  
+  return {
+    name,
+    traffic,
+    priceStr,
+    desc,
+    isStudent,
+    yearPlan
+  };
+});
+---
+
+<div class="mb-12">
+  <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+    <span class="w-1.5 h-6 bg-brand-neon mr-3 rounded-sm"></span>
+    5 秒选套餐
+  </h2>
+  <div class="flex overflow-x-auto gap-4 pb-4 snap-x">
+    {cards.map(card => (
+      <div class="shrink-0 w-[240px] snap-center bg-brand-dark border border-white/10 rounded-xl p-5 flex flex-col hover:border-brand-neon/50 transition-colors shadow-lg relative">
+        <h3 class="text-lg font-bold text-white mb-1">{card.name}</h3>
+        <div class="text-xs text-brand-neon font-mono mb-4">{card.traffic}</div>
+        
+        <div class="text-xl font-bold text-white mb-4">
+          {card.priceStr}
+        </div>
+        
+        <div class="text-sm text-slate-400 whitespace-pre-line mb-6 flex-grow leading-relaxed">
+          {card.desc}
+        </div>
+        
+        <div class="mt-auto">
+          {card.isStudent ? (
+            <div class="inline-block px-2 py-1 bg-slate-800 text-slate-400 text-xs rounded border border-slate-700">不支持优惠码</div>
+          ) : (
+            <div class="flex flex-col space-y-2">
+              <div class="inline-block self-start px-2 py-1 bg-brand-accent/10 text-brand-accent text-xs rounded border border-brand-accent/20">
+                {brand.coupon?.code} 可用
+              </div>
+              {card.yearPlan && card.yearPlan.discountPrice && (
+                <div class="text-xs text-brand-neon font-bold">
+                  年付实测 {card.yearPlan.discountPrice}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>

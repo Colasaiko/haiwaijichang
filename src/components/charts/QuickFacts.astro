@@ -1,0 +1,34 @@
+---
+const { brand } = Astro.props;
+
+if (!brand) return null;
+
+const facts = [];
+
+if (brand.lineType) facts.push({ label: '线路', value: brand.lineType.join(' / ') });
+if (brand.protocols) facts.push({ label: '协议', value: brand.protocols.join(' / ') });
+if (brand.speedLimit) facts.push({ label: '最高标称速率', value: brand.speedLimit });
+if (brand.deviceLimit) facts.push({ label: '设备', value: brand.deviceLimit });
+if (brand.coupon && brand.coupon.code) facts.push({ label: '优惠码', value: `${brand.coupon.code} · ${brand.coupon.discount}` });
+if (brand.nodeSnapshot && brand.nodeSnapshot.total) facts.push({ label: '当前节点快照', value: `${brand.nodeSnapshot.total} 个`, sub: `${brand.nodeSnapshot.online} 在线 · ${brand.nodeSnapshot.offline} 离线\n${brand.nodeSnapshot.date} 官方后台快照` });
+
+if (facts.length === 0) return null;
+---
+
+<div class="mb-10">
+  <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+    <span class="w-1.5 h-6 bg-brand-neon mr-3 rounded-sm"></span>
+    {brand.name} 快速数据
+  </h2>
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+    {facts.map(fact => (
+      <div class="bg-brand-dark border border-white/10 rounded-lg p-4 flex flex-col justify-center shadow-sm hover:border-brand-neon/30 transition-colors">
+        <span class="text-xs text-slate-400 mb-1 uppercase tracking-wider">{fact.label}</span>
+        <span class="text-base sm:text-lg font-bold text-white leading-tight">{fact.value}</span>
+        {fact.sub && (
+          <span class="text-[0.65rem] text-slate-500 mt-2 leading-snug whitespace-pre-line">{fact.sub}</span>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
