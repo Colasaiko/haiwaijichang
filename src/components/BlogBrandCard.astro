@@ -43,11 +43,11 @@ const displayTags = tags.slice(0, 3);
           </li>
         ))}
       </ul>
-      {brand.discount && brand.discount !== '暂无优惠' && brand.discount !== '(暂无优惠）' && (
-         <div class="mt-3 text-xs text-brand-accent font-mono border border-brand-accent/20 bg-brand-accent/5 inline-block px-2 py-1 rounded">
-           优惠码: {brand.discount}
-         </div>
-      )}
+      {(brand.coupon || (brand.discount && brand.discount !== '暂无优惠' && brand.discount !== '(暂无优惠）')) && (
+  <div class="mt-3 text-xs text-brand-accent font-mono border border-brand-accent/20 bg-brand-accent/5 inline-block px-2 py-1 rounded">
+    {brand.coupon ? `优惠: ${brand.coupon.discount} [${brand.coupon.code}]` : `优惠: ${brand.discount}`}
+  </div>
+)}
     </div>
     
     <div class="flex flex-col sm:flex-row md:flex-col gap-3 shrink-0 min-w-[140px]">
