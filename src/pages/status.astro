@@ -5,11 +5,7 @@ import { getEntry } from 'astro:content';
 const page = await getEntry('pages', 'status');
 const { title, description, h1, heroText, coreServices, regionalNetworks, incidents, scheduled, footerNote } = page.data;
 
-// Generate 90 days uptime array (1 = green, 0 = yellow)
-const uptimeDays = Array.from({ length: 90 }, (_, i) => {
-  // Make a few random days yellow to look realistic, but mostly green
-  return (i === 15 || i === 70) ? 'yellow' : 'green';
-});
+
 ---
 
 <Layout 
@@ -102,18 +98,13 @@ const uptimeDays = Array.from({ length: 90 }, (_, i) => {
           <h3 class="text-lg font-bold text-white">历史运行状态 (90 Days)</h3>
           <p class="text-sm text-slate-400 mt-1">Uptime History</p>
         </div>
-        <div class="text-2xl font-bold text-white font-mono">99.98%</div>
+        <div class="text-sm font-bold text-white font-mono pt-3">暂无可验证的历史可用率数据。</div>
       </div>
       
       <div class="bg-brand-navy p-6 rounded-xl border border-white/10">
         <!-- Bars Container -->
         <div class="flex items-end justify-between space-x-1 h-16 w-full">
-          {uptimeDays.map(day => (
-            <div 
-              class={`flex-1 rounded-t-sm opacity-80 hover:opacity-100 transition-opacity cursor-crosshair h-full ${day === 'green' ? 'bg-green-500' : 'bg-brand-accent h-3/4'}`}
-              title={day === 'green' ? 'No downtime recorded' : 'Degraded performance'}
-            ></div>
-          ))}
+          
         </div>
         <!-- Legend -->
         <div class="flex justify-between mt-4 text-xs font-mono text-slate-500">
