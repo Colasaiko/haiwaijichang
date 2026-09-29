@@ -4,7 +4,7 @@ import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import BrandCard from '../components/BrandCard.astro';
 const brandEntries = await getCollection('brands');
-const brands = brandEntries.map(e => ({ id: e.id, ...e.data }));
+const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (a.order || 999) - (b.order || 999));
 const blogs = (await getCollection('blog')).slice(0, 3);
 ---
 

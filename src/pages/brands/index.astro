@@ -13,7 +13,7 @@ const description = "探索最新、最全的海外机场和梯子品牌数据�
 const currentUrl = Astro.url.href;
 const siteUrl = Astro.site?.toString() || Astro.url.origin;
 const brandEntries = await getCollection('brands');
-const brands = brandEntries.map(e => ({ id: e.id, ...e.data }));
+const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (a.order || 999) - (b.order || 999));
 ---
 
 <Layout title={title} description={description}>

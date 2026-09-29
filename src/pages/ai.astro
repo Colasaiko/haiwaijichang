@@ -5,7 +5,7 @@ import path from 'node:path';
 
 import { getCollection } from 'astro:content';
 const brandEntries = await getCollection('brands');
-const brands = brandEntries.map(e => ({ id: e.id, ...e.data }));
+const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (a.order || 999) - (b.order || 999));
 
 // Filter brands relevant to this topic
 const matchedBrands = 'chatgpt' 

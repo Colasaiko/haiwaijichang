@@ -1,4 +1,5 @@
 ---
+order: 27
 features:
   - "基础中转方案 + 多入口智能调度，全程不限速"
   - "完整解锁 Netflix / YouTube / ChatGPT"

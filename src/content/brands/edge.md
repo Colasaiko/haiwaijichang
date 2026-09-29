@@ -1,4 +1,5 @@
 ---
+order: 22
 features:
   - "全 IPLC 专线网络，最高 2.5Gbps 稳定速率"
   - "原生 IP 轻松解锁 Netflix/ChatGPT"

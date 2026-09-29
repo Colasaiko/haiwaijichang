@@ -1,4 +1,5 @@
 ---
+order: 18
 features:
   - "全 IPLC 专线，最大提供 2.5Gbps 速率"
   - "原生 IP 解锁各大流媒体、ChatGPT"

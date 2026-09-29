@@ -12,7 +12,7 @@ export async function getStaticPaths() {
 
 const { entry, allEntries } = Astro.props;
 const brand = entry.data;
-const allBrands = allEntries.map(e => ({ id: e.id, ...e.data }));
+const allBrands = allEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (a.order || 999) - (b.order || 999));
 const { Content } = await render(entry);
 
 // Determine tags/features

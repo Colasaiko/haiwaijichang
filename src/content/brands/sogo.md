@@ -1,4 +1,5 @@
 ---
+order: 9
 features:
   - "VLESS 协议｜企业级 IEPL 专线｜三网优化"
   - "全线路流媒体解锁 / AI 全支持"

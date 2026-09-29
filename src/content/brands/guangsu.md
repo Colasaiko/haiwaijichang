@@ -1,4 +1,5 @@
 ---
+order: 16
 features:
   - "全球 IPLC · 单节点至高 2.5 Gbps"
   - "原生 IP 解锁 Netflix / Disney+ / ChatGPT"
