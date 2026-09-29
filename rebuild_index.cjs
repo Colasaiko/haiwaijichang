@@ -1,153 +1,20 @@
----
-import Layout from '../layouts/Layout.astro';
-import brands from '../data/brands.json';
-const blogs = (await getCollection('blog')).slice(0, 3);
-import { getCollection } from 'astro:content';
-import BrandCard from '../components/BrandCard.astro';
----
+const fs = require('fs');
 
-<Layout 
-  title="海外机场推荐 2026 - 稳定专线与优质 VPN 梯子排行榜 | Overseas Airport"
-  description="2026 稳定便宜机场推荐，海外机场为您精选高性价比、专线网络与低延迟的全球节点。提供流媒体解锁、AI 工具访问、科学上网梯子推荐及各平台 VPN 客户端配置教程。"
-  keywords="机场推荐, 机场推荐 2026, 稳定机场推荐, 便宜机场推荐, 专线机场推荐, 机场排行榜, 2026 机场排行榜, 梯子推荐, 翻墙梯子推荐, 科学上网梯子推荐"
->
-  <!-- SEO: FAQ Schema -->
-  <script type="application/ld+json" set:html={JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "海外机场是什么？",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "海外机场是一个提供全球网络加速与安全连接的服务平台，致力于为您在访问海外网站、使用 AI 工具、流媒体娱乐及远程办公时，提供更稳定顺畅的网络体验。"
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "适合哪些使用场景？",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "主要适用于需要访问国际网络资源的用户，例如使用海外 AI 工具、观看跨国流媒体、参与跨国远程会议及开发者进行跨区域代码部署等场景。"
-        }
-      }
-    ]
-  })} />
+const originalIndex = fs.readFileSync('src/pages/index.astro', 'utf8');
+const lines = originalIndex.split('\n');
 
-  <!-- 1. Hero Section -->
-  <section class="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
-    <!-- Background grid/map elements -->
-    <div class="absolute inset-0 z-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(var(--color-brand-neon) 1px, transparent 1px); background-size: 40px 40px; mask-image: linear-gradient(to bottom, black 40%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);"></div>
-    
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full grid lg:grid-cols-2 gap-12 items-center">
-      <!-- Left Content -->
-      <div>
-        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-brand-neon/10 border border-brand-neon/20 mb-6">
-          <span class="w-2 h-2 rounded-full bg-brand-neon animate-pulse-slow"></span>
-          <span class="text-xs font-mono tracking-widest text-brand-neon">OVERSEAS AIRPORT · GLOBAL NETWORK</span>
-        </div>
-        
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
-          海外机场<br />
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">连接你的下一站</span>
-        </h1>
-        
-        <p class="text-lg text-slate-400 mb-8 max-w-xl leading-relaxed">
-          为海外网站、流媒体、AI 工具、远程办公与日常网络访问场景，提供更顺畅的全球网络连接体验。
-        </p>
-        
-        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-10">
-          <a href="#board" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-bold text-brand-dark bg-brand-accent hover:bg-yellow-400 rounded-sm transition-colors uppercase tracking-wider">
-            立即登机
-          </a>
-          <a href="#destinations" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-medium text-white border border-white/20 hover:bg-white/5 rounded-sm transition-colors uppercase tracking-wider">
-            查看全球航线
-          </a>
-        </div>
-        
-        <div class="flex items-center space-x-6 text-xs font-mono text-slate-500 uppercase">
-          <div class="flex items-center space-x-2">
-            <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>Network Online</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <svg class="w-4 h-4 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>Global Routes</span>
-          </div>
-          <div class="flex items-center space-x-2">
-            <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>24/7 Available</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Right Visual: Control Panel -->
-      <div class="relative hidden lg:block h-[500px] w-full rounded-xl border border-white/10 bg-brand-navy shadow-2xl overflow-hidden p-6">
-        <div class="absolute inset-0 bg-gradient-to-br from-brand-neon/5 to-transparent"></div>
-        
-        <!-- Header of Panel -->
-        <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
-          <div class="font-mono text-xs text-slate-400 tracking-widest">GLOBAL ROUTE CONTROL</div>
-          <div class="flex space-x-2">
-            <div class="w-2 h-2 rounded-full bg-red-500/50"></div>
-            <div class="w-2 h-2 rounded-full bg-yellow-500/50"></div>
-            <div class="w-2 h-2 rounded-full bg-green-500/80 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-          </div>
-        </div>
-        
-        <!-- Simplified Map abstraction -->
-        <div class="relative h-64 border border-white/5 bg-black/20 rounded-md mb-6 overflow-hidden flex items-center justify-center">
-          <svg class="w-full h-full text-white/5 opacity-50" viewBox="0 0 800 400" fill="currentColor">
-            <!-- Very abstract dotted map shapes -->
-            <path d="M600,100 Q650,50 700,100 T750,150" stroke="var(--color-brand-neon)" stroke-width="2" fill="none" stroke-dasharray="4,4" class="opacity-50" />
-            <path d="M200,150 Q300,100 400,150 T600,200" stroke="var(--color-brand-neon)" stroke-width="2" fill="none" class="animate-pulse-slow" />
-            
-            <!-- Nodes -->
-            <circle cx="200" cy="150" r="4" fill="var(--color-brand-accent)" />
-            <circle cx="400" cy="150" r="3" fill="var(--color-brand-neon)" />
-            <circle cx="600" cy="200" r="4" fill="white" />
-            <circle cx="700" cy="100" r="3" fill="var(--color-brand-neon)" />
-          </svg>
-          
-          <!-- Node labels -->
-          <div class="absolute top-1/3 left-1/4 transform -translate-x-1/2 -translate-y-1/2 font-mono text-[10px] text-brand-accent bg-black/50 px-1 border border-brand-accent/30">ASIA-01</div>
-          <div class="absolute top-1/2 left-3/4 transform -translate-x-1/2 -translate-y-1/2 font-mono text-[10px] text-white bg-black/50 px-1 border border-white/30">US-WEST</div>
-        </div>
-        
-        <!-- Status Cards -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-black/30 border border-white/5 rounded-md p-3">
-            <div class="text-[10px] text-slate-500 font-mono mb-1">FLIGHT OA-001</div>
-            <div class="text-sm font-bold text-brand-neon font-mono">STATUS: CONNECTED</div>
-            <div class="text-xs text-slate-400 mt-2">ROUTE: ASIA → GLOBAL</div>
-          </div>
-          <div class="bg-black/30 border border-white/5 rounded-md p-3">
-            <div class="text-[10px] text-slate-500 font-mono mb-1">CURRENT GATE</div>
-            <div class="text-sm font-bold text-green-400 font-mono">ONLINE</div>
-            <div class="text-xs text-slate-400 mt-2">SECURE TUNNEL ACTIVE</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+// Find the line index to insert import
+const frontmatterEnd = lines.indexOf('---', 1);
+lines.splice(frontmatterEnd, 0, "import BrandCard from '../components/BrandCard.astro';");
+lines.splice(frontmatterEnd, 0, "import { getCollection } from 'astro:content';");
+lines.splice(frontmatterEnd, 0, "const blogs = (await getCollection('blog')).slice(0, 3);");
 
-  <!-- SEO Keyword Topic Cluster: 2026机场推荐 -->
-  <section class="py-16 bg-brand-navy border-t border-white/5 relative z-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="max-w-4xl prose prose-invert prose-brand">
-        <h2 class="text-3xl font-bold text-white mb-6">2026机场推荐与科学上网选择指南</h2>
-        <p class="text-lg text-slate-400">
-          在寻找 <strong>2026机场推荐</strong> 或 <strong>梯子推荐</strong> 时，我们往往会面临无数复杂的选择。不要盲目相信跑满带宽的测速截图，因为 <strong>稳定机场</strong> 的核心在于底层的 <strong>专线机场</strong> 架构（如 IPLC/IEPL）以及应对晚高峰网络拥堵的路由优化策略。
-        </p>
-        <p class="text-slate-400">
-          对于预算有限的用户，高性价比的 <strong>便宜机场</strong> 同样可以满足轻度浏览需求；而如果你是重度使用者，支持 <strong>Clash机场</strong> 配置、提供原生 IP 的 <strong>流媒体机场</strong> 甚至是 <strong>ChatGPT机场</strong> 则显得尤为重要。你可以通过我们的 <a href="/ranking" class="text-brand-neon hover:underline">机场天梯榜</a> 根据自身真实场景（而不是虚假的绝对分数）进行选择。
-        </p>
-      </div>
-    </div>
-  </section>
+// Find the end of SEO block (<!-- 2. Global Network Departure Board --> is around line 147)
+const boardStartIdx = lines.findIndex(l => l.includes('<!-- 2. Global Network Departure Board -->'));
 
+const topPart = lines.slice(0, boardStartIdx).join('\n');
 
+const newContent = `
   <!-- FAST PICK -->
   <section class="py-20 bg-brand-dark border-y border-white/5 relative z-10" id="fast-pick">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -295,7 +162,7 @@ import BrandCard from '../components/BrandCard.astro';
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         {blogs.map(post => (
-          <a href={`/blog/${post.id}`} class="block group bg-brand-navy border border-white/5 rounded-xl p-6 hover:border-brand-neon/30 transition-all">
+          <a href={\`/blog/\${post.id}\`} class="block group bg-brand-navy border border-white/5 rounded-xl p-6 hover:border-brand-neon/30 transition-all">
             <div class="text-xs font-mono text-brand-accent mb-3">{post.data.date || 'LATEST'}</div>
             <h4 class="text-lg font-bold text-white mb-2 group-hover:text-brand-neon line-clamp-2">{post.data.title}</h4>
             <p class="text-sm text-slate-400 line-clamp-3">{post.data.description}</p>
@@ -310,3 +177,7 @@ import BrandCard from '../components/BrandCard.astro';
     </div>
   </section>
 </Layout>
+`;
+
+fs.writeFileSync('src/pages/index.astro', topPart + '\n' + newContent);
+console.log('Successfully rebuilt index.astro');

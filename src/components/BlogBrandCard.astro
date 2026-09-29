@@ -1,0 +1,66 @@
+---
+import brands from '../data/brands.json';
+
+export interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const brand = brands.find(b => b.slug === slug);
+
+if (!brand) return null;
+
+// Determine tags
+const tags = [];
+if (brand.features.some((f: string) => f.toLowerCase().includes('iplc') || f.toLowerCase().includes('iepl') || f.toLowerCase().includes('专线'))) tags.push('专线');
+if (brand.features.some((f: string) => f.toLowerCase().includes('netflix') || f.toLowerCase().includes('流媒体') || f.toLowerCase().includes('disney'))) tags.push('Streaming');
+if (brand.features.some((f: string) => f.toLowerCase().includes('chatgpt') || f.toLowerCase().includes('ai'))) tags.push('AI');
+const displayTags = tags.slice(0, 3);
+---
+
+<div class="my-8 bg-brand-navy border border-brand-neon/30 rounded-xl overflow-hidden shadow-lg not-prose">
+  <div class="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div class="flex-grow">
+      <div class="flex items-center gap-3 mb-2">
+        <h4 class="text-xl font-bold text-white m-0">{brand.name}</h4>
+        {displayTags.length > 0 && (
+          <div class="flex gap-1">
+            {displayTags.map(tag => (
+              <span class="text-[0.6rem] font-bold tracking-widest bg-brand-accent/10 text-brand-accent px-2 py-0.5 rounded-sm uppercase">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+      <ul class="space-y-1 mb-0 pl-0">
+        {brand.features.slice(0, 2).map((b: string) => (
+          <li class="flex items-center text-sm text-slate-300">
+            <svg class="w-4 h-4 text-brand-neon mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+      {brand.discount && brand.discount !== '暂无优惠' && brand.discount !== '(暂无优惠）' && (
+         <div class="mt-3 text-xs text-brand-accent font-mono border border-brand-accent/20 bg-brand-accent/5 inline-block px-2 py-1 rounded">
+           优惠码: {brand.discount}
+         </div>
+      )}
+    </div>
+    
+    <div class="flex flex-col sm:flex-row md:flex-col gap-3 shrink-0 min-w-[140px]">
+      {brand.aff ? (
+        <a href={brand.aff} data-departure-link class="text-center py-2 px-4 bg-brand-neon text-brand-dark font-bold rounded hover:bg-white transition-colors text-sm uppercase tracking-widest shadow-[0_0_10px_rgba(56,189,248,0.3)] w-full">
+          快速购买
+        </a>
+      ) : (
+        <span class="text-center py-2 px-4 bg-white/10 text-slate-400 font-bold rounded cursor-not-allowed text-sm uppercase w-full">
+          入口待补充
+        </span>
+      )}
+      <a href={`/brands/${brand.slug}`} class="text-center py-2 px-4 border border-white/20 text-white font-bold rounded hover:border-brand-neon hover:text-brand-neon transition-colors text-sm w-full">
+        查看详情
+      </a>
+    </div>
+  </div>
+</div>

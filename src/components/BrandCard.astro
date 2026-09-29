@@ -1,0 +1,79 @@
+---
+export interface Props {
+  brand: any;
+  featured?: boolean;
+}
+
+const { brand, featured = false } = Astro.props;
+
+// Compute derived properties
+const tags = [];
+if (brand.features.some((f: string) => f.toLowerCase().includes('iplc') || f.toLowerCase().includes('iepl') || f.toLowerCase().includes('专线'))) tags.push('专线');
+if (brand.features.some((f: string) => f.toLowerCase().includes('netflix') || f.toLowerCase().includes('流媒体') || f.toLowerCase().includes('disney'))) tags.push('Streaming');
+if (brand.features.some((f: string) => f.toLowerCase().includes('chatgpt') || f.toLowerCase().includes('ai'))) tags.push('AI');
+if (brand.features.some((f: string) => f.toLowerCase().includes('不限设备') || f.toLowerCase().includes('多设备'))) tags.push('多设备');
+
+const isVless = brand.features.some((f: string) => f.toLowerCase().includes('vless'));
+if (isVless) tags.push('VLESS');
+
+// Only take up to 4 tags
+const displayTags = tags.slice(0, 4);
+
+// Positioning sentence
+let positioning = '优质网络加速服务提供商';
+if (tags.includes('专线') && tags.includes('AI')) positioning = '专线级稳定，完美支持 AI 与流媒体解锁';
+else if (tags.includes('专线')) positioning = '低延迟跨境专线服务商';
+else if (tags.includes('Streaming')) positioning = '流媒体解锁优化网络服务';
+
+// Bullet points
+const bullets = brand.features.slice(0, 3);
+---
+
+<div class={`flex flex-col relative bg-brand-navy border rounded-xl overflow-hidden transition-all duration-300 ${featured ? 'border-brand-neon/50 shadow-[0_0_15px_rgba(56,189,248,0.15)] hover:shadow-[0_0_25px_rgba(56,189,248,0.25)] scale-[1.02]' : 'border-white/10 hover:border-brand-neon/30 hover:bg-brand-navy/80'}`} data-brand-card data-tags={tags.join(',')}>
+  {featured && (
+    <div class="absolute top-0 right-0 bg-brand-accent text-brand-dark text-[0.65rem] font-bold px-3 py-1 uppercase tracking-widest rounded-bl-lg z-10">
+      Featured
+    </div>
+  )}
+
+  <div class="p-6 flex-grow flex flex-col">
+    <h3 class={`font-bold mb-1 ${featured ? 'text-2xl text-white' : 'text-xl text-slate-100'}`}>
+      {brand.name}
+    </h3>
+    <p class="text-xs text-brand-neon mb-4 font-mono">{positioning}</p>
+
+    {displayTags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-5">
+        {displayTags.map(tag => (
+          <span class="text-[0.65rem] font-bold tracking-widest bg-white/5 text-slate-300 px-2 py-1 rounded-sm uppercase border border-white/10">
+            {tag}
+          </span>
+        ))}
+      </div>
+    )}
+
+    <ul class="space-y-2 mb-6 flex-grow">
+      {bullets.map((b: string) => (
+        <li class="flex items-start text-sm text-slate-400">
+          <svg class="w-4 h-4 text-brand-neon mr-2 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <span class="leading-snug">{b}</span>
+        </li>
+      ))}
+    </ul>
+    
+    <div class="flex flex-col gap-3 mt-auto pt-4 border-t border-white/5">
+      {brand.aff ? (
+        <a href={brand.aff} data-departure-link class={`text-center py-3 rounded-md font-bold transition-colors ${featured ? 'bg-brand-neon text-brand-dark hover:bg-white' : 'bg-brand-accent text-brand-dark hover:bg-yellow-400'}`}>
+          快速购买
+        </a>
+      ) : (
+        <span class="text-center py-3 rounded-md font-bold bg-white/10 text-slate-400 cursor-not-allowed">
+          购买入口待补充
+        </span>
+      )}
+      <a href={`/brands/${brand.slug}`} class="text-center py-3 rounded-md font-bold border border-white/20 text-white hover:border-brand-neon hover:text-brand-neon transition-colors">
+        查看详情
+      </a>
+    </div>
+  </div>
+</div>
