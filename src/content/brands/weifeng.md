@@ -126,6 +126,10 @@ purchase:
   url: "https://edp01.breezenetaff.com/#/?code=bSnymFll"
   cloaked: true
 
+serviceIntro:
+  - "微风网络目前以全 IPLC 专线作为主要线路架构，并使用 VLESS 协议提供跨境网络连接。官方资料显示其套餐不限速，也不限制设备同时接入数量。"
+  - "套餐结构同时覆盖按月刷新流量与不限时总流量两种模式，从 100GB/月到 1200GB/月均有对应方案，并提供 270GB 与 570GB 的不限时流量包。当前全场套餐还可以使用优惠码 weifeng90 享受 7 折优惠。"
+
 visualData:
   traffic:
     - label: "清风"
