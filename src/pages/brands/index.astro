@@ -1,0 +1,109 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+// Read brands data
+const brandsPath = path.resolve(process.cwd(), 'src/data/brands.json');
+const brands = JSON.parse(fs.readFileSync(brandsPath, 'utf8'));
+
+const title = "全球机场与 VPN 品牌大全 | 2026 稳定网络服务评测与推荐";
+const description = "探索最新、最全的海外机场和梯子品牌数据库。根据专线、流媒体解锁、AI 支持等场景，帮您筛选出最合适的科学上网工具。";
+const currentUrl = Astro.url.href;
+const siteUrl = Astro.site?.toString() || Astro.url.origin;
+---
+
+<Layout title={title} description={description}>
+  <!-- Schema.org -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "海外机场品牌大全",
+    "description": description,
+    "url": currentUrl
+  })} />
+
+  <!-- Breadcrumb -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "首页", "item": siteUrl },
+      { "@type": "ListItem", "position": 2, "name": "品牌中心", "item": currentUrl }
+    ]
+  })} />
+
+  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5 relative overflow-hidden">
+    <div class="absolute inset-0 z-0 flex items-center justify-center opacity-10 pointer-events-none">
+      <div class="w-[800px] h-[800px] border-[40px] border-brand-neon rounded-full blur-[120px]"></div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center max-w-3xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-6 text-white uppercase">
+          Brand Hub <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-neon to-brand-accent">品牌中心</span>
+        </h1>
+        <p class="text-lg text-slate-400">
+          全网最全的稳定机场与专线网络服务目录。我们通过实测数据，为您呈现各品牌的核心优势。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-brand-dark">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Brand Filters -->
+      <div class="flex flex-wrap gap-4 mb-12 justify-center">
+        <span class="px-4 py-2 bg-brand-neon/20 text-brand-neon border border-brand-neon rounded-full text-sm font-bold uppercase tracking-wider">全部品牌</span>
+        <span class="px-4 py-2 bg-white/5 text-slate-400 border border-white/10 hover:border-brand-neon hover:text-white rounded-full text-sm font-medium transition-colors cursor-pointer">IPLC 专线</span>
+        <span class="px-4 py-2 bg-white/5 text-slate-400 border border-white/10 hover:border-brand-neon hover:text-white rounded-full text-sm font-medium transition-colors cursor-pointer">流媒体解锁</span>
+        <span class="px-4 py-2 bg-white/5 text-slate-400 border border-white/10 hover:border-brand-neon hover:text-white rounded-full text-sm font-medium transition-colors cursor-pointer">支持 ChatGPT</span>
+        <span class="px-4 py-2 bg-white/5 text-slate-400 border border-white/10 hover:border-brand-neon hover:text-white rounded-full text-sm font-medium transition-colors cursor-pointer">Clash 支持</span>
+      </div>
+
+      <!-- Brand Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {brands.map((brand) => {
+          const hasIPLC = brand.features.some(f => f.toLowerCase().includes('iplc') || f.includes('专线'));
+          const hasNetflix = brand.features.some(f => f.toLowerCase().includes('netflix') || f.includes('流媒体'));
+          const hasAI = brand.features.some(f => f.toLowerCase().includes('chatgpt') || f.toLowerCase().includes('ai'));
+          
+          return (
+            <a href={`/brands/${brand.slug}`} class="group bg-brand-navy border border-white/10 rounded-xl p-6 hover:border-brand-neon/50 hover:bg-brand-navy/80 transition-all relative overflow-hidden flex flex-col">
+              <div class="absolute top-0 right-0 w-32 h-32 bg-brand-neon/5 rounded-bl-full -mr-16 -mt-16 group-hover:bg-brand-neon/20 transition-colors"></div>
+              
+              <div class="flex items-start justify-between mb-4 relative z-10">
+                <h2 class="text-xl font-bold text-white group-hover:text-brand-neon transition-colors">{brand.name}</h2>
+                {brand.discount && brand.discount !== '(暂无优惠）' && (
+                  <span class="text-[0.65rem] bg-brand-accent/20 text-brand-accent px-2 py-1 rounded font-mono uppercase tracking-wider">{brand.discount}</span>
+                )}
+              </div>
+              
+              <div class="flex flex-wrap gap-2 mb-6 relative z-10">
+                {hasIPLC && <span class="text-[0.65rem] font-mono border border-white/20 text-slate-300 px-2 py-0.5 rounded-sm">IPLC专线</span>}
+                {hasNetflix && <span class="text-[0.65rem] font-mono border border-white/20 text-slate-300 px-2 py-0.5 rounded-sm">流媒体</span>}
+                {hasAI && <span class="text-[0.65rem] font-mono border border-white/20 text-slate-300 px-2 py-0.5 rounded-sm">AI 解锁</span>}
+                <span class="text-[0.65rem] font-mono border border-white/20 text-slate-300 px-2 py-0.5 rounded-sm">全平台</span>
+              </div>
+              
+              <ul class="space-y-2 mb-6 flex-grow relative z-10">
+                {brand.features.slice(0, 3).map((feature) => (
+                  <li class="text-sm text-slate-400 flex items-start">
+                    <svg class="w-4 h-4 text-brand-neon mr-2 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <span class="line-clamp-2">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <div class="mt-auto relative z-10 pt-4 border-t border-white/5 flex items-center justify-between">
+                <span class="text-sm font-bold text-white">查看 {brand.name} 详情</span>
+                <svg class="w-5 h-5 text-brand-neon transform group-hover:translate-x-2 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+</Layout>

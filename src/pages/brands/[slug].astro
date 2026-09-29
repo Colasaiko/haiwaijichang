@@ -1,0 +1,201 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+export async function getStaticPaths() {
+  const brandsPath = path.resolve(process.cwd(), 'src/data/brands.json');
+  const brands = JSON.parse(fs.readFileSync(brandsPath, 'utf8'));
+  
+  return brands.map((brand) => {
+    return {
+      params: { slug: brand.slug },
+      props: { brand, allBrands: brands }
+    };
+  });
+}
+
+const { brand, allBrands } = Astro.props;
+
+// Determine tags/features
+const hasIPLC = brand.features.some(f => f.toLowerCase().includes('iplc') || f.includes('专线'));
+const hasNetflix = brand.features.some(f => f.toLowerCase().includes('netflix') || f.includes('流媒体'));
+const hasAI = brand.features.some(f => f.toLowerCase().includes('chatgpt') || f.toLowerCase().includes('ai') || f.toLowerCase().includes('claude'));
+
+const title = `${brand.name} 怎么样？线路评测、套餐价格与使用教程 - 海外机场`;
+const description = `详细了解 ${brand.name} 的线路质量、套餐价格、流媒体及 ChatGPT 解锁能力。为您提供最新优惠信息及真实使用评价，帮您判断 ${brand.name} 是否适合您。`;
+const currentUrl = Astro.url.href;
+const siteUrl = Astro.site?.toString() || Astro.url.origin;
+
+// Get a few related brands randomly or sequentially
+const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
+---
+
+<Layout title={title} description={description} keywords={`${brand.name}, ${brand.name}怎么样, ${brand.name}机场, ${brand.name}优惠码, ${brand.name}专线, ${brand.name}教程`}>
+  
+  <!-- Schema.org for Brand/Service -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": brand.name,
+    "description": description,
+    "category": "Network Service",
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "CNY",
+      "price": "10.00",
+      "availability": "https://schema.org/InStock"
+    },
+    "brand": {
+      "@type": "Brand",
+      "name": brand.name
+    }
+  })} />
+
+  <!-- Breadcrumb -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "首页", "item": siteUrl },
+      { "@type": "ListItem", "position": 2, "name": "品牌", "item": `${siteUrl}/brands` },
+      { "@type": "ListItem", "position": 3, "name": brand.name, "item": currentUrl }
+    ]
+  })} />
+
+  <section class="pt-32 pb-16 bg-brand-dark border-b border-white/5 relative">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumb UI -->
+      <nav class="flex items-center space-x-2 text-xs font-mono tracking-wider text-slate-500 mb-8 uppercase">
+        <a href="/" class="hover:text-brand-neon transition-colors">HOME</a>
+        <span>/</span>
+        <a href="/brands" class="hover:text-brand-neon transition-colors">BRANDS</a>
+        <span>/</span>
+        <span class="text-white">{brand.slug}</span>
+      </nav>
+
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
+        <div>
+          <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
+            {brand.name}
+          </h1>
+          <div class="flex flex-wrap gap-2 mb-6">
+            {hasIPLC && <span class="text-[0.7rem] font-bold tracking-widest bg-brand-accent text-brand-dark px-3 py-1 rounded-sm uppercase">IPLC 专线</span>}
+            {hasNetflix && <span class="text-[0.7rem] font-bold tracking-widest bg-white/10 text-white px-3 py-1 rounded-sm uppercase border border-white/20">Streaming</span>}
+            {hasAI && <span class="text-[0.7rem] font-bold tracking-widest bg-white/10 text-white px-3 py-1 rounded-sm uppercase border border-white/20">AI Ready</span>}
+          </div>
+          <p class="text-lg text-slate-400 max-w-2xl leading-relaxed">
+            {brand.name} 是一家优质的海外网络加速服务提供商，专为解决国际网络延迟、流媒体解锁和海外工作需求而设计。本页为您提供详细的评测和使用指导。
+          </p>
+        </div>
+        
+        <div class="shrink-0">
+          <a href="#" data-departure-link class="inline-flex items-center justify-center px-8 py-4 bg-brand-neon text-brand-dark font-bold text-lg rounded-sm hover:bg-brand-neon/90 transition-all uppercase tracking-widest shadow-[0_0_20px_rgba(56,189,248,0.3)]">
+            前往 {brand.name} 官网
+          </a>
+          {brand.discount && brand.discount !== '(暂无优惠）' && (
+            <div class="mt-4 text-center">
+              <span class="text-xs text-slate-400">专属优惠码:</span>
+              <div class="mt-1 font-mono font-bold text-brand-accent bg-white/5 border border-white/10 px-3 py-1.5 rounded inline-block">
+                {brand.discount}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Details Content -->
+  <section class="py-16 bg-brand-navy">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
+      
+      <!-- Main Content -->
+      <div class="md:col-span-2 space-y-12">
+        <div>
+          <h2 class="text-2xl font-bold text-white mb-6 pb-4 border-b border-white/10 flex items-center">
+            <span class="w-1.5 h-6 bg-brand-neon mr-3 rounded-sm"></span>
+            核心特性与优势
+          </h2>
+          <ul class="space-y-4">
+            {brand.features.map((f) => (
+              <li class="flex items-start text-slate-300">
+                <svg class="w-6 h-6 text-brand-neon mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span class="text-base leading-relaxed">{f}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="prose prose-invert prose-brand max-w-none">
+          <h2 class="text-2xl font-bold text-white mb-6 pb-4 border-b border-white/10 flex items-center mt-12">
+            <span class="w-1.5 h-6 bg-brand-neon mr-3 rounded-sm"></span>
+            {brand.name} 详细评测
+          </h2>
+          <p>
+            在选择机场和加速服务时，稳定性是首要考量。<strong>{brand.name}</strong> 通过部署优质的跨境数据专线，确保了在晚高峰期间依然能够提供出色的网络连接速度。
+          </p>
+          
+          <h3>使用场景</h3>
+          <p>
+            结合我们的测试数据，{brand.name} 特别适合以下场景：
+          </p>
+          <ul>
+            {hasIPLC && <li><strong>游戏与极速浏览：</strong> 借助 IPLC 专线，物理延迟极低，杜绝了普通线路的拥堵和丢包现象。</li>}
+            {hasNetflix && <li><strong>流媒体解锁：</strong> 提供大量原生 IP 节点，完美解锁 Netflix、Disney+、Hulu 等主流流媒体平台。</li>}
+            {hasAI && <li><strong>AI 工具访问：</strong> 纯净的 IP 质量，让您无忧访问 ChatGPT、Claude、Midjourney 等人工智能服务，降低封号风险。</li>}
+            <li><strong>跨端使用：</strong> 支持全面兼容 Clash、Shadowrocket、v2rayN 等主流客户端。</li>
+          </ul>
+
+          <h3>如何开始使用？</h3>
+          <p>
+            新手用户可以通过 <a href="/guides" class="text-brand-neon hover:underline">通用客户端导入教程</a> 快速上手。前往 {brand.name} 购买对应套餐后，复制订阅链接，导入您的软件并一键更新即可连接。
+          </p>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-8">
+        <!-- Related Articles -->
+        <div class="bg-brand-dark border border-white/5 p-6 rounded-xl">
+          <h3 class="text-xs font-bold font-mono tracking-widest text-slate-500 uppercase mb-4">关于这个品牌的内容</h3>
+          <ul class="space-y-4">
+            <li>
+              <a href="/help/getting-started" class="group flex flex-col">
+                <span class="text-sm font-bold text-slate-300 group-hover:text-brand-neon transition-colors">新手如何导入节点？</span>
+                <span class="text-xs text-slate-500 mt-1">适用于 {brand.name} 的基础指南</span>
+              </a>
+            </li>
+            <li>
+              <a href={hasAI ? "/help/ai-tools-access" : "/help/streaming-region-locked"} class="group flex flex-col">
+                <span class="text-sm font-bold text-slate-300 group-hover:text-brand-neon transition-colors">{hasAI ? "如何解决 ChatGPT 封号问题？" : "Netflix 地区限制如何突破？"}</span>
+                <span class="text-xs text-slate-500 mt-1">进阶使用场景</span>
+              </a>
+            </li>
+            <li>
+              <a href="/help/how-to-check-plan-status" class="group flex flex-col">
+                <span class="text-sm font-bold text-slate-300 group-hover:text-brand-neon transition-colors">套餐与流量查询方法</span>
+                <span class="text-xs text-slate-500 mt-1">管理您的 {brand.name} 账户</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Similar Brands -->
+        <div class="bg-brand-dark border border-white/5 p-6 rounded-xl">
+          <h3 class="text-xs font-bold font-mono tracking-widest text-slate-500 uppercase mb-4">站内其他相关品牌</h3>
+          <ul class="space-y-3">
+            {relatedBrands.map(rb => (
+              <li>
+                <a href={`/brands/${rb.slug}`} class="flex items-center justify-between group">
+                  <span class="text-sm font-bold text-slate-300 group-hover:text-white transition-colors">{rb.name}</span>
+                  <svg class="w-4 h-4 text-slate-500 group-hover:text-brand-neon transition-colors transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

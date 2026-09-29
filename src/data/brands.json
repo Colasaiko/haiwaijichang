@@ -7,7 +7,8 @@
       "不限制设备同时接入",
       "不限速"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "weifeng"
   },
   {
     "name": "飞猫云",
@@ -17,7 +18,8 @@
       "原生 IP 线路，轻松解锁 Netflix、Disney+、ChatGPT、TikTok 等服务",
       "不限制设备连接数量，多端同时登录使用"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "feimao"
   },
   {
     "name": "萤火虫 (FireFly)",
@@ -27,7 +29,8 @@
       "不限设备数",
       "IPLC专线网络"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "firefly"
   },
   {
     "name": "跨界云",
@@ -38,7 +41,8 @@
       "支持ChatGPT、Gemini、Claude等AI",
       "不限制设备登录数"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "kuajie"
   },
   {
     "name": "灵猫",
@@ -48,7 +52,8 @@
       "可达到的最大带宽：1000 Mbps",
       "原生IP解锁Netfilx等流媒体， 解锁 Chatgpt，Gemini，Tiktok"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "lingmao"
   },
   {
     "name": "闪跃",
@@ -58,7 +63,8 @@
       "原生IP解锁各大流媒体",
       "解锁 Chatgpt，Tiktok"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "shanyue"
   },
   {
     "name": "无忧链接",
@@ -68,7 +74,8 @@
       "稳定全球Chatgpt，Gemini等AI支持",
       "4K流畅Netfilx/Hulu等观影体验"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "wuyou"
   },
   {
     "name": "BitzNet",
@@ -79,7 +86,8 @@
       "普通国际线路",
       "不限制本人设备数"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "bitznet"
   },
   {
     "name": "sogo云",
@@ -89,7 +97,8 @@
       "智能负载｜晚高峰不限速｜4K 秒开",
       "全线路流媒体解锁"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "sogo"
   },
   {
     "name": "暮光加速",
@@ -99,7 +108,8 @@
       "Netflix / Hulu / HBO / Disney+ / DAZN 等主流流媒体完整解锁，4K 即点即播，支持 8K 资源",
       "全面支持 ChatGPT、Claude 等 AI 应用与开发工具访问"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "muguang"
   },
   {
     "name": "星岛梦",
@@ -109,7 +119,8 @@
       "解锁能力：原生 IP，支持 Netflix / Disney+ / ChatGPT / TikTok。",
       "设备并发：多设备不限量同时在线（电脑/手机/路由器）。"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "xingdaomeng"
   },
   {
     "name": "唯兔云",
@@ -119,7 +130,8 @@
       "原生IP解锁Netfilx/Hulu/Hbo/Disney+/HUGO等流媒体",
       "解锁 Chatgpt，Tiktok"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "weitu"
   },
   {
     "name": "光速云",
@@ -129,7 +141,8 @@
       "原生 IP 解锁 Netflix / Disney+ / ChatGPT / TikTok",
       "不限设备，多端同时在线"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "guangsu"
   },
   {
     "name": "U1S1",
@@ -139,7 +152,8 @@
       "不限速 · 不限设备数量",
       "Netflix / Disney+ / HBO / DAZN 全平台解锁秒开"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "u1s1"
   },
   {
     "name": "极连云",
@@ -149,7 +163,8 @@
       "原生 IP 解锁各大流媒体",
       "解锁 ChatGPT、TikTok"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "jilian"
   },
   {
     "name": "光年梯",
@@ -159,7 +174,8 @@
       "原生 IP，解锁主流流媒体平台",
       "支持解锁 ChatGPT / TikTok"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "guangnian"
   },
   {
     "name": "一翻云",
@@ -169,7 +185,8 @@
       "适配自研客户端，轻松一键快速连接",
       "覆盖港/台/新/日/美等 60+ 优质全球节点"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "yifan"
   },
   {
     "name": "二猫云",
@@ -179,7 +196,8 @@
       "解锁能力：原生 IP，支持 Netflix / Disney+ / ChatGPT / TikTok。",
       "设备并发：多设备不限量同时在线（电脑/手机/路由器）。"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "ermao"
   },
   {
     "name": "边缘节点",
@@ -189,7 +207,8 @@
       "原生 IP 线路，轻松解锁 Netflix、Disney+、ChatGPT、TikTok 等服务",
       "不限制设备连接数量，多端同时登录使用"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "edge"
   },
   {
     "name": "可信云",
@@ -199,7 +218,8 @@
       "解锁各大流媒体及AI工具",
       "不限制客户端"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "kexin"
   },
   {
     "name": "速界机场",
@@ -209,7 +229,8 @@
       "原生 IP 线路，轻松解锁 Netflix、Disney+、ChatGPT、TikTok 等服务",
       "智能流量分配与路由优化，让访问更顺畅更智能"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "sujie"
   },
   {
     "name": "快狸",
@@ -219,7 +240,8 @@
       "解锁能力：原生 IP，支持 Netflix / Disney+ / ChatGPT / TikTok。",
       "设备并发：多设备不限量同时在线（电脑/手机/路由器）。"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "kuaili"
   },
   {
     "name": "飞V",
@@ -229,7 +251,8 @@
       "流媒体全家桶：Netflix / Prime Video / BBC / Abema / TVer 等全面覆盖，原生IP直通，极致体验",
       "开发者之选：ChatGPT 4 / GitHub Copilot / Hugging Face 完整支持，低延迟API调用"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "v"
   },
   {
     "name": "梯子云",
@@ -239,7 +262,8 @@
       "完整解锁 Netflix / YouTube /ChatGPT 等全球主流流媒体，前沿 AI 工具。",
       "采用高性能 Shadowsocks (SS) 协议架构，不限制同时在线设备数。"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "tizi"
   },
   {
     "name": "WaveNet",
@@ -249,7 +273,8 @@
       "独占带宽，不抢网，彻底告别直播画质模糊与卡顿",
       "全球主流流媒体与内容平台全解锁，4K / 8K 稳定播放"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "wavenet"
   },
   {
     "name": "灵动云",
@@ -259,7 +284,8 @@
       "全能解锁｜全线解锁海外流媒体，4K 秒开，完美兼容 8K",
       "多端无阻｜SS 协议全平台一键导入，多设备同时在线无压力"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "lingdong"
   },
   {
     "name": "隐形人",
@@ -269,7 +295,8 @@
       "流媒体全家桶全面覆盖，原生IP直通，极致体验",
       "高性能协议，多国节点可选，不限制在线设备数，商务家庭优选"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "invisible"
   },
   {
     "name": "NanoCloud",
@@ -279,7 +306,8 @@
       "每个价钱有自己的同时支持多少设备",
       "添加TG频道享受内部优惠折扣"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "nanocloud"
   },
   {
     "name": "Phantom",
@@ -288,6 +316,7 @@
       "不限速",
       "高防服务器"
     ],
-    "pricing": []
+    "pricing": [],
+    "slug": "phantom"
   }
 ]

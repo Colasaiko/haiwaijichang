@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import LoadingOverlay from '../components/LoadingOverlay.astro';
 
 interface Props {
   title: string;
@@ -55,16 +56,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     })} />
   </head>
   <body class="bg-brand-navy text-brand-light antialiased min-h-screen flex flex-col">
-    <!-- Page Entry Animation (Only on initial load) -->
-    <div id="page-entry" class="page-entry-overlay fixed inset-0 z-[100] bg-brand-dark flex flex-col items-center justify-center">
-      <div class="text-center">
-        <div class="text-3xl font-bold tracking-widest text-brand-light mb-2">OVERSEAS AIRPORT</div>
-        <p class="text-xl text-brand-accent tracking-widest mb-8">海外机场</p>
-        <div class="font-mono text-sm text-brand-neon tracking-widest h-6 flex justify-center items-center">
-          <span class="page-entry-text"></span>
-        </div>
-      </div>
-    </div>
+    
+    <LoadingOverlay />
+
 
     <!-- Header Navigation -->
     <header id="main-header" class="fixed w-full top-0 z-50 transition-all duration-300 bg-brand-navy/80 backdrop-blur-md border-b border-white/5">
@@ -188,16 +182,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         btn.addEventListener('click', () => {
           menu.classList.toggle('hidden');
         });
-      }
-
-      // Check if this is a first visit to show animation
-      // For demo purposes, we show it every time. In production, maybe use sessionStorage
-      const entry = document.getElementById('page-entry');
-      if (entry) {
-        // Fallback to remove entry block just in case animation hangs
-        setTimeout(() => {
-          entry.style.display = 'none';
-        }, 1100);
       }
     </script>
   </body>

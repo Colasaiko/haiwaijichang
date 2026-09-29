@@ -1,0 +1,319 @@
+---
+// src/components/LoadingOverlay.astro
+---
+
+<div id="oa-loading-overlay" class="fixed inset-0 z-[9999] pointer-events-none opacity-0 flex flex-col justify-between overflow-hidden font-sans" aria-hidden="true" style="display: none;">
+  
+  <!-- Left Door -->
+  <div id="oa-door-left" class="absolute top-0 left-0 w-1/2 h-full bg-brand-dark z-10 origin-left transition-transform duration-500 ease-in-out"></div>
+  
+  <!-- Right Door -->
+  <div id="oa-door-right" class="absolute top-0 right-0 w-1/2 h-full bg-brand-dark z-10 origin-right transition-transform duration-500 ease-in-out"></div>
+
+  <!-- Background Container -->
+  <div id="oa-bg-container" class="absolute inset-0 z-20 flex justify-center items-center overflow-hidden opacity-0 transition-opacity duration-300">
+    <!-- Cinematic Image -->
+    <img src="/images/airport-bg.jpg" alt="Airport Background" class="absolute inset-0 w-full h-full object-cover origin-center transform scale-100" id="oa-bg-img" />
+    
+    <!-- Gradient Overlays -->
+    <div class="absolute inset-0 bg-gradient-to-b from-[#0a0f1d]/90 via-[#0a0f1d]/60 to-[#0a0f1d]/95 mix-blend-multiply"></div>
+    <div class="absolute inset-0 bg-brand-dark/40"></div>
+
+    <!-- Mode A Content (Entry) -->
+    <div id="oa-content-entry" class="relative z-30 flex flex-col items-center text-center opacity-0 transition-opacity duration-500 transform translate-y-4">
+      <span class="text-xs font-mono tracking-[0.3em] text-slate-400 uppercase mb-3">WELCOME TO</span>
+      <h1 class="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-white mb-2 uppercase">OVERSEAS AIRPORT</h1>
+      <h2 class="text-lg sm:text-xl md:text-2xl font-medium tracking-[0.3em] text-slate-300 mb-6">海外机场</h2>
+      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+        <span class="text-[0.65rem] font-mono tracking-[0.2em] text-brand-neon uppercase">GLOBAL NETWORK TERMINAL</span>
+      </div>
+    </div>
+
+    <!-- Mode B Content (Departure) -->
+    <div id="oa-content-departure" class="hidden relative z-30 flex-col items-center text-center opacity-0 transition-opacity duration-300 transform translate-y-2">
+      <h1 class="text-xl sm:text-2xl md:text-3xl font-bold tracking-wider text-white mb-4 uppercase">OVERSEAS AIRPORT</h1>
+      <div class="flex flex-col items-center space-y-2">
+        <span class="text-xs font-mono tracking-[0.2em] text-brand-accent uppercase animate-pulse">PREPARING DEPARTURE</span>
+        <span class="text-[0.65rem] font-mono tracking-[0.1em] text-slate-400">CONNECTING TO DESTINATION...</span>
+      </div>
+    </div>
+
+    <!-- Footer Area: Runway Lights & Status -->
+    <div class="absolute bottom-10 left-0 w-full z-30 flex flex-col items-center px-4">
+      
+      <!-- Status Sequence (Mode A only) -->
+      <div id="oa-status-text" class="text-xs font-mono tracking-[0.2em] text-brand-neon mb-6 h-4 transition-all duration-300"></div>
+
+      <!-- Runway Lights -->
+      <div class="relative w-full max-w-sm h-0.5 bg-white/10 flex justify-between items-center mb-6">
+        <div class="absolute left-0 top-0 h-full bg-brand-accent/30" id="oa-runway-line"></div>
+        {Array.from({ length: 9 }).map((_, i) => (
+          <div class="w-1.5 h-1.5 rounded-full bg-white/20 oa-runway-dot z-10 transition-colors duration-300 shadow-[0_0_8px_rgba(0,0,0,0)]" data-index={i}></div>
+        ))}
+      </div>
+
+      <!-- Terminal Info -->
+      <div class="flex items-center space-x-4 text-[0.6rem] font-mono tracking-widest text-slate-500 uppercase">
+        <span>TERMINAL OA</span>
+        <span class="w-1 h-1 rounded-full bg-slate-700"></span>
+        <span>GATE 01</span>
+        <span class="w-1 h-1 rounded-full bg-slate-700"></span>
+        <span class="text-slate-400">STATUS &middot; <span id="oa-final-status">BOARDING</span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Reduce motion */
+  @media (prefers-reduced-motion: reduce) {
+    #oa-bg-img {
+      transition: none !important;
+      transform: none !important;
+      animation: none !important;
+    }
+    .oa-runway-dot {
+      transition: opacity 0.3s ease !important;
+    }
+    #oa-door-left, #oa-door-right {
+      transition: opacity 0.3s ease !important;
+    }
+  }
+
+  .zoom-in-slow {
+    transition: transform 6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: scale(1.035) !important;
+  }
+  
+  .door-open-left {
+    transform: translateX(-100%);
+  }
+  
+  .door-open-right {
+    transform: translateX(100%);
+  }
+  
+  .door-fade-out {
+    opacity: 0;
+  }
+
+  .dot-active {
+    background-color: var(--color-brand-accent, #f59e0b) !important;
+    box-shadow: 0 0 10px var(--color-brand-accent, #f59e0b);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('oa-loading-overlay');
+    const doorLeft = document.getElementById('oa-door-left');
+    const doorRight = document.getElementById('oa-door-right');
+    const bgContainer = document.getElementById('oa-bg-container');
+    const bgImg = document.getElementById('oa-bg-img');
+    const contentEntry = document.getElementById('oa-content-entry');
+    const contentDeparture = document.getElementById('oa-content-departure');
+    const statusText = document.getElementById('oa-status-text');
+    const runwayDots = document.querySelectorAll('.oa-runway-dot');
+    
+    // Check reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Reset overlay state
+    const resetOverlay = () => {
+      overlay.style.display = 'none';
+      overlay.classList.remove('pointer-events-auto');
+      overlay.classList.add('pointer-events-none');
+      overlay.style.opacity = '0';
+      bgContainer.style.opacity = '0';
+      
+      contentEntry.classList.add('hidden');
+      contentEntry.style.opacity = '0';
+      contentEntry.style.transform = 'translateY(16px)';
+      
+      contentDeparture.classList.add('hidden');
+      contentDeparture.style.opacity = '0';
+      contentDeparture.style.transform = 'translateY(8px)';
+      
+      bgImg.classList.remove('zoom-in-slow');
+      
+      if (prefersReducedMotion) {
+        doorLeft.classList.remove('door-fade-out');
+        doorRight.classList.remove('door-fade-out');
+      } else {
+        doorLeft.classList.remove('door-open-left');
+        doorRight.classList.remove('door-open-right');
+      }
+      
+      runwayDots.forEach(dot => dot.classList.remove('dot-active'));
+      statusText.textContent = '';
+      document.body.style.overflow = '';
+    };
+
+    // Close doors animation
+    const closeDoors = () => {
+      return new Promise(resolve => {
+        document.body.style.overflow = 'hidden';
+        overlay.style.display = 'flex';
+        overlay.style.opacity = '1';
+        overlay.classList.remove('pointer-events-none');
+        overlay.classList.add('pointer-events-auto');
+        
+        // Wait a tiny bit for display:flex to apply
+        requestAnimationFrame(() => {
+          if (prefersReducedMotion) {
+            doorLeft.classList.remove('door-fade-out');
+            doorRight.classList.remove('door-fade-out');
+          } else {
+            doorLeft.classList.remove('door-open-left');
+            doorRight.classList.remove('door-open-right');
+          }
+          setTimeout(resolve, 500); // door transition time
+        });
+      });
+    };
+
+    // Open doors animation
+    const openDoors = () => {
+      bgContainer.style.opacity = '0';
+      
+      setTimeout(() => {
+        if (prefersReducedMotion) {
+          doorLeft.classList.add('door-fade-out');
+          doorRight.classList.add('door-fade-out');
+        } else {
+          doorLeft.classList.add('door-open-left');
+          doorRight.classList.add('door-open-right');
+        }
+        
+        setTimeout(() => {
+          resetOverlay();
+        }, 500);
+      }, 300);
+    };
+
+    // Animate runway lights
+    const animateRunway = (duration, steps) => {
+      const timePerStep = duration / steps;
+      let currentStep = 0;
+      
+      const interval = setInterval(() => {
+        if (currentStep < runwayDots.length) {
+          runwayDots[currentStep].classList.add('dot-active');
+        }
+        currentStep++;
+        if (currentStep > steps) {
+          clearInterval(interval);
+        }
+      }, timePerStep);
+    };
+
+    // Entry Sequence (Mode A)
+    const playEntrySequence = async () => {
+      resetOverlay();
+      document.body.style.overflow = 'hidden';
+      overlay.style.display = 'flex';
+      overlay.classList.remove('pointer-events-none');
+      overlay.classList.add('pointer-events-auto');
+      overlay.style.opacity = '1';
+      
+      // Doors are already closed by default CSS state
+      bgContainer.style.opacity = '1';
+      
+      contentEntry.classList.remove('hidden');
+      
+      // Slight delay for content to fade in
+      setTimeout(() => {
+        contentEntry.style.opacity = '1';
+        contentEntry.style.transform = 'translateY(0)';
+        if (!prefersReducedMotion) {
+          bgImg.classList.add('zoom-in-slow');
+        }
+      }, 100);
+
+      // Status text sequence
+      const statuses = ['CHECKING ROUTE', 'PREPARING NETWORK', 'GATE OPEN', 'READY FOR DEPARTURE'];
+      let sIdx = 0;
+      statusText.textContent = statuses[0];
+      
+      const statusInterval = setInterval(() => {
+        sIdx++;
+        if(sIdx < statuses.length) {
+          statusText.style.opacity = '0';
+          setTimeout(() => {
+            statusText.textContent = statuses[sIdx];
+            statusText.style.opacity = '1';
+          }, 150);
+        } else {
+          clearInterval(statusInterval);
+        }
+      }, 350);
+
+      animateRunway(1200, 9);
+
+      // Total entry time ~1.6s
+      setTimeout(() => {
+        openDoors();
+      }, 1600);
+    };
+
+    // Departure Sequence (Mode B)
+    const playDepartureSequence = async (targetUrl) => {
+      await closeDoors();
+      
+      bgContainer.style.opacity = '1';
+      contentDeparture.classList.remove('hidden');
+      
+      setTimeout(() => {
+        contentDeparture.style.opacity = '1';
+        contentDeparture.style.transform = 'translateY(0)';
+        if (!prefersReducedMotion) {
+          bgImg.classList.add('zoom-in-slow');
+        }
+      }, 50);
+      
+      statusText.textContent = ''; // Hide status sequence in Mode B
+      animateRunway(600, 9);
+      
+      // Short delay for Mode B (~800ms)
+      setTimeout(() => {
+        window.location.href = targetUrl;
+      }, 800);
+    };
+
+    // Initialization logic
+    // We check if it's the first time in the session
+    const hasSeenEntry = sessionStorage.getItem('oa_entry_seen');
+    
+    // We also need to check if this is a back navigation (bfcache)
+    // If it's a back navigation, we don't want to show the entry loading
+    window.addEventListener('pageshow', (event) => {
+      // event.persisted means it's loaded from back/forward cache
+      if (event.persisted) {
+        resetOverlay();
+        return;
+      }
+      
+      // Only play Entry Mode if we haven't seen it and it's a fresh load, not bfcache
+      if (!hasSeenEntry && !event.persisted) {
+        sessionStorage.setItem('oa_entry_seen', 'true');
+        playEntrySequence();
+      } else {
+        resetOverlay();
+      }
+    });
+
+    // Handle clicks on Departure Links
+    document.addEventListener('click', (e) => {
+      // Find closest a tag with data-departure-link
+      const link = e.target.closest('a[data-departure-link]');
+      if (link) {
+        // Only intercept if it's a left click without modifiers
+        if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+        
+        e.preventDefault();
+        const targetUrl = link.href;
+        playDepartureSequence(targetUrl);
+      }
+    });
+  });
+</script>

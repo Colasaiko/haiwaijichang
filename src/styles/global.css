@@ -22,30 +22,7 @@ body {
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-/* Page Entry Animation */
-@keyframes check-sequence {
-  0% { content: "CHECKING NETWORK..."; opacity: 0; }
-  10% { content: "CHECKING NETWORK..."; opacity: 1; }
-  30% { content: "ROUTE READY"; opacity: 1; }
-  50% { content: "DESTINATION AVAILABLE"; opacity: 1; }
-  70% { content: "BOARDING..."; opacity: 1; }
-  90% { content: "READY FOR DEPARTURE"; opacity: 1; }
-  100% { content: "READY FOR DEPARTURE"; opacity: 0; }
-}
 
-.page-entry-text::after {
-  content: "";
-  animation: check-sequence 0.8s ease-in-out forwards;
-}
-
-.page-entry-overlay {
-  animation: fade-out-overlay 0.3s ease-in-out 0.8s forwards;
-}
-
-@keyframes fade-out-overlay {
-  from { opacity: 1; visibility: visible; }
-  to { opacity: 0; visibility: hidden; }
-}
 
 /* Animations */
 @keyframes pulse-slow {
