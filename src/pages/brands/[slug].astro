@@ -138,9 +138,13 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
             <span class="w-1.5 h-6 bg-brand-neon mr-3 rounded-sm"></span>
             关于 {brand.name} 的线路与服务信息
           </h2>
-          <p>
-            根据当前收录的官方品牌资料，<strong>{brand.name}</strong> 提供了适合不同需求用户的网络加速方案。请注意，目前站内对该品牌的独立测试数据仍在完善中，实际体验可能受限于您所在地区的网络环境和运营商（如电信、联通、移动）的路由差异。
-          </p>
+          {brand.intro ? (
+            <div class="space-y-4" set:html={brand.intro} />
+          ) : (
+            <p>
+              根据当前收录的官方品牌资料，<strong>{brand.name}</strong> 提供了适合不同需求用户的网络加速方案。请注意，目前站内对该品牌的独立测试数据仍在完善中，实际体验可能受限于您所在地区的网络环境和运营商（如电信、联通、移动）的路由差异。
+            </p>
+          )}
           
           <h3>已知服务特性</h3>
           <p>
@@ -148,6 +152,11 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
           </p>
           <ul>
             {hasIPLC ? <li><strong>线路类型：</strong> 资料显示支持 IPLC 或其他专线网络，理论上在晚高峰时能提供较低的物理延迟。</li> : <li><strong>线路类型：</strong> 暂无明确的专线网络标记，通常可能是直连或中转线路，建议结合个人网络测试。</li>}
+            {brand.protocols && <li><strong>支持协议：</strong> {brand.protocols}</li>}
+            {brand.nodes && <li><strong>节点覆盖：</strong> {brand.nodes}</li>}
+            {brand.established && <li><strong>品牌背景：</strong> {brand.established}</li>}
+            {brand.payment && <li><strong>付款方式：</strong> {brand.payment}</li>}
+            {brand.telegram && <li><strong>官方频道：</strong> <a href={brand.telegram} target="_blank" class="text-brand-neon hover:underline break-all">{brand.telegram}</a></li>}
             {hasNetflix ? <li><strong>流媒体解锁：</strong> 具备流媒体解锁能力，可以满足 Netflix、Disney+ 等海外视频平台的需求。</li> : <li><strong>流媒体解锁：</strong> 暂未收录针对原生 IP 库的详细流媒体解锁测试资料。</li>}
             {hasAI ? <li><strong>AI 支持：</strong> 明确标记了对 ChatGPT、Claude 等 AI 工具的 IP 纯净度支持。</li> : <li><strong>AI 支持：</strong> 未明确说明，可能在访问特定严格风控的 AI 工具时遇到 Access Denied。</li>}
             <li><strong>套餐价格：</strong> {brand.pricing && brand.pricing.length > 0 ? (
