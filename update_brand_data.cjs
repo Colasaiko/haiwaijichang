@@ -1,0 +1,446 @@
+const fs = require('fs');
+
+const brandDataUpdates = {
+  "微风网络": {
+    discount: "weifeng90（7折）",
+    features: ["全IPLC专线，享受低延迟高速率", "不限制设备同时接入", "不限速"],
+    pricing: [
+      { name: "清风 (Breeze)", traffic: "100 GB", price: "¥11.00/月 | ¥137.00/年" },
+      { name: "乘风 (Riding)", traffic: "200 GB", price: "¥27.00/月 | ¥72.00/季 | ¥259.00/年" },
+      { name: "破风 (Breaking)", traffic: "500 GB", price: "¥57.00/月 | ¥153.00/季 | ¥547.00/年" },
+      { name: "御风 (Mastery)", traffic: "1200 GB", price: "¥127.00/月 | ¥342.00/季 | ¥1219.00/年" },
+      { name: "信风 · 不限时", traffic: "270 GB", price: "¥200.00/一次性" },
+      { name: "长风 · 不限时", traffic: "570 GB", price: "¥370.00/一次性" }
+    ]
+  },
+  "萤火虫 (FireFly)": {
+    discount: "firefly (8折)",
+    features: ["不限速", "不限设备数", "IPLC专线网络"],
+    pricing: [
+      { name: "Firefly年付版", traffic: "60 GB", price: "¥96.00/年" },
+      { name: "Firefly Lite", traffic: "150 GB", price: "¥25.00/月 | ¥67.00/季 | ¥240.00/年" },
+      { name: "Firefly Plus", traffic: "300 GB", price: "¥45.00/月 | ¥121.00/季 | ¥432.00/年" },
+      { name: "Firefly Blaze", traffic: "600 GB", price: "¥85.00/月 | ¥229.00/季 | ¥816.00/年" },
+      { name: "Firefly Nova", traffic: "1000 GB", price: "¥150.00/月 | ¥400.00/季 | ¥1360.00/年" },
+      { name: "Firefly不限时", traffic: "100 GB", price: "¥100.00/一次性" }
+    ]
+  },
+  "跨界云": {
+    discount: "kuajie（8 折）",
+    features: [
+      "IPLC高端线路，不限速，所有节点x1倍率",
+      "Netflix/Hulu/HBO/Disney+/DAZN等流媒体解锁",
+      "支持ChatGPT、Gemini、Claude等AI",
+      "不限制设备登录数"
+    ],
+    pricing: [
+      { name: "跨界年付版", traffic: "60 GB", price: "¥96.00/年" },
+      { name: "轻云 (Lite)", traffic: "120 GB", price: "¥20.00/月 | ¥54.00/季 | ¥192.00/年" },
+      { name: "跃云 (Leap)", traffic: "300 GB", price: "¥40.00/月 | ¥108.00/季 | ¥384.00/年" },
+      { name: "凌云 (Soar)", traffic: "700 GB", price: "¥100.00/月 | ¥270.00/季 | ¥960.00/年" },
+      { name: "无界 (Infinity)", traffic: "1500 GB", price: "¥180.00/月 | ¥486.00/季 | ¥1728.00/年" }
+    ]
+  },
+  "闪跃": {
+    discount: "shanyue（8折）",
+    features: ["全IPLC专线", "原生IP解锁各大流媒体", "解锁 Chatgpt，Tiktok"],
+    pricing: [
+      { name: "闪跃年付版", traffic: "60 GB", price: "¥96.00/年" },
+      { name: "闪动 (Flicker)", traffic: "150 GB", price: "¥24.00/月 | ¥64.00/季 | ¥230.00/年" },
+      { name: "飞跃 (Leap)", traffic: "300 GB", price: "¥44.00/月 | ¥118.00/季 | ¥422.00/年" },
+      { name: "瞬移 (Teleport)", traffic: "600 GB", price: "¥84.00/月 | ¥226.00/季 | ¥806.00/年" },
+      { name: "跃迁 (Warp)", traffic: "1000 GB", price: "¥134.00/月 | ¥369.00/季 | ¥1315.00/年" }
+    ]
+  },
+  "无忧链接": {
+    discount: "(暂无优惠）",
+    features: [
+      "全IPLC专线，节点速率×1",
+      "稳定全球Chatgpt，Gemini等AI支持",
+      "4K流畅Netfilx/Hulu/Hbo/Disney+/HUGO等观影体验"
+    ],
+    pricing: [
+      { name: "MINI链接", traffic: "40 GB", price: "¥79.00/年" },
+      { name: "舒心链接", traffic: "100 GB", price: "¥19.00/月 | ¥51.00/季 | ¥182.00/年" },
+      { name: "省心链接", traffic: "200 GB", price: "¥33.00/月 | ¥89.00/季 | ¥316.00/年" },
+      { name: "随心链接", traffic: "500 GB", price: "¥77.00/月 | ¥207.00/季 | ¥739.00/年" },
+      { name: "忘忧链接", traffic: "1000 GB", price: "¥117.00/月 | ¥315.00/季 | ¥1123.00/年" }
+    ]
+  },
+  "灵猫": {
+    discount: "lingmao（8折）",
+    features: [
+      "全IPLC专线，不限速，不限制客户端",
+      "原生IP解锁Netfilx/Hulu/Hbo/Disney等流媒体",
+      "解锁 Chatgpt，Gemini，Tiktok"
+    ],
+    pricing: [
+      { name: "灵猫 · 年付小包", traffic: "45 GB", price: "¥85.00/年" },
+      { name: "灵猫 · 月付Small", traffic: "150 GB", price: "¥25.00/月 | ¥65.00/季 | ¥195.00/年" },
+      { name: "灵猫 · 月付Big", traffic: "300 GB", price: "¥45.00/月 | ¥125.00/季 | ¥295.00/年" }
+    ]
+  },
+  "BitzNet": {
+    aff: "https://red.bnaffred.com/#/register?code=8Hqeq4XA",
+    discount: "(暂无优惠）",
+    features: [
+      "流媒体解锁",
+      "广东 IEPL 专线",
+      "不限制本人设备数"
+    ],
+    pricing: [
+      { name: "BitzNet · 季付边缘访问", traffic: "80 GB", price: "¥69.99/季 | ¥244.99/年" },
+      { name: "BitzNet · 季付核心访问", traffic: "400 GB", price: "¥119.99/季 | ¥429.99/年" },
+      { name: "BitzNet · 季付深度访问", traffic: "1000 GB", price: "¥199.99/季 | ¥295.00/年" }
+    ]
+  },
+  "飞猫云": {
+    discount: "(暂无优惠）",
+    features: [
+      "全 IPLC 专线网络，提供最高 2.5Gbps 稳定速率",
+      "原生 IP 线路，解锁 Netflix、Disney+、ChatGPT、TikTok",
+      "不限制设备连接数量"
+    ],
+    pricing: [
+      { name: "飞猫 · 学生版", traffic: "150 GB", price: "¥84.00/年" },
+      { name: "飞猫 · 星耀版", traffic: "150 GB", price: "¥25.00/月 | ¥67.00/季 | ¥240.00/年" },
+      { name: "飞猫 · 星环版", traffic: "300 GB", price: "¥45.00/月 | ¥121.00/季 | ¥432.00/年" },
+      { name: "飞猫 · 银河版", traffic: "600 GB", price: "¥85.00/月 | ¥229.00/季 | ¥816.00/年" },
+      { name: "飞猫 · 宇宙版", traffic: "1.0 TB", price: "¥150.00/月 | ¥400.00/季 | ¥1360.00/年" }
+    ]
+  },
+  "sogo云": {
+    discount: "sogo10000 (9折)",
+    features: [
+      "VLESS 协议｜企业级 IEPL 专线｜三网优化",
+      "全线路流媒体解锁 / AI 全支持",
+      "多设备不限量同时在线"
+    ],
+    pricing: [
+      { name: "小包-年付版", traffic: "60 GB", price: "¥98.00/年" },
+      { name: "小包-基础版", traffic: "150 GB", price: "¥25.00/月 | ¥65.00/季 | ¥250.00/年" },
+      { name: "小包-优选版", traffic: "350 GB", price: "¥45.00/月 | ¥125.00/季 | ¥485.00/年" },
+      { name: "小包-强化版", traffic: "550 GB", price: "¥80.00/月 | ¥230.00/季 | ¥850.00/年" },
+      { name: "小包-顶配版", traffic: "1.1 TB", price: "¥150.00/月 | ¥440.00/季 | ¥1750.00/年" }
+    ]
+  },
+  "暮光加速": {
+    discount: "mm88（8折）",
+    features: [
+      "BGP 多线路智能调度 + 专线级出口架构",
+      "主流流媒体完整解锁，4K即点即播",
+      "全面支持 ChatGPT、Claude 等 AI 应用",
+      "不限制同时在线设备数量"
+    ],
+    pricing: [
+      { name: "暮光 · 年付轻量版", traffic: "70 GB", price: "¥109.00/年" },
+      { name: "暮光 · 基础版", traffic: "120 GB", price: "¥20.00/月 | ¥57.00/季 | ¥204.00/年" },
+      { name: "暮光 · 标准版", traffic: "240 GB", price: "¥40.00/月 | ¥114.00/季 | ¥408.00/年" },
+      { name: "暮光 · 旗舰版", traffic: "700 GB", price: "¥100.00/月 | ¥285.00/季 | ¥1020.00/年" },
+      { name: "暮光 · 至尊版", traffic: "1.5 TB", price: "¥180.00/月 | ¥513.00/季 | ¥1836.00/年" }
+    ]
+  },
+  "星岛梦": {
+    discount: "nmw888（9折）",
+    features: [
+      "全 IEPL专线，低延迟；单节点峰值至 2.5Gbps",
+      "原生 IP，支持 Netflix / Disney+ / ChatGPT",
+      "多设备不限量同时在线"
+    ],
+    pricing: [
+      { name: "星岛梦 · 贴心小包", traffic: "60 GB", price: "¥96.00/年" },
+      { name: "星岛梦 · 超量150G", traffic: "150 GB", price: "¥25.00/月 | ¥75.00/季 | ¥240.00/年" },
+      { name: "星岛梦 · 进阶300G", traffic: "300 GB", price: "¥50.00/月 | ¥145.00/季 | ¥480.00/年" },
+      { name: "星岛梦 · 闪光500G", traffic: "500 GB", price: "¥70.00/月 | ¥195.00/季 | ¥699.00/年" },
+      { name: "星岛梦 · 旗舰1T版", traffic: "1.0 TB", price: "¥130.00/月 | ¥370.00/季 | ¥1249.00/年" }
+    ]
+  },
+  "唯兔云": {
+    discount: "rabbit（8折）",
+    features: [
+      "全IPLC专线，vless协议，不限制客户端",
+      "原生IP解锁Netfilx/Hbo/Disney+等流媒体",
+      "解锁 Chatgpt，Tiktok"
+    ],
+    pricing: [
+      { name: "唯兔云 · 年付加强专线", traffic: "75 GB", price: "¥120.00/年" },
+      { name: "唯兔云 · 普通版", traffic: "150 GB", price: "¥19.90/月 | ¥53.90/季 | ¥191.90/年" },
+      { name: "唯兔云 · 进阶版", traffic: "200 GB", price: "¥29.90/月 | ¥80.90/季 | ¥286.90/年" },
+      { name: "唯兔云 · 专业版", traffic: "500 GB", price: "¥59.90/月 | ¥161.90/季 | ¥547.90/年" },
+      { name: "唯兔云 · 至尊版", traffic: "1.0 TB", price: "¥119.90/月 | ¥323.90/季 | ¥1150.90/年" }
+    ]
+  },
+  "光速云": {
+    discount: "(暂无优惠）",
+    features: [
+      "全球 IPLC · 单节点至高 2.5 Gbps",
+      "原生 IP 解锁 Netflix / Disney+ / ChatGPT",
+      "不限设备，多端同时在线"
+    ],
+    pricing: [
+      { name: "光速云 · 轻量版", traffic: "59 GB", price: "¥99.00/年" },
+      { name: "光速云 · 极速版", traffic: "138 GB", price: "¥23.00/月 | ¥50.00/季 | ¥160.00/年" },
+      { name: "光速云 · 流光版", traffic: "220 GB", price: "¥34.00/月 | ¥100.00/季 | ¥320.00/年" },
+      { name: "光速云 · 量子版", traffic: "450 GB", price: "¥68.00/月 | ¥200.00/季 | ¥667.00/年" },
+      { name: "光速云 · 无界版", traffic: "900 GB", price: "¥130.00/月 | ¥390.00/季 | ¥1248.00/年" }
+    ]
+  },
+  "U1S1": {
+    discount: "U1S1（85折）",
+    features: [
+      "BGP 三网智能优化 + IEPL 专线出口",
+      "不限速 · 不限设备数量",
+      "Netflix/Disney+ 全解锁，支持 ChatGPT"
+    ],
+    pricing: [
+      { name: "u1s1 · 就是好用包", traffic: "60 GB", price: "¥96.00/年" },
+      { name: "u1s1 · 普通人真够了包", traffic: "120 GB", price: "¥20.00/月 | ¥54.00/季 | ¥192.00/年" },
+      { name: "u1s1 · 你以为用不到包", traffic: "300 GB", price: "¥40.00/月 | ¥108.00/季 | ¥384.00/年" },
+      { name: "u1s1 · 瘾大就拉满包", traffic: "700 GB", price: "¥100.00/月 | ¥270.00/季 | ¥960.00/年" },
+      { name: "u1s1 · 我全都要包", traffic: "1.5 TB", price: "¥180.00/月 | ¥486.00/季 | ¥1728.00/年" }
+    ]
+  },
+  "极连云": {
+    discount: "JLY888（8折）",
+    features: [
+      "全 IPLC 专线，最大提供 2.5Gbps 速率",
+      "原生 IP 解锁各大流媒体、ChatGPT",
+      "不限制同时使用客户端数量"
+    ],
+    pricing: [
+      { name: "极连云 · 基础套餐", traffic: "100 GB", price: "¥18.00/月 | ¥51.30/季 | ¥183.60/年" },
+      { name: "极连云 · 进阶套餐", traffic: "200 GB", price: "¥32.00/月 | ¥102.00/季 | ¥367.00/年" },
+      { name: "极连云 · 旗舰套餐", traffic: "500 GB", price: "¥61.00/月 | ¥205.00/季 | ¥734.40/年" },
+      { name: "极连云 · 尊享套餐", traffic: "1.0 TB", price: "¥122.00/月 | ¥410.40/季 | ¥1468.80/年" }
+    ]
+  },
+  "光年梯": {
+    discount: "(暂无优惠）",
+    features: [
+      "全程 IPLC 专线，最高可提供 2.5Gbps 速率",
+      "原生 IP，解锁主流流媒体及ChatGPT",
+      "不限制同时在线客户端数量"
+    ],
+    pricing: [
+      { name: "年付限时套餐", traffic: "50 GB", price: "¥89.00/年" },
+      { name: "光年梯 入门版", traffic: "110 GB", price: "¥18.00/月 | ¥50.00/季 | ¥160.00/年" },
+      { name: "光年梯 晋级版", traffic: "220 GB", price: "¥34.00/月 | ¥100.00/季 | ¥320.00/年" },
+      { name: "光年梯 专业版", traffic: "450 GB", price: "¥68.00/月 | ¥200.00/季 | ¥667.00/年" },
+      { name: "光年梯 至尊版", traffic: "900 GB", price: "¥130.00/月 | ¥390.00/季 | ¥1248.00/年" }
+    ]
+  },
+  "一翻云": {
+    discount: "(暂无优惠）",
+    features: [
+      "解锁主流流媒体及各类 AI 智能工具",
+      "适配自研客户端，轻松一键快速连接",
+      "覆盖港/台/新/日/美等 60+ 优质节点"
+    ],
+    pricing: [
+      { name: "年付小包", traffic: "60 GB", price: "¥98.00/年" },
+      { name: "轻享版", traffic: "150 GB", price: "¥20.00/月 | ¥55.00/季 | ¥168.00/年" },
+      { name: "舒享版", traffic: "350 GB", price: "¥35.00/月 | ¥98.00/季 | ¥298.00/年" },
+      { name: "尊享版", traffic: "600 GB", price: "¥55.00/月 | ¥155.00/季 | ¥498.00/年" },
+      { name: "极致版", traffic: "1.2 TB", price: "¥95.00/月 | ¥268.00/季 | ¥888.00/年" }
+    ]
+  },
+  "二猫云": {
+    discount: "ermao888（85折）",
+    features: [
+      "全 IEPL专线，低延迟；单节点峰值至 2.5Gbps",
+      "原生 IP，支持 Netflix / Disney+ / ChatGPT",
+      "多设备不限量同时在线"
+    ],
+    pricing: [
+      { name: "二猫年付小包", traffic: "60 GB", price: "¥89.00/年" },
+      { name: "二猫云 · 白猫套餐", traffic: "130 GB", price: "¥20.00/月 | ¥57.00/季 | ¥204.00/年" },
+      { name: "二猫云 · 橘猫畅玩版", traffic: "230 GB", price: "¥40.00/月 | ¥114.00/季 | ¥408.00/年" },
+      { name: "二猫云 · 牛奶猫尊享版", traffic: "430 GB", price: "¥80.00/月 | ¥228.00/季 | ¥816.00/年" },
+      { name: "二猫云 · 黑猫版", traffic: "850 GB", price: "¥160.00/月 | ¥456.00/季 | ¥1632.00/年" }
+    ]
+  },
+  "边缘节点": {
+    discount: "xk808（8折）",
+    features: [
+      "全 IPLC 专线网络，最高 2.5Gbps 稳定速率",
+      "原生 IP 轻松解锁 Netflix/ChatGPT",
+      "不限制设备连接数量"
+    ],
+    pricing: [
+      { name: "限时年付", traffic: "45 GB", price: "¥108.00/年" },
+      { name: "极界·标准套餐", traffic: "120 GB", price: "¥25.00/月 | ¥70.00/季 | ¥240.00/年" },
+      { name: "极界·进阶套餐", traffic: "250 GB", price: "¥50.00/月 | ¥145.00/季 | ¥510.00/年" },
+      { name: "极界·高级套餐", traffic: "499 GB", price: "¥100.00/月 | ¥290.00/季 | ¥1020.00/年" },
+      { name: "极界·极限套餐", traffic: "1.0 TB", price: "¥200.00/月 | ¥580.00/季 | ¥2040.00/年" }
+    ]
+  },
+  "可信云": {
+    discount: "(暂无优惠）",
+    features: [
+      "全IEPL专线，不限制设备数量",
+      "解锁各大流媒体及AI工具",
+      "60+顶级专线节点"
+    ],
+    pricing: [
+      { name: "可信云年费小礼包", traffic: "60 GB", price: "¥96.00/年" },
+      { name: "基础版", traffic: "150 GB", price: "¥25.00/月 | ¥71.25/季 | ¥255.00/年" },
+      { name: "标准版", traffic: "300 GB", price: "¥50.00/月 | ¥142.50/季 | ¥510.00/年" },
+      { name: "专业版", traffic: "600 GB", price: "¥100.00/月 | ¥285.00/季 | ¥1020.00/年" },
+      { name: "旗舰版", traffic: "1.2 TB", price: "¥200.00/月 | ¥570.00/季 | ¥2040.00/年" }
+    ]
+  },
+  "速界机场": {
+    discount: "sujie888（8折)",
+    features: [
+      "全 IPLC 专线网络，最高 2.5Gbps 稳定速率",
+      "原生 IP 解锁 Netflix/ChatGPT",
+      "不限制设备连接数量"
+    ],
+    pricing: [
+      { name: "限时年付", traffic: "50 GB", price: "¥90.00/年" },
+      { name: "极速版", traffic: "120 GB", price: "¥25.00/月 | ¥70.00/季 | ¥268.00/年" },
+      { name: "超速版", traffic: "250 GB", price: "¥50.00/月 | ¥142.50/季 | ¥560.00/年" },
+      { name: "光速版", traffic: "500 GB", price: "¥100.00/月 | ¥285.00/季 | ¥1080.00/年" },
+      { name: "跃迁版", traffic: "1.0 TB", price: "¥200.00/月 | ¥570.00/季 | ¥2040.00/年" }
+    ]
+  },
+  "快狸": {
+    discount: "(暂无优惠）",
+    features: [
+      "全 IEPL专线，低延迟；单节点峰值至 2.5Gbps",
+      "原生 IP，支持 Netflix / Disney+ / ChatGPT",
+      "多设备不限量同时在线"
+    ],
+    pricing: [
+      { name: "森狸年付小套餐", traffic: "30 GB", price: "¥120.00/年" },
+      { name: "小狸基础版", traffic: "100 GB", price: "¥22.00/月 | ¥62.00/季 | ¥255.00/年" },
+      { name: "灵狸标准版", traffic: "250 GB", price: "¥35.00/月 | ¥103.00/季 | ¥415.00/年" },
+      { name: "夜狸强化版", traffic: "500 GB", price: "¥95.00/月 | ¥290.00/季 | ¥1025.00/年" },
+      { name: "天狸顶配版", traffic: "1.0 TB", price: "¥180.00/月 | ¥535.00/季 | ¥2140.00/年" }
+    ]
+  },
+  "飞V": {
+    discount: "fly20（8折)",
+    features: [
+      "云端多链路即时优化 + 全链路专线架构",
+      "流媒体全家桶全面覆盖，原生IP直通",
+      "ChatGPT 4 / GitHub Copilot 完整支持"
+    ],
+    pricing: [
+      { name: "入门方案", traffic: "150 GB", price: "¥25.00/月" },
+      { name: "进阶方案", traffic: "380 GB", price: "¥50.00/月 | ¥62.00/季 | ¥255.00/年" },
+      { name: "高端方案", traffic: "800 GB", price: "¥110.00/月 | ¥103.00/季 | ¥415.00/年" },
+      { name: "商业方案", traffic: "1.8 TB", price: "¥190.00/月 | ¥290.00/季 | ¥1025.00/年" }
+    ]
+  },
+  "梯子云": {
+    discount: "tiziyun（8折)",
+    features: [
+      "基础中转方案 + 多入口智能调度，全程不限速",
+      "完整解锁 Netflix / YouTube / ChatGPT",
+      "采用高性能 SS 协议，不限制在线设备数"
+    ],
+    pricing: [
+      { name: "天梯随行 · 年度保活", traffic: "1.6 TB", price: "¥89.00/年" },
+      { name: "初阶网络 · 基础视界", traffic: "125 GB", price: "¥25.00/月 | ¥71.25/季 | ¥255.00/年" },
+      { name: "中阶加速 · 极清多线", traffic: "350 GB", price: "¥60.00/月 | ¥171.00/季 | ¥612.00/年" },
+      { name: "高阶专线 · 全球智联", traffic: "750 GB", price: "¥110.00/月 | ¥313.50/季 | ¥1122.00/年" },
+      { name: "顶阶商业 · 全球骨干", traffic: "800 GB", price: "¥190.00/月 | ¥541.50/季 | ¥1938.00/年" }
+    ]
+  },
+  "WaveNet": {
+    discount: "lw888（8折)",
+    features: [
+      "三网智能优化+纯专线出口",
+      "主流流媒体与内容平台全解锁，4K/8K 稳定播放",
+      "企业级 BGP 智能路由，不限速"
+    ],
+    pricing: [
+      { name: "浪网 年付标准", traffic: "80 GB", price: "¥119.00/年" },
+      { name: "浪网 入门", traffic: "150 GB", price: "¥30.00/月 | ¥85.50/季" },
+      { name: "浪网 进阶", traffic: "400 GB", price: "¥70.00/月 | ¥199.50/季 | ¥378.00/半年" },
+      { name: "浪网 高端", traffic: "800 GB", price: "¥120.00/月 | ¥342.00/季 | ¥1224.00/年" },
+      { name: "浪网 商业", traffic: "2.0 TB", price: "¥200.00/月 | ¥570.00/季 | ¥2040.00/年" }
+    ]
+  },
+  "灵动云": {
+    discount: "880223（8折)",
+    features: [
+      "纯专线线路｜BGP 三网优化，晚高峰不限速",
+      "全能解锁流媒体，完美兼容 8K",
+      "原生纯净 IP，支持 ChatGPT / Claude 创作"
+    ],
+    pricing: [
+      { name: "灵动 · 穿云", traffic: "70 GB", price: "¥99.00/年" },
+      { name: "灵动 · 拂风", traffic: "100 GB", price: "¥20.00/月 | ¥57.00/季 | ¥204.00/年" },
+      { name: "灵动 · 驭浪", traffic: "300 GB", price: "¥50.00/月 | ¥142.50/季 | ¥510.00/年" },
+      { name: "灵动 · 破晓", traffic: "700 GB", price: "¥100.00/月 | ¥285.00/季 | ¥1020.00/年" },
+      { name: "灵动 · 凌霄", traffic: "1.5 TB", price: "¥180.00/月 | ¥513.00/季 | ¥1836.00/年" }
+    ]
+  },
+  "隐形人": {
+    discount: "yxr888（8折)",
+    features: [
+      "云端多链路即时优化 + 全链路专线架构",
+      "流媒体全家桶全面覆盖，原生IP直通",
+      "ChatGPT 4 / GitHub Copilot 完整支持"
+    ],
+    pricing: [
+      { name: "星耀风暴", traffic: "80 GB", price: "¥109.00/年" },
+      { name: "隐形人 白银纪元", traffic: "144 GB", price: "¥24.00/月 | ¥68.40/季 | ¥244.80/年" },
+      { name: "隐形人 黄金序列", traffic: "360 GB", price: "¥48.00/月 | ¥136.80/季 | ¥489.60/年" },
+      { name: "隐形人 铂金至臻", traffic: "750 GB", price: "¥105.00/月 | ¥299.25/季 | ¥1071.00/年" },
+      { name: "隐形人 钻石穹顶", traffic: "1.6 TB", price: "¥185.00/月 | ¥527.25/季 | ¥1887.00/年" }
+    ]
+  },
+  "NanoCloud": {
+    aff: "https://edu.uodoo.bid/auth/register?code=P7gzTydW",
+    discount: "（加入tg享受内部优惠）",
+    features: [
+      "安卓手机需要给Nano通知权限才能连接",
+      "每个价钱有自己的同时支持多少设备",
+      "添加TG频道享受内部优惠折扣"
+    ],
+    pricing: [
+      { name: "猎户座", traffic: "100 GB", price: "¥1.00/月 | ¥12.00/年" },
+      { name: "白羊座", traffic: "300 GB", price: "¥10.00/月 | ¥120.00/年" },
+      { name: "双鱼座", traffic: "480 GB", price: "¥15.00/月 | ¥180.00/年" },
+      { name: "射手座", traffic: "650 GB", price: "¥20.00/月 | ¥240.00/年" }
+    ]
+  },
+  "Phantom": {
+    aff: "https://pin.dianping.men/auth/register?code=Cv2pH8HA",
+    discount: "（暂无优惠）",
+    features: [
+      "优质加速网络",
+      "稳定解锁",
+      "低延迟响应"
+    ],
+    pricing: [
+      { name: "天蝎座", traffic: "100 GB", price: "¥1.00/月 | ¥12.00/年" },
+      { name: "水瓶座", traffic: "300 GB", price: "¥10.00/月 | ¥120.00/年" },
+      { name: "双子座", traffic: "650 GB", price: "¥20.00/月 | ¥240.00/年" }
+    ]
+  }
+};
+
+let brands = JSON.parse(fs.readFileSync('src/data/brands.json', 'utf8'));
+
+// Apply updates
+brands.forEach(b => {
+  const updateData = brandDataUpdates[b.name] || Object.values(brandDataUpdates).find(u => b.name.includes(Object.keys(brandDataUpdates).find(k => brandDataUpdates[k] === u)));
+  
+  if (updateData) {
+    if (updateData.discount) b.discount = updateData.discount;
+    if (updateData.features && updateData.features.length > 0) b.features = updateData.features;
+    if (updateData.pricing && updateData.pricing.length > 0) b.pricing = updateData.pricing;
+    if (updateData.aff) b.aff = updateData.aff;
+  }
+});
+
+fs.writeFileSync('src/data/brands.json', JSON.stringify(brands, null, 2));
+console.log('Successfully updated brand pricing, features and aff links!');
+
+// Check which brands still lack an aff link
+const missingAff = brands.filter(b => !b.aff).map(b => b.name);
+console.log('Brands without aff link:', missingAff.join(', '));
