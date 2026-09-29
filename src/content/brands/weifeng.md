@@ -1,4 +1,5 @@
 ---
+heroDescription: "微风网络 Breeze Network 提供全 IPLC 专线、多档流量套餐与不限时流量包，不限速且不限制设备同时接入。当前官网全场套餐可使用优惠码 weifeng90 享受 7 折优惠。"
 order: 1
 features:
   - "全IPLC专线，享受低延迟高速率"
@@ -12,7 +13,6 @@ description: "微风网络 Breeze Network 提供 IPLC 专线、VLESS、多档月
 primaryKeyword: "微风网络怎么样"
 keywords:
   - 微风网络
-  - 微风网络机场
   - 微风网络怎么样
   - 微风网络价格
   - 微风网络套餐

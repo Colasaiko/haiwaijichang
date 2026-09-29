@@ -23,6 +23,10 @@ const hasAI = brand.features.some(f => f.toLowerCase().includes('chatgpt') || f.
 const title = brand.seoTitle || brand.title || `${brand.name} 怎么样？线路评测、套餐价格与使用教程 - 海外机场`;
 const description = brand.seoDescription || brand.description || `详细了解 ${brand.name} 的线路质量、套餐价格、流媒体及 ChatGPT 解锁能力。为您提供最新优惠信息及真实使用评价，帮您判断 ${brand.name} 是否适合您。`;
 const h1 = brand.h1 || brand.name;
+
+const keywords = Array.isArray(brand.keywords) 
+  ? brand.keywords.join(', ')
+  : brand.keywords || `${brand.name}, ${brand.name}怎么样, ${brand.name}机场, ${brand.name}优惠码, ${brand.name}专线, ${brand.name}教程`;
 const currentUrl = Astro.url.href;
 const siteUrl = Astro.site?.toString() || Astro.url.origin;
 
@@ -30,7 +34,7 @@ const siteUrl = Astro.site?.toString() || Astro.url.origin;
 const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
 ---
 
-<Layout title={title} description={description} keywords={`${brand.name}, ${brand.name}怎么样, ${brand.name}机场, ${brand.name}优惠码, ${brand.name}专线, ${brand.name}教程`}>
+<Layout title={title} description={description} keywords={keywords}>
   
   <!-- Schema.org for Brand/Service -->
   
@@ -80,7 +84,7 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
             {hasAI && <span class="text-[0.7rem] font-bold tracking-widest bg-white/10 text-white px-3 py-1 rounded-sm uppercase border border-white/20">AI Ready</span>}
           </div>
           <p class="text-lg text-slate-400 max-w-2xl leading-relaxed">
-            {brand.name} 是一家优质的海外网络加速服务提供商，专为解决国际网络延迟、流媒体解锁和海外工作需求而设计。本页为您提供详细的评测和使用指导。
+            {brand.heroDescription || "查看该品牌当前收录的线路、套餐与使用资料。"}
           </p>
         </div>
         
@@ -141,6 +145,51 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
           </p>
           
   </div>
+  {brand.pricing && brand.pricing.length > 0 && (
+    <div class="mt-12 mb-8">
+      <h3 class="text-2xl font-bold text-white mb-6 pb-4 border-b border-white/10 flex items-center">
+        <span class="w-1.5 h-6 bg-brand-neon mr-3 rounded-sm"></span>
+        套餐与价格
+      </h3>
+      <div class="overflow-x-auto w-full border border-white/10 rounded-lg">
+        <table class="min-w-full text-sm text-left text-slate-300 border-collapse">
+          <thead class="text-xs uppercase bg-white/5 text-slate-400 border-b border-white/10">
+            <tr>
+              <th class="px-5 py-4 font-bold tracking-wider">套餐名称</th>
+              <th class="px-5 py-4 font-bold tracking-wider">包含流量</th>
+              <th class="px-5 py-4 font-bold tracking-wider">周期</th>
+              <th class="px-5 py-4 font-bold tracking-wider">价格</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 bg-brand-dark/30">
+            {brand.pricing.map((p) => (
+              <tr class="hover:bg-white/5 transition-colors">
+                <td class="px-5 py-4 font-bold text-white align-middle">{p.name || '-'}</td>
+                <td class="px-5 py-4 align-middle">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-neon/10 text-brand-neon border border-brand-neon/20">
+                    {p.traffic || '-'}
+                  </span>
+                </td>
+                <td class="px-5 py-4 align-middle">{p.period || '-'}</td>
+                <td class="px-5 py-3 align-middle">
+                  <div class="flex flex-col space-y-1">
+                    {p.discountPrice ? (
+                      <>
+                        <span class="text-sm font-bold text-brand-neon">{p.discountPrice}</span>
+                        {p.originalPrice && <span class="text-xs text-slate-500 line-through">{p.originalPrice}</span>}
+                      </>
+                    ) : (
+                      <span class="text-sm font-bold text-brand-neon">{p.price || p.originalPrice || '-'}</span>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )}
   <div class="mt-8 pt-8 border-t border-white/10">
     <h3 class="text-xl font-bold text-white mb-4">准备好体验 {brand.name} 了吗？</h3>
     {(brand.purchase?.url || brand.aff) ? (

@@ -51,26 +51,6 @@ regionalNetworks:
     name: "Oceania Network / 大洋洲"
     status: "OPERATIONAL"
     color: "text-green-400"
-incidents:
-  - date: "2026-09-25"
-    title: "订阅更新异常 (已解决)"
-    status: "RESOLVED"
-    time: "08:00 - 09:30 UTC+8"
-    desc: "由于 CDN 边缘节点缓存策略异常，部分用户无法更新订阅。已于 09:30 完全修复并刷新缓存。"
-  - date: "2026-09-20"
-    title: "亚洲骨干网升级维护"
-    status: "COMPLETED"
-    time: "02:00 - 04:00 UTC+8"
-    desc: "进行了亚洲区域核心路由设备的硬件扩容，期间部分香港与日本航班发生短时间(约3分钟)闪断。"
-  - date: "2026-09-15"
-    title: "官网控制面板访问缓慢"
-    status: "RESOLVED"
-    time: "20:00 - 21:15 UTC+8"
-    desc: "遭受突发性大流量 CC 攻击，已及时接入高级清洗策略，面板恢复正常访问。"
-scheduled:
-  - date: "2026-10-01"
-    title: "北美航线 BGP 路由优化"
-    time: "凌晨 03:00 - 05:00 UTC+8"
-    desc: "计划内网割接，将为您提供更低延迟的北美访问体验。期间 OA-US 航班可能会有短暂的不可用状态。"
-footerNote: "状态信息由后台系统手动维护。受地理位置、本地 ISP 运营商策略（如长城宽带、移动墙中墙）等因素影响，实时网络情况可能与本页显示存在差异。"
+incidents: []
+scheduled: []
 ---

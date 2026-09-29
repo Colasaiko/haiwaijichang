@@ -50,7 +50,7 @@ const allGuides = await getCollection('guides');
   <section class="py-16 bg-brand-dark min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
       {categories.map((category) => {
-        const categoryGuides = allGuides.filter(g => g.data.category === category.id || (!g.data.category && category.id === 'clash')); // Just map clash-what-is to clash for now if missing
+        const categoryGuides = allGuides.filter(g => g.data.category === category.id); // Just map clash-what-is to clash for now if missing
         if(categoryGuides.length === 0) return null; // DO NOT RENDER EMPTY CATEGORIES
         return (
         <div>
