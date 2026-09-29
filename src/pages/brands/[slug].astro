@@ -90,7 +90,7 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
         </div>
         
         <div class="shrink-0">
-          <a href="#" data-departure-link class="inline-flex items-center justify-center px-8 py-4 bg-brand-neon text-brand-dark font-bold text-lg rounded-sm hover:bg-brand-neon/90 transition-all uppercase tracking-widest shadow-[0_0_20px_rgba(56,189,248,0.3)]">
+          <a href={brand.aff || "#"} data-departure-link class="inline-flex items-center justify-center px-8 py-4 bg-brand-neon text-brand-dark font-bold text-lg rounded-sm hover:bg-brand-neon/90 transition-all uppercase tracking-widest shadow-[0_0_20px_rgba(56,189,248,0.3)]">
             前往 {brand.name} 官网
           </a>
           {brand.discount && brand.discount !== '(暂无优惠）' && (
@@ -130,26 +130,48 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
         <div class="prose prose-invert prose-brand max-w-none">
           <h2 class="text-2xl font-bold text-white mb-6 pb-4 border-b border-white/10 flex items-center mt-12">
             <span class="w-1.5 h-6 bg-brand-neon mr-3 rounded-sm"></span>
-            {brand.name} 详细评测
+            关于 {brand.name} 的线路与服务信息
           </h2>
           <p>
-            在选择机场和加速服务时，稳定性是首要考量。<strong>{brand.name}</strong> 通过部署优质的跨境数据专线，确保了在晚高峰期间依然能够提供出色的网络连接速度。
+            根据当前收录的官方品牌资料，<strong>{brand.name}</strong> 提供了适合不同需求用户的网络加速方案。请注意，目前站内对该品牌的独立测试数据仍在完善中，实际体验可能受限于您所在地区的网络环境和运营商（如电信、联通、移动）的路由差异。
           </p>
           
-          <h3>使用场景</h3>
+          <h3>已知服务特性</h3>
           <p>
-            结合我们的测试数据，{brand.name} 特别适合以下场景：
+            基于当前数据采集，我们了解到 {brand.name} 具备以下特征：
           </p>
           <ul>
-            {hasIPLC && <li><strong>游戏与极速浏览：</strong> 借助 IPLC 专线，物理延迟极低，杜绝了普通线路的拥堵和丢包现象。</li>}
-            {hasNetflix && <li><strong>流媒体解锁：</strong> 提供大量原生 IP 节点，完美解锁 Netflix、Disney+、Hulu 等主流流媒体平台。</li>}
-            {hasAI && <li><strong>AI 工具访问：</strong> 纯净的 IP 质量，让您无忧访问 ChatGPT、Claude、Midjourney 等人工智能服务，降低封号风险。</li>}
-            <li><strong>跨端使用：</strong> 支持全面兼容 Clash、Shadowrocket、v2rayN 等主流客户端。</li>
+            {hasIPLC ? <li><strong>线路类型：</strong> 资料显示支持 IPLC 或其他专线网络，理论上在晚高峰时能提供较低的物理延迟。</li> : <li><strong>线路类型：</strong> 暂无明确的专线网络标记，通常可能是直连或中转线路，建议结合个人网络测试。</li>}
+            {hasNetflix ? <li><strong>流媒体解锁：</strong> 具备流媒体解锁能力，可以满足 Netflix、Disney+ 等海外视频平台的需求。</li> : <li><strong>流媒体解锁：</strong> 暂未收录针对原生 IP 库的详细流媒体解锁测试资料。</li>}
+            {hasAI ? <li><strong>AI 支持：</strong> 明确标记了对 ChatGPT、Claude 等 AI 工具的 IP 纯净度支持。</li> : <li><strong>AI 支持：</strong> 未明确说明，可能在访问特定严格风控的 AI 工具时遇到 Access Denied。</li>}
+            <li><strong>套餐价格：</strong> {brand.pricing && brand.pricing.length > 0 ? (
+  <div class="mt-4 overflow-x-auto w-full">
+    <table class="min-w-full text-sm text-left text-slate-300">
+      <thead class="text-xs uppercase bg-white/5 text-slate-400">
+        <tr>
+          <th class="px-4 py-2">套餐名称</th>
+          <th class="px-4 py-2">包含流量</th>
+          <th class="px-4 py-2">参考价格</th>
+        </tr>
+      </thead>
+      <tbody>
+        {brand.pricing.map((p) => (
+          <tr class="border-b border-white/5">
+            <td class="px-4 py-2 font-medium text-white">{p.name || '未知'}</td>
+            <td class="px-4 py-2">{p.traffic || '-'}</td>
+            <td class="px-4 py-2 text-brand-neon">{p.price || '-'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+) : "暂无可靠的套餐价格资料，以官网实时标注为准。"}</li>
+            <li><strong>客户端兼容：</strong> 支持主流系统环境下的 Clash、v2rayN、Shadowrocket 等代理协议。</li>
           </ul>
 
-          <h3>如何开始使用？</h3>
+          <h3>使用建议与支持</h3>
           <p>
-            新手用户可以通过 <a href="/guides" class="text-brand-neon hover:underline">通用客户端导入教程</a> 快速上手。前往 {brand.name} 购买对应套餐后，复制订阅链接，导入您的软件并一键更新即可连接。
+            如果你是新手，建议先参考我们的 <a href="/blog/what-is-airport-subscription" class="text-brand-neon hover:underline">机场订阅是什么？新手指南</a>。购买 {brand.name} 的服务后，将获取到的订阅链接导入本地客户端即可开始使用。如遇连接异常，请优先参考我们的<a href="/help">帮助中心故障排查</a>。
           </p>
         </div>
       </div>

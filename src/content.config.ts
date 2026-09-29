@@ -13,6 +13,16 @@ const helpCollection = defineCollection({
   })
 });
 
+const blogCollection = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/blog" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    date: z.string().or(z.date()).optional(),
+  })
+});
+
 export const collections = {
   'help': helpCollection,
+  'blog': blogCollection,
 };

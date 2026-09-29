@@ -78,14 +78,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
           </a>
 
           <!-- Desktop Nav -->
-          <nav class="hidden md:flex items-center space-x-8">
+          <nav class="hidden md:flex items-center space-x-6">
             <a href="/" class="text-sm font-medium hover:text-brand-neon transition-colors">首页</a>
-            <a href="/network" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">全球网络</a>
-            <a href="/technology" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">线路技术</a>
+            <a href="/brands" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">品牌中心</a>
+            <a href="/ranking" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">机场排行榜</a>
             <a href="/use-cases" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">使用场景</a>
+            <a href="/blog" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">官方博客</a>
+            <a href="/guides" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">使用指南</a>
             <a href="/help" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">帮助中心</a>
-            <a href="/guides" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">资讯</a>
-            <a href="/faq" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">FAQ</a>
           </nav>
 
           <!-- CTA & Mobile Menu Toggle -->
@@ -106,12 +106,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       <div id="mobile-menu" class="hidden md:hidden bg-brand-navy border-t border-white/5 absolute w-full pb-6 shadow-2xl">
         <div class="px-4 pt-2 pb-4 space-y-1">
           <a href="/" class="block px-3 py-3 rounded-md text-base font-medium bg-white/5 text-brand-neon">首页</a>
-          <a href="/network" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">全球网络</a>
-          <a href="/technology" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">线路技术</a>
+          <a href="/brands" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">品牌中心</a>
+          <a href="/ranking" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">机场排行榜</a>
           <a href="/use-cases" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">使用场景</a>
+          <a href="/blog" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">官方博客</a>
+          <a href="/guides" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">使用指南</a>
           <a href="/help" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">帮助中心</a>
-          <a href="/guides" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">资讯</a>
-          <a href="/faq" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">FAQ</a>
           <a href="#board" class="block px-3 py-4 mt-4 text-center rounded-sm text-base font-bold text-brand-dark bg-brand-accent hover:bg-yellow-400 transition-colors uppercase">立即登机</a>
         </div>
       </div>
@@ -140,8 +140,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
           <div>
             <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">产品 PRODUCT</h3>
             <ul class="space-y-3">
-              <li><a href="/network" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">全球网络</a></li>
-              <li><a href="/technology" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">线路技术</a></li>
+              <li><a href="/brands" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">品牌中心</a></li>
+              <li><a href="/ranking" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">机场排行榜</a></li>
               <li><a href="/use-cases" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">使用场景</a></li>
             </ul>
           </div>
@@ -150,8 +150,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
             <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">帮助 HELP</h3>
             <ul class="space-y-3">
               <li><a href="/help" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">帮助中心</a></li>
-              <li><a href="/guides" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">使用教程</a></li>
-              <li><a href="/faq" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">常见问题 (FAQ)</a></li>
+              <li><a href="/guides" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">使用指南</a></li>
+              <li><a href="/blog" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">官方博客</a></li>
               <li><a href="/status" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">服务状态</a></li>
             </ul>
           </div>
