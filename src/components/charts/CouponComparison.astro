@@ -1,5 +1,5 @@
 ---
-import { getActiveCoupon } from '../../utils/coupon.js';
+import { getActiveCoupon, getBestCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
 const { brand } = Astro.props;
 const activeCoupon = getActiveCoupon(brand);
 
@@ -34,12 +34,21 @@ function getDiscountMultiplier(coupon) {
   return 1;
 }
 let data = { ...brand.visualData.couponExample };
-if (activeCoupon?.type === 'temporary' && data.before && checkPlanEligibility(data.plan + " " + data.period, activeCoupon, brand.visualData?.couponEligibility)) {
-  const mult = getDiscountMultiplier(activeCoupon);
+const pEntry = brand.pricing?.find(p => p.name === data.plan && p.period === data.period) || { name: data.plan, period: data.period };
+const coupon = getBestCouponForPricing(brand, pEntry);
+
+if (!coupon) {
+  // If NO coupon is applicable, this chart shouldn't really render, but we return null or handle it.
+  return null;
+} else if (coupon.type === 'temporary' && data.before) {
+  const mult = getDiscountMultiplier(coupon);
   data.after = parseFloat((data.before * mult).toFixed(2));
   data.discount = (data.before - data.after).toFixed(2).replace(/\.00$/, '');
-  data.coupon = activeCoupon.code;
-  data.percent = activeCoupon.discountPercent.replace(/\D/g, '');
+  data.coupon = coupon.code;
+  data.percent = coupon.discountPercent.replace(/\D/g, '');
+} else if (coupon.type === 'standard') {
+  data.coupon = coupon.code;
+  data.percent = coupon.discount ? coupon.discount.replace(/\D/g, '') : '';
 }
 const footerNote = data.note || `以上价格基于官方资料计算。`;
 

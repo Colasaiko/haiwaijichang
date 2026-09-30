@@ -200,15 +200,23 @@ visualData:
 
   annualPrice:
     - label: "Lite"
+      plan: "轻云 Lite"
+      period: "月付"
       original: 20
       discounted: 16
     - label: "Leap"
+      plan: "跃云 Leap"
+      period: "月付"
       original: 40
       discounted: 32
     - label: "Soar"
+      plan: "凌云 Soar"
+      period: "月付"
       original: 90
       discounted: 72
     - label: "Infinity"
+      plan: "无界 Infinity"
+      period: "月付"
       original: 130
       discounted: 104
 
@@ -232,6 +240,8 @@ visualData:
 
   unlimitedTraffic:
     - label: "跨界·不限时包"
+      plan: "跨界·不限时包"
+      period: "一次性"
       traffic: 300
       original: 200
       resetPrice: 180

@@ -1,5 +1,5 @@
 ---
-import { getActiveCoupon } from '../../utils/coupon.js';
+import { getActiveCoupon, getBestCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
 const { brand } = Astro.props;
 const activeCoupon = getActiveCoupon(brand);
 
@@ -38,8 +38,15 @@ let data = brand.visualData.unlimitedTraffic;
 if (!Array.isArray(data)) data = [data];
 const mult = getDiscountMultiplier(activeCoupon);
 data = data.map(d => {
-  if (activeCoupon?.type === 'temporary' && d.original && checkPlanEligibility(d.label, activeCoupon, brand.visualData?.couponEligibility)) {
+  const planName = d.plan || d.label;
+  const pEntry = brand.pricing?.find(p => p.name === planName && (p.period === d.period || p.period === '一次性')) || { name: planName, period: d.period || '一次性' };
+  
+  const coupon = getBestCouponForPricing(brand, pEntry);
+  if (coupon && coupon.type === 'temporary' && d.original) {
+    const mult = getDiscountMultiplier(coupon);
     return { ...d, discounted: parseFloat((d.original * mult).toFixed(2)) };
+  } else if (!coupon) {
+    return { ...d, discounted: undefined };
   }
   return d;
 });

@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 import BrandDataDashboard from '../../components/BrandDataDashboard.astro';
+import { getBestCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
 
 export async function getStaticPaths() {
   const brandEntries = await getCollection('brands');
@@ -344,6 +345,7 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
               <th class="px-5 py-4 font-bold tracking-wider">包含流量</th>
               <th class="px-5 py-4 font-bold tracking-wider">周期</th>
               <th class="px-5 py-4 font-bold tracking-wider">价格</th>
+              <th class="px-5 py-4 font-bold tracking-wider">优惠情况</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-white/5 bg-brand-dark/30">
@@ -358,15 +360,46 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
                 <td class="px-5 py-4 align-middle">{p.period || '-'}</td>
                 <td class="px-5 py-3 align-middle">
                   <div class="flex flex-col space-y-1">
-                    {p.discountPrice ? (
-                      <>
-                        <span class="text-sm font-bold text-brand-neon">{p.discountPrice}</span>
-                        {p.originalPrice && <span class="text-xs text-slate-500 line-through">{p.originalPrice}</span>}
-                      </>
-                    ) : (
-                      <span class="text-sm font-bold text-brand-neon">{p.price || p.originalPrice || '-'}</span>
-                    )}
+                    {(() => {
+                      const coupon = getBestCouponForPricing(brand, p);
+                      if (!coupon) {
+                        return <span class="text-sm font-bold text-brand-neon">{p.price || p.originalPrice || '-'}</span>;
+                      } else {
+                        // Dynamically calculate discount or use hardcoded if not temporary
+                        let discPrice = p.discountPrice;
+                        if (coupon.type === 'temporary' && (p.originalPrice || p.price)) {
+                          const origMatch = (p.originalPrice || p.price).match(/\d+(\.\d+)?/);
+                          if (origMatch) {
+                            const val = parseFloat(origMatch[0]);
+                            const mult = getDiscountMultiplier(coupon);
+                            const prefix = (p.originalPrice || p.price).includes('¥') ? '¥' : '';
+                            discPrice = prefix + (val * mult).toFixed(2).replace(/\.00$/, '');
+                          }
+                        }
+                        if (discPrice) {
+                          return (
+                            <>
+                              <span class="text-sm font-bold text-brand-neon">{discPrice}</span>
+                              <span class="text-xs text-slate-500 line-through">{p.originalPrice || p.price}</span>
+                            </>
+                          );
+                        } else {
+                           return <span class="text-sm font-bold text-brand-neon">{p.price || p.originalPrice || '-'}</span>;
+                        }
+                      }
+                    })()}
                   </div>
+                </td>
+                <td class="px-5 py-3 align-middle text-xs">
+                  {(() => {
+                    const coupon = getBestCouponForPricing(brand, p);
+                    if (!coupon) return <span class="text-slate-500 bg-slate-800 px-2 py-1 rounded">不适用</span>;
+                    return (
+                      <span class={`${coupon.type === 'temporary' ? 'text-brand-neon bg-brand-neon/10 border-brand-neon/20' : 'text-brand-accent bg-brand-accent/10 border-brand-accent/20'} border px-2 py-1 rounded whitespace-nowrap`}>
+                        {coupon.code} · {coupon.type === 'temporary' ? '限时' : ''}{coupon.discount}
+                      </span>
+                    );
+                  })()}
                 </td>
               </tr>
             ))}

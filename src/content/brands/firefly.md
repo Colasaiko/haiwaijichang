@@ -85,10 +85,9 @@ temporaryCoupons:
     expiresAt: "2026-10-15T23:59:59+08:00"
     verified: true
     priority: 100
-    excludedPlans:
-      - "年付"
-      - "季付"
-      - "半年付"
+    eligiblePeriods:
+      - "月付"
+      - "一次性"
 
 nodeSnapshot:
   regions:
@@ -206,23 +205,35 @@ visualData:
 
   annualPrice:
     - label: "年付版"
+      plan: "Firefly年付版"
+      period: "年付"
       original: 96
       discounted: 76.80
     - label: "Lite"
+      plan: "Firefly Lite"
+      period: "年付"
       original: 240
       discounted: 192
     - label: "Plus"
+      plan: "Firefly Plus"
+      period: "年付"
       original: 432
       discounted: 345.60
     - label: "Blaze"
+      plan: "Firefly Blaze"
+      period: "年付"
       original: 816
       discounted: 652.80
     - label: "Nova"
+      plan: "Firefly Nova"
+      period: "年付"
       original: 1360
       discounted: 1088
 
   unlimitedTraffic:
     - label: "Firefly不限时"
+      plan: "Firefly不限时"
+      period: "一次性"
       traffic: 100
       original: 100
       discounted: 80

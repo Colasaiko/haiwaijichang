@@ -1,5 +1,5 @@
 ---
-import { getActiveCoupon } from '../../utils/coupon.js';
+import { getActiveCoupon, getBestCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
 const { brand } = Astro.props;
 const activeCoupon = getActiveCoupon(brand);
 
@@ -22,28 +22,34 @@ const couponCode = activeCoupon?.code || "优惠码";
   
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8">
     {data.map(item => {
-      let isEligible = item.eligible;
-      if (activeCoupon?.type === 'temporary') {
-        if (activeCoupon.eligiblePlans && activeCoupon.eligiblePlans.length > 0) {
-          isEligible = activeCoupon.eligiblePlans.includes(item.label);
-        } else if (activeCoupon.excludedPlans && activeCoupon.excludedPlans.length > 0) {
-          isEligible = !activeCoupon.excludedPlans.includes(item.label);
-        }
-      }
+      // Find all pricing entries for this plan
+      const planName = item.plan || item.label;
+      const entries = brand.pricing?.filter(p => p.name === planName) || [{ name: planName, period: '未知' }];
+      
+      const periodsWithCoupon = entries.filter(p => getBestCouponForPricing(brand, p));
+      const isEligible = periodsWithCoupon.length > 0;
+      
       return (
       <div class={`p-4 rounded-lg border flex flex-col items-center text-center transition-colors ${isEligible ? 'bg-brand-dark border-brand-neon/30 hover:border-brand-neon/60' : 'bg-slate-800/50 border-slate-700'}`}>
-        <span class={`text-sm font-bold mb-3 ${isEligible ? 'text-white' : 'text-slate-400'}`}>
+        <span class={`text-sm font-bold mb-2 ${isEligible ? 'text-white' : 'text-slate-400'}`}>
           {item.label}
         </span>
         {isEligible ? (
-          <div class="inline-flex items-center text-brand-neon text-sm font-bold bg-brand-neon/10 px-3 py-1.5 rounded-full border border-brand-neon/20">
-            <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-            可用
+          <div class="flex flex-col items-center">
+            <div class="inline-flex items-center text-brand-neon text-xs font-bold bg-brand-neon/10 px-2 py-1 rounded-full border border-brand-neon/20 mb-2">
+              <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+              可用
+            </div>
+            <div class="text-[10px] text-slate-400 text-center leading-tight">
+              {periodsWithCoupon.map(p => p.period).join('/')}
+            </div>
           </div>
         ) : (
-          <div class="inline-flex items-center text-slate-400 text-sm font-bold bg-slate-800 px-3 py-1.5 rounded-full border border-slate-600">
-            <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-            不适用
+          <div class="flex flex-col items-center">
+            <div class="inline-flex items-center text-slate-400 text-xs font-bold bg-slate-800 px-2 py-1 rounded-full border border-slate-600">
+              <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+              不适用
+            </div>
           </div>
         )}
       </div>
