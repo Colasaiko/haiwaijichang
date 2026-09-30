@@ -21,12 +21,15 @@ const cards = Array.from(planMap.entries()).map(([name, plans]) => {
   
   let traffic = plans[0].traffic;
   
-  let desc = '普通个人使用';
-  if (name.includes('学生')) desc = '轻量使用\n偶尔访问';
-  else if (traffic.includes('300')) desc = '中等流量';
-  else if (traffic.includes('600')) desc = '视频 / 多设备';
-  else if (traffic.includes('1.0TB') || traffic.includes('1000') || traffic.includes('1800') || traffic.includes('830')) desc = '大流量使用';
-  else if (traffic.includes('120') || traffic.includes('150')) desc = '日常网页/视频';
+  let desc = plans[0].desc || '普通个人使用';
+  let badge = plans[0].badge;
+  if (!plans[0].desc) {
+    if (name.includes('学生')) desc = '轻量使用\n偶尔访问';
+    else if (traffic.includes('300')) desc = '中等流量';
+    else if (traffic.includes('600')) desc = '视频 / 多设备';
+    else if (traffic.includes('1.0TB') || traffic.includes('1000') || traffic.includes('1800') || traffic.includes('830')) desc = '大流量使用';
+    else if (traffic.includes('120') || traffic.includes('150')) desc = '日常网页/视频';
+  }
   
   // Resolve coupon status for each period
   const periodsWithCoupon = [];
@@ -50,6 +53,7 @@ const cards = Array.from(planMap.entries()).map(([name, plans]) => {
   return {
     name,
     traffic,
+    badge,
     priceStr,
     desc,
     periodsWithCoupon,
