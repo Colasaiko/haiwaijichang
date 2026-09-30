@@ -48,12 +48,18 @@ if (coupons.length === 0) {
             <div class="text-white font-mono">{coupon.status === 'verified-currently-working' ? '当前结算页已验证' : coupon.status}</div>
           </div>
           <div>
+            <div class="text-slate-500 mb-1">官方身份 (是否新人专属)</div>
+            <div class="text-white">{coupon.officialIdentity || '未注明'}</div>
+          </div>
+          {coupon.usageLimitText && (
+            <div class="col-span-2">
+              <div class="text-slate-500 mb-1">使用次数 / 限制</div>
+              <div class="text-brand-accent font-bold">{coupon.usageLimitText}</div>
+            </div>
+          )}
+          <div>
             <div class="text-slate-500 mb-1">验证日期</div>
             <div class="text-white font-mono">{coupon.verifiedAt || '未记录'}</div>
-          </div>
-          <div>
-            <div class="text-slate-500 mb-1">官方身份</div>
-            <div class="text-white">{coupon.officialIdentity || '未注明'}</div>
           </div>
           <div>
             <div class="text-slate-500 mb-1">截止时间</div>
