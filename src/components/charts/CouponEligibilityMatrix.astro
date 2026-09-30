@@ -1,10 +1,12 @@
 ---
+import { getActiveCoupon } from '../../utils/coupon.js';
 const { brand } = Astro.props;
+const activeCoupon = getActiveCoupon(brand);
 
 if (!brand || !brand.visualData || !brand.visualData.couponEligibility) return null;
 
 const data = brand.visualData.couponEligibility;
-const couponCode = brand.coupon?.code || "优惠码";
+const couponCode = activeCoupon?.code || "优惠码";
 
 ---
 
@@ -19,12 +21,21 @@ const couponCode = brand.coupon?.code || "优惠码";
   </div>
   
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8">
-    {data.map(item => (
-      <div class={`p-4 rounded-lg border flex flex-col items-center text-center transition-colors ${item.eligible ? 'bg-brand-dark border-brand-neon/30 hover:border-brand-neon/60' : 'bg-slate-800/50 border-slate-700'}`}>
-        <span class={`text-sm font-bold mb-3 ${item.eligible ? 'text-white' : 'text-slate-400'}`}>
+    {data.map(item => {
+      let isEligible = item.eligible;
+      if (activeCoupon?.type === 'temporary') {
+        if (activeCoupon.eligiblePlans && activeCoupon.eligiblePlans.length > 0) {
+          isEligible = activeCoupon.eligiblePlans.includes(item.label);
+        } else if (activeCoupon.excludedPlans && activeCoupon.excludedPlans.length > 0) {
+          isEligible = !activeCoupon.excludedPlans.includes(item.label);
+        }
+      }
+      return (
+      <div class={`p-4 rounded-lg border flex flex-col items-center text-center transition-colors ${isEligible ? 'bg-brand-dark border-brand-neon/30 hover:border-brand-neon/60' : 'bg-slate-800/50 border-slate-700'}`}>
+        <span class={`text-sm font-bold mb-3 ${isEligible ? 'text-white' : 'text-slate-400'}`}>
           {item.label}
         </span>
-        {item.eligible ? (
+        {isEligible ? (
           <div class="inline-flex items-center text-brand-neon text-sm font-bold bg-brand-neon/10 px-3 py-1.5 rounded-full border border-brand-neon/20">
             <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
             可用
@@ -36,6 +47,7 @@ const couponCode = brand.coupon?.code || "优惠码";
           </div>
         )}
       </div>
-    ))}
+      );
+    })}
   </div>
 </div>

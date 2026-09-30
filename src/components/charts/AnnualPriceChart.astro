@@ -1,5 +1,7 @@
 ---
+import { getActiveCoupon } from '../../utils/coupon.js';
 const { brand } = Astro.props;
+const activeCoupon = getActiveCoupon(brand);
 
 if (!brand || !brand.visualData || (!brand.visualData.annualPrice && !brand.visualData.monthlyPrice)) return null;
 
@@ -8,17 +10,30 @@ const data = brand.visualData.annualPrice || brand.visualData.monthlyPrice;
 const isMonthly = !brand.visualData.annualPrice && brand.visualData.monthlyPrice;
 const priceChartLabel = brand.visualData.priceChartLabel || (isMonthly ? "月付" : "年付");
 
-const hasDiscount = data.some(d => d.original !== undefined && d.discounted !== undefined && d.original !== d.discounted);
+function getDiscountMultiplier(coupon) {
+  if (!coupon || !coupon.discountPercent) return 1;
+  const match = coupon.discountPercent.match(/(\d+)/);
+  if (match) return 1 - (parseInt(match[1]) / 100);
+  return 1;
+}
+const mult = getDiscountMultiplier(activeCoupon);
+let mappedData = data.map(d => {
+  if (activeCoupon?.type === 'temporary' && d.original && brand.visualData?.couponEligibility?.find(e => e.label === d.label)?.eligible !== false) {
+    return { ...d, discounted: parseFloat((d.original * mult).toFixed(2)) };
+  }
+  return d;
+});
+const hasDiscount = mappedData.some(d => d.original !== undefined && d.discounted !== undefined && d.original !== d.discounted);
 
-const max = Math.max(...data.flatMap(d => {
+const max = Math.max(...mappedData.flatMap(d => {
   const vals = [d.value || 0];
   if (d.original) vals.push(d.original);
   if (d.discounted) vals.push(d.discounted);
   return vals;
 }));
 
-const couponText = brand.coupon?.code || '优惠码';
-const discountPercentText = brand.coupon?.discount || '';
+const couponText = activeCoupon?.code || '优惠码';
+const discountPercentText = activeCoupon?.discount || '';
 
 ---
 
@@ -42,7 +57,7 @@ const discountPercentText = brand.coupon?.discount || '';
       ))}
     </div>
 
-    {data.map(item => {
+    {mappedData.map(item => {
       const isStudent = item.label.includes('学生');
       if (hasDiscount && item.original && item.discounted && item.original !== item.discounted) {
         const heightOrig = (item.original / max) * 100;

@@ -1,8 +1,10 @@
 ---
+import { getActiveCoupon } from '../../utils/coupon.js';
 const { brand } = Astro.props;
 
 if (!brand) return null;
 
+const activeCoupon = getActiveCoupon(brand);
 const facts = [];
 
 if (brand.lineType) facts.push({ label: '线路', value: Array.isArray(brand.lineType) ? brand.lineType.join(' / ') : brand.lineType });
@@ -10,7 +12,7 @@ if (brand.protocols) facts.push({ label: '协议', value: Array.isArray(brand.pr
 if (brand.speedLimit) facts.push({ label: '最高标称速率', value: brand.speedLimit });
 if (brand.deviceLimit) facts.push({ label: '设备', value: brand.deviceLimit });
 if (brand.ipType) facts.push({ label: 'IP', value: brand.ipType });
-if (brand.coupon && brand.coupon.code) facts.push({ label: '优惠码', value: `${brand.coupon.code} · ${brand.coupon.discount}` });
+if (activeCoupon && activeCoupon.code) facts.push({ label: '优惠码', value: `${activeCoupon.code} · ${activeCoupon.discount}` });
 if (brand.nodeSnapshot && brand.nodeSnapshot.total) facts.push({ label: '当前节点快照', value: `${brand.nodeSnapshot.total} 个`, sub: `${brand.nodeSnapshot.online} 在线 · ${brand.nodeSnapshot.offline} 离线\n${brand.nodeSnapshot.date} 官方后台快照` });
 
 if (facts.length === 0) return null;
@@ -25,6 +27,7 @@ if (facts.length === 0) return null;
     {facts.map(fact => (
       <div class="bg-brand-dark border border-white/10 rounded-lg p-4 flex flex-col justify-center shadow-sm hover:border-brand-neon/30 transition-colors">
         <span class="text-xs text-slate-400 mb-1 uppercase tracking-wider">{fact.label}</span>
+        {fact.label === "优惠码" && activeCoupon?.type === "temporary" && <span class="ml-2 text-[8px] bg-brand-neon/20 text-brand-neon px-1 rounded">限时</span>}
         <span class="text-base sm:text-lg font-bold text-white leading-tight">{fact.value}</span>
         {fact.sub && (
           <span class="text-[0.65rem] text-slate-500 mt-2 leading-snug whitespace-pre-line">{fact.sub}</span>

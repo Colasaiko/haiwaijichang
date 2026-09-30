@@ -1,9 +1,24 @@
 ---
+import { getActiveCoupon } from '../../utils/coupon.js';
 const { brand } = Astro.props;
+const activeCoupon = getActiveCoupon(brand);
 
 if (!brand || !brand.visualData || !brand.visualData.couponExample) return null;
 
-const data = brand.visualData.couponExample;
+function getDiscountMultiplier(coupon) {
+  if (!coupon || !coupon.discountPercent) return 1;
+  const match = coupon.discountPercent.match(/(\d+)/);
+  if (match) return 1 - (parseInt(match[1]) / 100);
+  return 1;
+}
+let data = { ...brand.visualData.couponExample };
+if (activeCoupon?.type === 'temporary' && data.before) {
+  const mult = getDiscountMultiplier(activeCoupon);
+  data.after = parseFloat((data.before * mult).toFixed(2));
+  data.discount = (data.before - data.after).toFixed(2).replace(/\.00$/, '');
+  data.coupon = activeCoupon.code;
+  data.percent = activeCoupon.discountPercent.replace(/\D/g, '');
+}
 const footerNote = data.note || `以上价格基于官方资料计算。`;
 
 ---
