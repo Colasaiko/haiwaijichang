@@ -8,7 +8,7 @@ seoTitle: "FireFly 萤火虫怎么样？2026 IPLC 专线、套餐价格与 firef
 title: "FireFly 萤火虫怎么样？2026 IPLC 专线、套餐价格与 firefly 8折优惠码测评 | 海外机场"
 description: "FireFly 萤火虫提供 IPLC 专线、VLESS 协议、不限速与不限设备使用。本文整理 2026 FireFly 套餐价格、firefly 8折优惠码、原生 IP、香港台湾日本新加坡美国节点，以及 Netflix、Disney+、ChatGPT 等流媒体与 AI 支持情况。"
 h1: "FireFly 萤火虫怎么样？IPLC 专线、套餐与 8 折优惠测评"
-heroDescription: "FireFly 萤火虫于 2026 年创立，采用 IPLC 专线与 VLESS 协议，全节点不限速且不限制客户端和设备数量。当前提供 60GB 至 1000GB 的多档月流量套餐以及 100GB 不限时流量包，新用户可使用优惠码 firefly 享受 8 折优惠。"
+heroDescription: "FireFly 萤火虫于 2026 年创立，采用 IPLC 专线与 VLESS 协议，全节点不限速且不限制客户端和设备数量。当前提供 60GB 至 1000GB 的多档月流量套餐以及 100GB 不限时流量包，符合条件的新用户套餐可使用优惠码 firefly 享受8折；Firefly年付版与不限时套餐不参与优惠。"
 keywords: "FireFly, 萤火虫, FireFly怎么样, FireFly机场, FireFly优惠码, firefly优惠码, FireFly萤火虫, IPLC专线, VLESS, 机场推荐, 海外机场"
 
 features:
@@ -73,6 +73,9 @@ coupon:
   scope: "新用户"
   verified: true
   sourceType: "official"
+  excludedPlans:
+    - "Firefly年付版"
+    - "Firefly不限时"
 
 temporaryCoupons:
   - id: "firefly-flymoon80-2026"
@@ -80,14 +83,13 @@ temporaryCoupons:
     code: "flymoon80"
     discount: "8折"
     discountPercent: "20%"
-    scope: "月付套餐 / 不限时"
+    scope: "符合条件的月付套餐"
     startsAt: "2026-09-01T00:00:00+08:00"
     expiresAt: "2026-10-15T23:59:59+08:00"
     verified: true
     priority: 100
     eligiblePeriods:
       - "月付"
-      - "一次性"
 
 nodeSnapshot:
   regions:
@@ -208,7 +210,6 @@ visualData:
       plan: "Firefly年付版"
       period: "年付"
       original: 96
-      discounted: 76.80
     - label: "Lite"
       plan: "Firefly Lite"
       period: "年付"
@@ -236,7 +237,6 @@ visualData:
       period: "一次性"
       traffic: 100
       original: 100
-      discounted: 80
 
   couponExample:
     coupon: "firefly"
@@ -274,13 +274,13 @@ FireFly 当前共提供 6 种套餐，包括 5 种按月刷新流量的常规套
 |---------|--------|---------|------|
 | Firefly不限时 | 100GB | 一次性 | ¥100 |
 
-新用户可使用优惠码 `firefly` 享受 **8 折** 优惠。
+优惠码 `firefly` 适用于符合条件的常规套餐；Firefly年付版与 Firefly不限时不参与优惠。
 
 ### 使用 firefly 后的年付参考价
 
 | 套餐 | 原价 | 8折后 | 节省 |
 |------|------|-------|------|
-| 年付版 | ¥96 | ¥76.80 | ¥19.20 |
+| 年付版 | ¥96 | 不适用 | - |
 | Lite | ¥240 | ¥192 | ¥48 |
 | Plus | ¥432 | ¥345.60 | ¥86.40 |
 | Blaze | ¥816 | ¥652.80 | ¥163.20 |
@@ -294,7 +294,7 @@ Firefly 年付版定价为 **¥96/年**，包含每月 60GB 流量。
 
 所谓"¥8/月"是年付折算结果：¥96 ÷ 12 = ¥8/月。这并不代表 FireFly 提供 ¥8 的月付套餐。年付版只能一次性支付 ¥96 整年费用。
 
-使用优惠码 `firefly` 后，年付版变为 **¥76.80/年**，折合约 **¥6.40/月**（同样为年付折算，不是月付）。
+该套餐不适用优惠码，必须以 ¥96 原价支付。
 
 ## FireFly Lite 适合谁？
 
@@ -322,13 +322,13 @@ Firefly 不限时是一个固定总量的流量包，提供 **100GB 总流量**�
 - **不是 100GB/月**，而是整个生命周期的总量
 - 适合作为备用线路或低频使用场景
 
-使用优惠码 `firefly` 后，不限时包变为 **¥80**。
+该不限时包不适用优惠码，必须以 ¥100 原价支付。
 
 ## firefly 优惠码怎么用？
 
 在 FireFly 官方结算页面输入优惠码 `firefly`，即可享受 **8 折** 优惠。
 
-官方资料显示该优惠码适用对象为**新用户**。所有套餐（包括年付版、Lite、Plus、Blaze、Nova 以及不限时包）均支持使用。
+官方资料显示该优惠码适用对象为**新用户**。优惠码适用于符合条件的常规套餐（Lite、Plus、Blaze、Nova）；Firefly年付版与 Firefly不限时不参与优惠。
 
 > 官方当前未标注优惠码截止日期。
 
@@ -428,7 +428,7 @@ FireFly 于 **2026 年** 创立。品牌方表示，其技术和运营团队拥�
 7. **AI 支持** — ChatGPT、Gemini、Claude
 8. **套餐跨度大** — 60GB 至 1000GB
 9. **不限时流量包** — 100GB 固定总量，适合低频使用
-10. **新用户 8 折** — 优惠码 firefly
+10. **新用户 8 折** — 优惠码 firefly（部分特价及不限时套餐除外）
 11. **五个节点地区** — 香港、台湾、新加坡、日本、美国
 12. **企业定制** — 提供企业级方案
 13. **多种支付** — USDT、微信、支付宝
@@ -473,9 +473,9 @@ FireFly 品牌成立于 2026 年。"8 年经验"是品牌方对其技术与运�
 
 ¥8/月是折算月成本（¥96 ÷ 12 = ¥8）。实际付款方式是 ¥96 一次性年付，不存在 ¥8 的月付选项。
 
-### 使用 firefly 后年付版多少钱？
+### Firefly年付版能用 firefly 优惠码吗？
 
-按 8 折计算：¥76.80/年，折合约 ¥6.40/月。仍然是年付，不是月付。
+不能。年付版不适用该优惠码，必须按原价 ¥96 支付。
 
 ### FireFly 月付最低多少钱？
 
