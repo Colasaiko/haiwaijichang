@@ -6,6 +6,9 @@ if (!brand || !brand.visualData || !brand.visualData.traffic) return null;
 const data = brand.visualData.traffic;
 const max = Math.max(...data.map(d => d.value));
 
+const minLabel = data[0]?.display || '';
+const maxLabel = data[data.length - 1]?.display || '';
+
 ---
 
 <div class="mb-12 bg-brand-dark p-6 rounded-xl border border-white/5">
@@ -15,7 +18,7 @@ const max = Math.max(...data.map(d => d.value));
       每月流量额度对比
     </h2>
     <p class="text-xs text-slate-500 mt-1 uppercase tracking-widest font-mono">BAGGAGE / DATA ALLOWANCE</p>
-    <p class="text-sm text-slate-400 mt-2">从 50GB 的学生版到 1TB 的宇宙版，套餐跨度较大，可以按自己的真实月流量选择。</p>
+    <p class="text-sm text-slate-400 mt-2">从 {minLabel} 到 {maxLabel}，套餐跨度较大，可以按自己的真实月流量选择。</p>
   </div>
   
   <div class="space-y-4 relative">
@@ -50,6 +53,6 @@ const max = Math.max(...data.map(d => d.value));
   </div>
   
   <div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
-    <p class="text-xs text-slate-500">资料更新时间：2026-09-29<br/>来源：官方套餐页面</p>
+    <p class="text-xs text-slate-500">来源：官方套餐页面</p>
   </div>
 </div>

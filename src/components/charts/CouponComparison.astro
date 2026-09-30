@@ -4,6 +4,7 @@ const { brand } = Astro.props;
 if (!brand || !brand.visualData || !brand.visualData.couponExample) return null;
 
 const data = brand.visualData.couponExample;
+const footerNote = data.note || `以上价格基于官方资料计算。`;
 
 ---
 
@@ -15,7 +16,7 @@ const data = brand.visualData.couponExample;
         {data.coupon} 能省多少钱？
       </h2>
       <p class="text-sm text-slate-400 mt-2">
-        以 {data.plan} {data.period} 为例，官方结算页面验证。
+        以 {data.plan} {data.period} 为例。
       </p>
     </div>
     
@@ -63,6 +64,6 @@ const data = brand.visualData.couponExample;
   </div>
   
   <div class="mt-6 pt-4 border-t border-white/10 text-center md:text-left">
-    <p class="text-[10px] text-slate-500 font-mono">以上价格来自 2026-09-29 官方结算页面实际验证。飞猫·学生版不支持该优惠码。</p>
+    <p class="text-[10px] text-slate-500 font-mono">{footerNote}</p>
   </div>
 </div>

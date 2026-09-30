@@ -3,7 +3,11 @@ const { brand } = Astro.props;
 
 if (!brand || !brand.visualData || !brand.visualData.unlimitedTraffic) return null;
 
-const data = brand.visualData.unlimitedTraffic;
+let data = brand.visualData.unlimitedTraffic;
+// Support both single object and array
+if (!Array.isArray(data)) data = [data];
+
+const discountLabel = brand.coupon?.discount || '优惠';
 
 ---
 
@@ -11,13 +15,13 @@ const data = brand.visualData.unlimitedTraffic;
   <div class="mb-6">
     <h2 class="text-xl font-bold text-white uppercase tracking-wider font-mono flex items-center">
       <svg class="w-5 h-5 text-brand-neon mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      不限时流量包对比
+      不限时流量包
     </h2>
     <p class="text-xs text-slate-500 mt-1 uppercase tracking-widest font-mono">FLEX TRAFFIC</p>
     <p class="text-sm text-slate-400 mt-2">一次性购买，不限制使用期限（不限时 ≠ 无限流量）。</p>
   </div>
   
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+  <div class={`grid grid-cols-1 ${data.length > 1 ? 'md:grid-cols-2' : ''} gap-6 mt-8`}>
     {data.map(item => {
       const saved = (item.original - item.discounted).toFixed(2).replace(/\.00$/, '');
       return (
@@ -39,7 +43,7 @@ const data = brand.visualData.unlimitedTraffic;
             
             <div class="flex flex-col items-end">
               <span class="text-[10px] text-brand-accent uppercase tracking-widest mb-1 bg-brand-accent/10 px-2 py-0.5 rounded">
-                7折后省 ¥{saved}
+                {discountLabel}后省 ¥{saved}
               </span>
               <span class="text-2xl font-bold text-white font-mono">¥{item.discounted}</span>
             </div>

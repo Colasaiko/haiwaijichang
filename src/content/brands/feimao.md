@@ -202,6 +202,7 @@ visualData:
     after: 192
     coupon: "flycat888"
     percent: 20
+    note: "以上价格来自 2026-09-29 官方结算页面实际验证。飞猫·学生版不支持该优惠码。"
 
 nodeSnapshot:
   date: "2026-09-29"

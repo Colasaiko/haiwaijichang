@@ -10,7 +10,7 @@ import UnlimitedTrafficChart from './charts/UnlimitedTrafficChart.astro';
 
 const { brand } = Astro.props;
 
-if (!brand || (brand.slug !== 'feimao' && brand.slug !== 'weifeng')) {
+if (!brand || !brand.visualData) {
   return null;
 }
 ---
