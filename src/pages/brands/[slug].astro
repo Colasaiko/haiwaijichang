@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 import BrandDataDashboard from '../../components/BrandDataDashboard.astro';
-import { getBestCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
+import { getBestCouponForPricing, getStandardCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
 
 export async function getStaticPaths() {
   const brandEntries = await getCollection('brands');
@@ -382,44 +382,109 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
                 <td class="px-5 py-3 align-middle">
                   <div class="flex flex-col space-y-1">
                     {(() => {
+                      const basePrice = p.price || p.originalPrice || '-';
+                      const getDisc = (c) => {
+                        if (!c) return null;
+                        if (p.discountPrice && c.type !== 'temporary') return p.discountPrice;
+                        const origMatch = basePrice.match(/\d+(\.\d+)?/);
+                        if (origMatch) {
+                          const val = parseFloat(origMatch[0]);
+                          const mult = getDiscountMultiplier(c);
+                          const prefix = basePrice.includes('¥') ? '¥' : '';
+                          return prefix + (val * mult).toFixed(2).replace(/\.00$/, '');
+                        }
+                        return null;
+                      };
+
                       const coupon = getBestCouponForPricing(brand, p);
                       if (!coupon) {
-                        return <span class="text-sm font-bold text-brand-neon">{p.price || p.originalPrice || '-'}</span>;
+                        return <span class="text-sm font-bold text-brand-neon">{basePrice}</span>;
+                      }
+
+                      const discActive = getDisc(coupon);
+                      let html = [];
+                      
+                      if (discActive) {
+                        html.push(
+                          <div class="flex-col show-if-temp-active">
+                            <span class="text-sm font-bold text-brand-neon block">{discActive}</span>
+                            <span class="text-xs text-slate-500 line-through block">{basePrice}</span>
+                          </div>
+                        );
                       } else {
-                        // Dynamically calculate discount or use hardcoded if not temporary
-                        let discPrice = p.discountPrice;
-                        if (coupon.type === 'temporary' && (p.originalPrice || p.price)) {
-                          const origMatch = (p.originalPrice || p.price).match(/\d+(\.\d+)?/);
-                          if (origMatch) {
-                            const val = parseFloat(origMatch[0]);
-                            const mult = getDiscountMultiplier(coupon);
-                            const prefix = (p.originalPrice || p.price).includes('¥') ? '¥' : '';
-                            discPrice = prefix + (val * mult).toFixed(2).replace(/\.00$/, '');
-                          }
-                        }
-                        if (discPrice) {
-                          return (
-                            <>
-                              <span class="text-sm font-bold text-brand-neon">{discPrice}</span>
-                              <span class="text-xs text-slate-500 line-through">{p.originalPrice || p.price}</span>
-                            </>
+                        html.push(<span class="text-sm font-bold text-brand-neon show-if-temp-active block">{basePrice}</span>);
+                      }
+
+                      if (coupon.type === 'temporary') {
+                        const stdCoupon = getStandardCouponForPricing(brand, p);
+                        const discExpired = getDisc(stdCoupon);
+                        if (discExpired) {
+                          html.push(
+                            <div class="flex-col show-if-temp-expired">
+                              <span class="text-sm font-bold text-brand-accent block">{discExpired}</span>
+                              <span class="text-xs text-slate-500 line-through block">{basePrice}</span>
+                            </div>
                           );
                         } else {
-                           return <span class="text-sm font-bold text-brand-neon">{p.price || p.originalPrice || '-'}</span>;
+                          html.push(<span class="text-sm font-bold text-brand-neon show-if-temp-expired block">{basePrice}</span>);
+                        }
+                      } else {
+                        if (discActive) {
+                          html.push(
+                            <div class="flex-col show-if-temp-expired">
+                              <span class="text-sm font-bold text-brand-accent block">{discActive}</span>
+                              <span class="text-xs text-slate-500 line-through block">{basePrice}</span>
+                            </div>
+                          );
+                        } else {
+                          html.push(<span class="text-sm font-bold text-brand-neon show-if-temp-expired block">{basePrice}</span>);
                         }
                       }
+                      return html;
                     })()}
                   </div>
                 </td>
                 <td class="px-5 py-3 align-middle text-xs">
                   {(() => {
                     const coupon = getBestCouponForPricing(brand, p);
-                    if (!coupon) return <span class="text-slate-500 bg-slate-800 px-2 py-1 rounded">不适用</span>;
-                    return (
-                      <span class={`${coupon.type === 'temporary' ? 'text-brand-neon bg-brand-neon/10 border-brand-neon/20' : 'text-brand-accent bg-brand-accent/10 border-brand-accent/20'} border px-2 py-1 rounded whitespace-nowrap`}>
-                        {coupon.code} · {coupon.type === 'temporary' ? '限时' : ''}{coupon.discount}
-                      </span>
+                    if (!coupon) return <span class="text-slate-500 bg-slate-800 px-2 py-1 rounded inline-block">不适用</span>;
+
+                    let html = [];
+                    html.push(
+                      <div class="show-if-temp-active">
+                        <span class={`${coupon.type === 'temporary' ? 'text-brand-neon bg-brand-neon/10 border-brand-neon/20' : 'text-brand-accent bg-brand-accent/10 border-brand-accent/20'} border px-2 py-1 rounded whitespace-nowrap inline-block`}>
+                          {coupon.code} · {coupon.type === 'temporary' ? '限时' : ''}{coupon.discount}
+                        </span>
+                      </div>
                     );
+
+                    if (coupon.type === 'temporary') {
+                      const stdCoupon = getStandardCouponForPricing(brand, p);
+                      if (stdCoupon) {
+                        html.push(
+                          <div class="show-if-temp-expired">
+                            <span class="text-brand-accent bg-brand-accent/10 border-brand-accent/20 border px-2 py-1 rounded whitespace-nowrap inline-block">
+                              {stdCoupon.code} · {stdCoupon.discount}
+                            </span>
+                          </div>
+                        );
+                      } else {
+                        html.push(
+                          <div class="show-if-temp-expired mt-1">
+                            <span class="text-slate-500 bg-slate-800 px-2 py-1 rounded inline-block">不适用</span>
+                          </div>
+                        );
+                      }
+                    } else {
+                      html.push(
+                        <div class="show-if-temp-expired mt-1">
+                          <span class="text-brand-accent bg-brand-accent/10 border-brand-accent/20 border px-2 py-1 rounded whitespace-nowrap inline-block">
+                            {coupon.code} · {coupon.discount}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return html;
                   })()}
                 </td>
               </tr>

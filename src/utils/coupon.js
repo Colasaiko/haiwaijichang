@@ -133,6 +133,19 @@ export function getBestCouponForPricing(brand, pricingEntry, clientDate = new Da
 }
 
 /**
+ * Gets the standard coupon for a specific pricing entry (ignoring temporary coupons).
+ * Useful for resolving the fallback state.
+ */
+export function getStandardCouponForPricing(brand, pricingEntry) {
+  if (!brand || !pricingEntry) return null;
+  if (pricingEntry.couponEligible === false) return null;
+  if (brand.coupon && isCouponApplicableToPricing(brand, brand.coupon, pricingEntry)) {
+    return { type: "standard", ...brand.coupon };
+  }
+  return null;
+}
+
+/**
  * Helper to calculate discount multiplier from a coupon object.
  */
 export function getDiscountMultiplier(coupon) {
