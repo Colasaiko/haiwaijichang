@@ -10,6 +10,28 @@ const data = brand.visualData.annualPrice || brand.visualData.monthlyPrice;
 const isMonthly = !brand.visualData.annualPrice && brand.visualData.monthlyPrice;
 const priceChartLabel = brand.visualData.priceChartLabel || (isMonthly ? "月付" : "年付");
 
+
+function checkPlanEligibility(planLabel, activeCoupon, visualEligibility) {
+  if (activeCoupon?.type !== 'temporary') return true;
+  
+  // 1. Check activeCoupon explicit lists
+  if (activeCoupon.eligiblePlans && activeCoupon.eligiblePlans.length > 0) {
+    // Exact match or includes (e.g. "月付" or plan name)
+    return activeCoupon.eligiblePlans.some(p => planLabel.includes(p));
+  }
+  if (activeCoupon.excludedPlans && activeCoupon.excludedPlans.length > 0) {
+    if (activeCoupon.excludedPlans.some(p => planLabel.includes(p))) return false;
+  }
+  
+  // 2. Fallback to brand visualData couponEligibility if exists
+  if (visualEligibility) {
+    const matched = visualEligibility.find(e => e.label === planLabel);
+    if (matched && matched.eligible === false) return false;
+  }
+  
+  return true;
+}
+
 function getDiscountMultiplier(coupon) {
   if (!coupon || !coupon.discountPercent) return 1;
   const match = coupon.discountPercent.match(/(\d+)/);
@@ -18,7 +40,7 @@ function getDiscountMultiplier(coupon) {
 }
 const mult = getDiscountMultiplier(activeCoupon);
 let mappedData = data.map(d => {
-  if (activeCoupon?.type === 'temporary' && d.original && brand.visualData?.couponEligibility?.find(e => e.label === d.label)?.eligible !== false) {
+  if (activeCoupon?.type === 'temporary' && d.original && checkPlanEligibility(d.label, activeCoupon, brand.visualData?.couponEligibility)) {
     return { ...d, discounted: parseFloat((d.original * mult).toFixed(2)) };
   }
   return d;

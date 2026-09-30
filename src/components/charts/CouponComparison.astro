@@ -5,6 +5,28 @@ const activeCoupon = getActiveCoupon(brand);
 
 if (!brand || !brand.visualData || !brand.visualData.couponExample) return null;
 
+
+function checkPlanEligibility(planLabel, activeCoupon, visualEligibility) {
+  if (activeCoupon?.type !== 'temporary') return true;
+  
+  // 1. Check activeCoupon explicit lists
+  if (activeCoupon.eligiblePlans && activeCoupon.eligiblePlans.length > 0) {
+    // Exact match or includes (e.g. "月付" or plan name)
+    return activeCoupon.eligiblePlans.some(p => planLabel.includes(p));
+  }
+  if (activeCoupon.excludedPlans && activeCoupon.excludedPlans.length > 0) {
+    if (activeCoupon.excludedPlans.some(p => planLabel.includes(p))) return false;
+  }
+  
+  // 2. Fallback to brand visualData couponEligibility if exists
+  if (visualEligibility) {
+    const matched = visualEligibility.find(e => e.label === planLabel);
+    if (matched && matched.eligible === false) return false;
+  }
+  
+  return true;
+}
+
 function getDiscountMultiplier(coupon) {
   if (!coupon || !coupon.discountPercent) return 1;
   const match = coupon.discountPercent.match(/(\d+)/);
@@ -12,7 +34,7 @@ function getDiscountMultiplier(coupon) {
   return 1;
 }
 let data = { ...brand.visualData.couponExample };
-if (activeCoupon?.type === 'temporary' && data.before) {
+if (activeCoupon?.type === 'temporary' && data.before && checkPlanEligibility(data.plan + " " + data.period, activeCoupon, brand.visualData?.couponEligibility)) {
   const mult = getDiscountMultiplier(activeCoupon);
   data.after = parseFloat((data.before * mult).toFixed(2));
   data.discount = (data.before - data.after).toFixed(2).replace(/\.00$/, '');
