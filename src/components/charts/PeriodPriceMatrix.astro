@@ -1,0 +1,99 @@
+---
+import { getBestCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
+const { brand } = Astro.props;
+
+if (!brand || !brand.visualData || !brand.visualData.periodPrices) return null;
+
+const periodPrices = brand.visualData.periodPrices;
+const planNames = Object.keys(periodPrices);
+
+// Build data for each plan
+const plans = planNames.map(planName => {
+  const periods = periodPrices[planName];
+  const pricingEntry = brand.pricing?.find(p => p.name === planName);
+  const traffic = pricingEntry?.traffic || '';
+
+  const rows = periods.map(pd => {
+    const pe = brand.pricing?.find(p => p.name === planName && p.period === pd.period) || { name: planName, period: pd.period };
+    const coupon = getBestCouponForPricing(brand, pe);
+    let discounted = null;
+    if (coupon) {
+      const mult = getDiscountMultiplier(coupon);
+      discounted = parseFloat((pd.price * mult).toFixed(2));
+    }
+    const eqMonthly = pd.months > 0 ? parseFloat((pd.price / pd.months).toFixed(2)) : null;
+    const eqMonthlyDisc = (discounted && pd.months > 0) ? parseFloat((discounted / pd.months).toFixed(2)) : null;
+    return {
+      ...pd,
+      coupon,
+      discounted,
+      eqMonthly,
+      eqMonthlyDisc
+    };
+  });
+
+  return { planName, traffic, rows };
+});
+---
+
+<div class="mb-12">
+  <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+    <span class="w-1.5 h-6 bg-brand-neon mr-3 rounded-sm"></span>
+    周期价格矩阵
+  </h2>
+  <p class="text-xs text-slate-500 mb-6 uppercase tracking-widest font-mono">PERIOD FARE MATRIX</p>
+
+  <div class="space-y-8">
+    {plans.map(plan => (
+      <div class="bg-brand-dark rounded-xl border border-white/5 overflow-x-auto">
+        <div class="px-6 pt-5 pb-3 border-b border-white/5">
+          <h3 class="text-lg font-bold text-white font-mono">{plan.planName}</h3>
+          {plan.traffic && <span class="text-xs text-brand-neon">{plan.traffic}</span>}
+        </div>
+        <table class="min-w-full text-sm text-left text-slate-300">
+          <thead class="text-[10px] uppercase bg-white/5 text-slate-500 border-b border-white/10">
+            <tr>
+              <th class="px-4 py-3 font-bold tracking-wider">周期</th>
+              <th class="px-4 py-3 font-bold tracking-wider">总价</th>
+              <th class="px-4 py-3 font-bold tracking-wider">等效月成本</th>
+              <th class="px-4 py-3 font-bold tracking-wider">当前活动</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            {plan.rows.map(row => (
+              <tr class="hover:bg-white/5 transition-colors">
+                <td class="px-4 py-3 font-bold text-white">{row.period}</td>
+                <td class="px-4 py-3 font-mono">
+                  {row.discounted ? (
+                    <div class="flex flex-col">
+                      <span class="text-slate-500 line-through text-xs">¥{row.price}</span>
+                      <span class="text-brand-neon font-bold">¥{row.discounted}</span>
+                    </div>
+                  ) : (
+                    <span class="font-bold">¥{row.price}</span>
+                  )}
+                </td>
+                <td class="px-4 py-3 font-mono text-xs text-slate-400">
+                  {row.eqMonthlyDisc ? (
+                    <span>≈ ¥{row.eqMonthlyDisc}/月</span>
+                  ) : row.eqMonthly ? (
+                    <span>≈ ¥{row.eqMonthly}/月</span>
+                  ) : '-'}
+                </td>
+                <td class="px-4 py-3">
+                  {row.coupon ? (
+                    <span class={`text-xs font-bold px-2 py-1 rounded border whitespace-nowrap ${row.coupon.type === 'temporary' ? 'text-brand-neon bg-brand-neon/10 border-brand-neon/20' : 'text-brand-accent bg-brand-accent/10 border-brand-accent/20'}`}>
+                      {row.coupon.code} · {row.coupon.type === 'temporary' ? '限时' : ''}{row.coupon.discount}
+                    </span>
+                  ) : (
+                    <span class="text-slate-500 text-xs">-</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ))}
+  </div>
+</div>

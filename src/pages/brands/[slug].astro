@@ -213,6 +213,14 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
                     function update() {
                       const now = Date.now();
                       const activeTemps = temps.filter(c => {
+                        // Type B: manualActive with no expiresAt
+                        if (c.manualActive === true && !c.expiresAt) {
+                          if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
+                          return true;
+                        }
+                        // Explicitly deactivated
+                        if (c.manualActive === false) return false;
+                        // Type A: time-based
                         if (!c.startsAt || !c.expiresAt) return false;
                         const s = new Date(c.startsAt).getTime();
                         const e = new Date(c.expiresAt).getTime();
@@ -222,14 +230,17 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
                       if (activeTemps.length > 0) {
                         activeTemps.sort((a, b) => (b.priority || 0) - (a.priority || 0));
                         const best = activeTemps[0];
-                        const expiresAt = new Date(best.expiresAt).getTime();
                         
                         // Populate H1
                         h1Code.textContent = best.code;
                         h1Discount.textContent = best.discount;
                         
-                        const expDate = new Date(best.expiresAt);
-                        h1Expiry.textContent = (expDate.getMonth() + 1) + '月' + expDate.getDate() + '日截止';
+                        if (best.expiresAt) {
+                          const expDate = new Date(best.expiresAt);
+                          h1Expiry.textContent = (expDate.getMonth() + 1) + '月' + expDate.getDate() + '日截止';
+                        } else {
+                          h1Expiry.textContent = '截止时间以官方公告为准';
+                        }
                         h1Expiry.classList.remove('hidden');
                         h1ExpirySep.classList.remove('hidden');
                         h1Copy.classList.remove('hidden');
@@ -250,10 +261,15 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
                           cardDiscount.textContent = best.discount;
                           cardScope.textContent = best.scope || '-';
                           
-                          const diff = expiresAt - now;
-                          const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                          const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                          cardCountdown.textContent = `剩余 ${d}天 ${h}小时`;
+                          if (best.expiresAt) {
+                            const expiresAt = new Date(best.expiresAt).getTime();
+                            const diff = expiresAt - now;
+                            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            cardCountdown.textContent = `剩余 ${d}天 ${h}小时`;
+                          } else {
+                            cardCountdown.textContent = '活动进行中';
+                          }
                         }
                         return true;
                       } else {
