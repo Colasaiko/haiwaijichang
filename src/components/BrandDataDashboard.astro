@@ -18,6 +18,12 @@ if (!brand || !brand.visualData) {
 }
 ---
 
+<style is:inline>
+  body.no-active-temp-coupon .show-if-temp-active { display: none !important; }
+  body.has-active-temp-coupon .show-if-temp-expired { display: none !important; }
+  body:not(.no-active-temp-coupon):not(.has-active-temp-coupon) .show-if-temp-expired { display: none !important; }
+</style>
+
 <div class="brand-data-dashboard">
   <QuickFacts brand={brand} />
   <QuickSelector brand={brand} />

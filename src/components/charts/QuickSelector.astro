@@ -36,17 +36,43 @@ const cards = Array.from(planMap.entries()).map(([name, plans]) => {
   const periodsWithoutCoupon = [];
   let bestCouponName = null;
   let isTemp = false;
+
+  const stdPeriodsWithCoupon = [];
+  const stdPeriodsWithoutCoupon = [];
+  let stdCouponName = null;
   
   plans.forEach(p => {
     const activeCoupon = getBestCouponForPricing(brand, p);
+    let stdCoupon = null;
+    
     if (activeCoupon) {
       periodsWithCoupon.push(p.period);
       if (!bestCouponName || activeCoupon.type === 'temporary') {
         bestCouponName = activeCoupon.code;
         isTemp = activeCoupon.type === 'temporary';
       }
+      
+      if (activeCoupon.type === 'temporary' && brand.coupon) {
+        const isApplicable = (c, pEntry) => {
+          if (pEntry.couponEligible === false) return false;
+          if (c.excludedPlans && c.excludedPlans.some(x => pEntry.name.includes(x))) return false;
+          return true;
+        };
+        if (isApplicable(brand.coupon, p)) {
+          stdCoupon = { type: 'standard', ...brand.coupon };
+        }
+      } else {
+        stdCoupon = activeCoupon;
+      }
     } else {
       periodsWithoutCoupon.push(p.period);
+    }
+    
+    if (stdCoupon) {
+      stdPeriodsWithCoupon.push(p.period);
+      stdCouponName = stdCoupon.code;
+    } else {
+      stdPeriodsWithoutCoupon.push(p.period);
     }
   });
   
@@ -60,6 +86,9 @@ const cards = Array.from(planMap.entries()).map(([name, plans]) => {
     periodsWithoutCoupon,
     bestCouponName,
     isTemp,
+    stdPeriodsWithCoupon,
+    stdPeriodsWithoutCoupon,
+    stdCouponName,
     yearPlan
   };
 });
@@ -88,14 +117,30 @@ const cards = Array.from(planMap.entries()).map(([name, plans]) => {
           {card.periodsWithCoupon.length === 0 ? (
             <div class="inline-block px-2 py-1 bg-slate-800 text-slate-400 text-xs rounded border border-slate-700">优惠码不适用</div>
           ) : (
-            <div class="flex flex-col space-y-2">
-              <div class={`inline-block self-start px-2 py-1 text-xs rounded border ${card.isTemp ? 'bg-brand-neon/10 text-brand-neon border-brand-neon/30' : 'bg-brand-accent/10 text-brand-accent border-brand-accent/20'}`}>
-                {card.bestCouponName} {card.isTemp ? '限时可用' : '可用'}
+            <>
+              <div class="flex-col space-y-2 show-if-temp-active flex">
+                <div class={`inline-block self-start px-2 py-1 text-xs rounded border ${card.isTemp ? 'bg-brand-neon/10 text-brand-neon border-brand-neon/30' : 'bg-brand-accent/10 text-brand-accent border-brand-accent/20'}`}>
+                  {card.bestCouponName} {card.isTemp ? '限时可用' : '可用'}
+                </div>
+                <div class="text-[10px] text-slate-500">
+                  {card.periodsWithCoupon.join(' / ')} {card.periodsWithoutCoupon.length > 0 ? ` (排除 ${card.periodsWithoutCoupon.join('/')})` : ''}
+                </div>
               </div>
-              <div class="text-[10px] text-slate-500">
-                {card.periodsWithCoupon.join(' / ')} {card.periodsWithoutCoupon.length > 0 ? ` (排除 ${card.periodsWithoutCoupon.join('/')})` : ''}
+              <div class="flex-col space-y-2 show-if-temp-expired">
+                {card.stdPeriodsWithCoupon.length > 0 ? (
+                  <>
+                    <div class="inline-block self-start px-2 py-1 text-xs rounded border bg-brand-accent/10 text-brand-accent border-brand-accent/20">
+                      {card.stdCouponName} 可用
+                    </div>
+                    <div class="text-[10px] text-slate-500">
+                      {card.stdPeriodsWithCoupon.join(' / ')} {card.stdPeriodsWithoutCoupon.length > 0 ? ` (排除 ${card.stdPeriodsWithoutCoupon.join('/')})` : ''}
+                    </div>
+                  </>
+                ) : (
+                  <div class="inline-block px-2 py-1 bg-slate-800 text-slate-400 text-xs rounded border border-slate-700">优惠码不适用</div>
+                )}
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>

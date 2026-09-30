@@ -7,7 +7,7 @@ const facts = [];
 
 if (brand.lineType) facts.push({ label: '线路', value: Array.isArray(brand.lineType) ? brand.lineType.join(' / ') : brand.lineType });
 if (brand.protocols) facts.push({ label: '协议', value: Array.isArray(brand.protocols) ? brand.protocols.join(' / ') : brand.protocols });
-if (brand.speedLimit) facts.push({ label: '最高标称速率', value: brand.speedLimit });
+if (brand.speedLimit) facts.push({ label: '速度 / 限速', value: brand.speedLimit });
 if (brand.deviceLimit) facts.push({ label: '设备', value: brand.deviceLimit });
 if (brand.nodeMultiplier) facts.push({ label: '节点倍率', value: brand.nodeMultiplier });
 if (brand.maxBandwidth) facts.push({ label: '最大带宽', value: brand.maxBandwidth });
@@ -39,9 +39,9 @@ if (brand.verifiedCoupons && Array.isArray(brand.verifiedCoupons)) {
 }
 if (activeTemps.length > 0) {
   activeTemps.sort((a, b) => (b.priority || 0) - (a.priority || 0));
-  facts.push({ label: '限时优惠', value: `${activeTemps[0].code} · ${activeTemps[0].discount}`, isTemp: true });
+  facts.push({ label: '限时优惠', value: `${activeTemps[0].code} · ${activeTemps[0].discount}`, isTemp: true, classes: 'show-if-temp-active' });
+  facts.push({ label: '限时优惠', value: '- · -', isTemp: true, classes: 'show-if-temp-expired' });
 } else if (brand.temporaryCoupons && brand.temporaryCoupons.length > 0) {
-  // If has temporary coupons but expired
   facts.push({ label: '限时优惠', value: '- · -', isTemp: true });
 }
 
@@ -57,7 +57,7 @@ if (facts.length === 0) return null;
   </h2>
   <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
     {facts.map(fact => (
-      <div class="bg-brand-dark border border-white/10 rounded-lg p-4 flex flex-col justify-center shadow-sm hover:border-brand-neon/30 transition-colors">
+      <div class={`bg-brand-dark border border-white/10 rounded-lg p-4 flex flex-col justify-center shadow-sm hover:border-brand-neon/30 transition-colors ${fact.classes || ''}`}>
         <span class="text-xs text-slate-400 mb-1 uppercase tracking-wider">{fact.label}</span>
         {fact.isTemp && <span class="ml-2 text-[8px] bg-brand-neon/20 text-brand-neon px-1 rounded">限时</span>}
         <span class="text-base sm:text-lg font-bold text-white leading-tight">{fact.value}</span>

@@ -17,18 +17,45 @@ const plans = planNames.map(planName => {
     const pe = brand.pricing?.find(p => p.name === planName && p.period === pd.period) || { name: planName, period: pd.period };
     const coupon = getBestCouponForPricing(brand, pe);
     let discounted = null;
+    let stdDiscounted = null;
+    let stdCoupon = null;
+    let stdEqMonthlyDisc = null;
+
     if (coupon) {
       const mult = getDiscountMultiplier(coupon);
       discounted = parseFloat((pd.price * mult).toFixed(2));
+      
+      if (coupon.type === 'temporary' && brand.coupon) {
+        const isApplicable = (c, p) => {
+          if (p.couponEligible === false) return false;
+          if (c.excludedPlans && c.excludedPlans.some(x => p.name.includes(x))) return false;
+          return true;
+        };
+        if (isApplicable(brand.coupon, pe)) {
+          stdCoupon = { type: 'standard', ...brand.coupon };
+          const stdMult = getDiscountMultiplier(stdCoupon);
+          stdDiscounted = parseFloat((pd.price * stdMult).toFixed(2));
+          if (pd.months > 0) stdEqMonthlyDisc = parseFloat((stdDiscounted / pd.months).toFixed(2));
+        }
+      } else {
+        stdCoupon = coupon;
+        stdDiscounted = discounted;
+      }
     }
+    
     const eqMonthly = pd.months > 0 ? parseFloat((pd.price / pd.months).toFixed(2)) : null;
     const eqMonthlyDisc = (discounted && pd.months > 0) ? parseFloat((discounted / pd.months).toFixed(2)) : null;
+    if (!stdEqMonthlyDisc) stdEqMonthlyDisc = eqMonthlyDisc;
+    
     return {
       ...pd,
       coupon,
+      stdCoupon,
       discounted,
+      stdDiscounted,
       eqMonthly,
-      eqMonthlyDisc
+      eqMonthlyDisc,
+      stdEqMonthlyDisc
     };
   });
 
@@ -65,29 +92,49 @@ const plans = planNames.map(planName => {
                 <td class="px-4 py-3 font-bold text-white">{row.period}</td>
                 <td class="px-4 py-3 font-mono">
                   {row.discounted ? (
-                    <div class="flex flex-col">
+                    <div class="flex flex-col show-if-temp-active">
                       <span class="text-slate-500 line-through text-xs">¥{row.price}</span>
                       <span class="text-brand-neon font-bold">¥{row.discounted}</span>
                     </div>
                   ) : (
-                    <span class="font-bold">¥{row.price}</span>
+                    <span class="font-bold show-if-temp-active">¥{row.price}</span>
+                  )}
+                  {row.discounted ? (
+                    <div class="flex-col show-if-temp-expired">
+                      <span class="text-slate-500 line-through text-xs">¥{row.price}</span>
+                      <span class="text-brand-accent font-bold">¥{row.stdDiscounted || row.price}</span>
+                    </div>
+                  ) : (
+                    <span class="font-bold show-if-temp-expired">¥{row.price}</span>
                   )}
                 </td>
                 <td class="px-4 py-3 font-mono text-xs text-slate-400">
-                  {row.eqMonthlyDisc ? (
-                    <span>≈ ¥{row.eqMonthlyDisc}/月</span>
-                  ) : row.eqMonthly ? (
-                    <span>≈ ¥{row.eqMonthly}/月</span>
-                  ) : '-'}
+                  <div class="show-if-temp-active">
+                    {row.eqMonthlyDisc ? `≈ ¥${row.eqMonthlyDisc}/月` : row.eqMonthly ? `≈ ¥${row.eqMonthly}/月` : '-'}
+                  </div>
+                  <div class="show-if-temp-expired">
+                    {row.stdEqMonthlyDisc ? `≈ ¥${row.stdEqMonthlyDisc}/月` : row.eqMonthly ? `≈ ¥${row.eqMonthly}/月` : '-'}
+                  </div>
                 </td>
                 <td class="px-4 py-3">
-                  {row.coupon ? (
-                    <span class={`text-xs font-bold px-2 py-1 rounded border whitespace-nowrap ${row.coupon.type === 'temporary' ? 'text-brand-neon bg-brand-neon/10 border-brand-neon/20' : 'text-brand-accent bg-brand-accent/10 border-brand-accent/20'}`}>
-                      {row.coupon.code} · {row.coupon.type === 'temporary' ? '限时' : ''}{row.coupon.discount}
-                    </span>
-                  ) : (
-                    <span class="text-slate-500 text-xs">-</span>
-                  )}
+                  <div class="show-if-temp-active">
+                    {row.coupon ? (
+                      <span class={`text-xs font-bold px-2 py-1 rounded border whitespace-nowrap ${row.coupon.type === 'temporary' ? 'text-brand-neon bg-brand-neon/10 border-brand-neon/20' : 'text-brand-accent bg-brand-accent/10 border-brand-accent/20'}`}>
+                        {row.coupon.code} · {row.coupon.type === 'temporary' ? '限时' : ''}{row.coupon.discount}
+                      </span>
+                    ) : (
+                      <span class="text-slate-500 text-xs">-</span>
+                    )}
+                  </div>
+                  <div class="show-if-temp-expired">
+                    {row.stdCoupon ? (
+                      <span class={`text-xs font-bold px-2 py-1 rounded border whitespace-nowrap text-brand-accent bg-brand-accent/10 border-brand-accent/20`}>
+                        {row.stdCoupon.code} · {row.stdCoupon.discount}
+                      </span>
+                    ) : (
+                      <span class="text-slate-500 text-xs">-</span>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

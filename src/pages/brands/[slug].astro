@@ -213,14 +213,12 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
                     function update() {
                       const now = Date.now();
                       const activeTemps = temps.filter(c => {
-                        // Type B: manualActive with no expiresAt
-                        if (c.manualActive === true && !c.expiresAt) {
+                        if (c.manualActive === false) return false;
+                        if (c.manualActive === true) {
                           if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
+                          if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
                           return true;
                         }
-                        // Explicitly deactivated
-                        if (c.manualActive === false) return false;
-                        // Type A: time-based
                         if (!c.startsAt || !c.expiresAt) return false;
                         const s = new Date(c.startsAt).getTime();
                         const e = new Date(c.expiresAt).getTime();
@@ -285,12 +283,19 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
                           card.style.display = 'none';
                         }
                         if (activeInterval) clearInterval(activeInterval);
+                        document.body.classList.remove('has-active-temp-coupon');
+                        document.body.classList.add('no-active-temp-coupon');
                         return false;
                       }
                     }
                     
                     if (update()) {
+                      document.body.classList.remove('no-active-temp-coupon');
+                      document.body.classList.add('has-active-temp-coupon');
                       activeInterval = setInterval(update, 1000 * 60 * 60);
+                    } else {
+                      document.body.classList.remove('has-active-temp-coupon');
+                      document.body.classList.add('no-active-temp-coupon');
                     }
                   })();
                 </script>
