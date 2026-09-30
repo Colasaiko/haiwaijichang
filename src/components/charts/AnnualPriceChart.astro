@@ -1,9 +1,13 @@
 ---
 const { brand } = Astro.props;
 
-if (!brand || !brand.visualData || !brand.visualData.annualPrice) return null;
+if (!brand || !brand.visualData || (!brand.visualData.annualPrice && !brand.visualData.monthlyPrice)) return null;
 
-const data = brand.visualData.annualPrice;
+// Fallback to monthlyPrice if annualPrice doesn't exist
+const data = brand.visualData.annualPrice || brand.visualData.monthlyPrice;
+const isMonthly = !brand.visualData.annualPrice && brand.visualData.monthlyPrice;
+const priceChartLabel = brand.visualData.priceChartLabel || (isMonthly ? "月付" : "年付");
+
 const hasDiscount = data.some(d => d.original !== undefined && d.discounted !== undefined && d.original !== d.discounted);
 
 const max = Math.max(...data.flatMap(d => {
@@ -22,11 +26,11 @@ const discountPercentText = brand.coupon?.discount || '';
   <div class="mb-6 min-w-[500px]">
     <h2 class="text-xl font-bold text-white uppercase tracking-wider font-mono flex items-center">
       <svg class="w-5 h-5 text-brand-accent mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      {hasDiscount ? `年付原价 vs ${discountPercentText}价` : '年付价格对比'}
+      {hasDiscount ? `${priceChartLabel}原价 vs ${discountPercentText}价` : `${priceChartLabel}价格对比`}
     </h2>
     <p class="text-xs text-slate-500 mt-1 uppercase tracking-widest font-mono">FARE COMPARISON</p>
     <p class="text-sm text-slate-400 mt-2">
-      {hasDiscount ? `左侧为官方年付原价，右侧为使用 ${couponText} 后的最终金额。` : '官方年付标价。未包含优惠码折扣情况。'}
+      {hasDiscount ? `左侧为官方${priceChartLabel}原价，右侧为使用 ${couponText} 后的最终金额。` : `官方${priceChartLabel}标价。未包含优惠码折扣情况。`}
     </p>
   </div>
   

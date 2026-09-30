@@ -23,7 +23,7 @@ const discountLabel = brand.coupon?.discount || '优惠';
   
   <div class={`grid grid-cols-1 ${data.length > 1 ? 'md:grid-cols-2' : ''} gap-6 mt-8`}>
     {data.map(item => {
-      const saved = (item.original - item.discounted).toFixed(2).replace(/\.00$/, '');
+      const saved = item.discounted ? (item.original - item.discounted).toFixed(2).replace(/\.00$/, '') : 0;
       return (
         <div class="bg-brand-dark p-6 rounded-lg border border-white/10 hover:border-brand-neon/40 transition-colors relative group">
           <div class="absolute top-0 right-0 bg-brand-neon text-brand-dark text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
@@ -37,16 +37,25 @@ const discountLabel = brand.coupon?.discount || '优惠';
           
           <div class="flex items-end justify-between border-t border-white/5 pt-4">
             <div class="flex flex-col">
-              <span class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">官方原价</span>
-              <span class="text-sm text-slate-400 line-through decoration-slate-500 font-mono">¥{item.original}</span>
+              <span class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">官方标价</span>
+              <span class={`text-sm text-slate-400 font-mono ${item.discounted ? 'line-through decoration-slate-500' : 'text-2xl font-bold text-white'}`}>¥{item.original}</span>
             </div>
             
-            <div class="flex flex-col items-end">
-              <span class="text-[10px] text-brand-accent uppercase tracking-widest mb-1 bg-brand-accent/10 px-2 py-0.5 rounded">
-                {discountLabel}后省 ¥{saved}
-              </span>
-              <span class="text-2xl font-bold text-white font-mono">¥{item.discounted}</span>
-            </div>
+            {item.discounted ? (
+              <div class="flex flex-col items-end">
+                <span class="text-[10px] text-brand-accent uppercase tracking-widest mb-1 bg-brand-accent/10 px-2 py-0.5 rounded">
+                  {discountLabel}后省 ¥{saved}
+                </span>
+                <span class="text-2xl font-bold text-white font-mono">¥{item.discounted}</span>
+              </div>
+            ) : item.resetPrice ? (
+              <div class="flex flex-col items-end">
+                <span class="text-[10px] text-brand-neon uppercase tracking-widest mb-1 bg-brand-neon/10 px-2 py-0.5 rounded">
+                  流量重置价
+                </span>
+                <span class="text-xl font-bold text-white font-mono">¥{item.resetPrice}</span>
+              </div>
+            ) : null}
           </div>
         </div>
       );
