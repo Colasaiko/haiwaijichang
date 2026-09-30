@@ -1,31 +1,10 @@
 ---
 import { getActiveCoupon, getBestCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
 const { brand } = Astro.props;
-const activeCoupon = getActiveCoupon(brand);
 
 if (!brand || !brand.visualData || !brand.visualData.couponExample) return null;
 
 
-function checkPlanEligibility(planLabel, activeCoupon, visualEligibility) {
-  if (activeCoupon?.type !== 'temporary') return true;
-  
-  // 1. Check activeCoupon explicit lists
-  if (activeCoupon.eligiblePlans && activeCoupon.eligiblePlans.length > 0) {
-    // Exact match or includes (e.g. "月付" or plan name)
-    return activeCoupon.eligiblePlans.some(p => planLabel.includes(p));
-  }
-  if (activeCoupon.excludedPlans && activeCoupon.excludedPlans.length > 0) {
-    if (activeCoupon.excludedPlans.some(p => planLabel.includes(p))) return false;
-  }
-  
-  // 2. Fallback to brand visualData couponEligibility if exists
-  if (visualEligibility) {
-    const matched = visualEligibility.find(e => e.label === planLabel);
-    if (matched && matched.eligible === false) return false;
-  }
-  
-  return true;
-}
 
 let data = { ...brand.visualData.couponExample };
 const pEntry = brand.pricing?.find(p => p.name === data.plan && p.period === data.period) || { name: data.plan, period: data.period };

@@ -1,7 +1,6 @@
 ---
 import { getActiveCoupon, getBestCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
 const { brand } = Astro.props;
-const activeCoupon = getActiveCoupon(brand);
 
 if (!brand || !brand.visualData || (!brand.visualData.annualPrice && !brand.visualData.monthlyPrice)) return null;
 
@@ -32,7 +31,6 @@ function checkPlanEligibility(planLabel, activeCoupon, visualEligibility) {
   return true;
 }
 
-const mult = getDiscountMultiplier(activeCoupon);
 let mappedData = data.map(d => {
   const planName = d.plan || d.label;
   const pPeriod = d.period || brand.visualData?.priceChartLabel || (isMonthly ? "月付" : "年付");
@@ -41,13 +39,18 @@ let mappedData = data.map(d => {
   const coupon = getBestCouponForPricing(brand, pEntry);
   if (coupon && coupon.type === 'temporary' && d.original) {
     const mult = getDiscountMultiplier(coupon);
-    return { ...d, discounted: parseFloat((d.original * mult).toFixed(2)) };
+    return { ...d, discounted: parseFloat((d.original * mult).toFixed(2)), resolvedCoupon: coupon };
   } else if (!coupon) {
-    // If no coupon is applicable (even standard), remove discounted
-    return { ...d, discounted: undefined };
+    return { ...d, discounted: undefined, resolvedCoupon: null };
+  } else if (coupon.type === 'standard' && d.original) {
+    // Standard coupon. Wait, in original behavior, does it rely on visualData.discounted?
+    // The user's request: "Firefly年付版 ¥96 优惠不适用; Lite ¥240 -> ¥192 firefly".
+    // If we just return the visualData's discounted value for standard coupons:
+    return { ...d, resolvedCoupon: coupon };
   }
-  return d;
+  return { ...d, resolvedCoupon: coupon };
 });
+
 const hasDiscount = mappedData.some(d => d.original !== undefined && d.discounted !== undefined && d.original !== d.discounted);
 
 const max = Math.max(...mappedData.flatMap(d => {
@@ -57,8 +60,27 @@ const max = Math.max(...mappedData.flatMap(d => {
   return vals;
 }));
 
-const couponText = activeCoupon?.code || '优惠码';
-const discountPercentText = activeCoupon?.discount || '';
+// Determine coupon text based on actual applied coupons
+const appliedCoupons = Array.from(new Set(mappedData.filter(d => d.resolvedCoupon && d.discounted).map(d => d.resolvedCoupon.code)));
+let couponDesc = '';
+let titleText = `${priceChartLabel}价格对比`;
+
+if (hasDiscount) {
+  if (appliedCoupons.length === 1) {
+    couponDesc = `折后价按优惠码 ${appliedCoupons[0]} 计算。`;
+    // Find the discount percent for the title
+    const c = mappedData.find(d => d.resolvedCoupon?.code === appliedCoupons[0])?.resolvedCoupon;
+    titleText = `${priceChartLabel}原价 vs ${c?.discount || ''}价`;
+  } else if (appliedCoupons.length > 1) {
+    couponDesc = "折后价按各套餐当前实际适用优惠计算。";
+    titleText = `${priceChartLabel}原价 vs 折后价`;
+  } else {
+    couponDesc = "部分套餐包含优惠，以实际计算为准。";
+    titleText = `${priceChartLabel}原价 vs 折后价`;
+  }
+} else {
+  couponDesc = `官方${priceChartLabel}标价。未包含优惠码折扣情况。`;
+}
 
 ---
 
@@ -66,11 +88,11 @@ const discountPercentText = activeCoupon?.discount || '';
   <div class="mb-6 min-w-[500px]">
     <h2 class="text-xl font-bold text-white uppercase tracking-wider font-mono flex items-center">
       <svg class="w-5 h-5 text-brand-accent mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      {hasDiscount ? `${priceChartLabel}原价 vs ${discountPercentText}价` : `${priceChartLabel}价格对比`}
+      {titleText}
     </h2>
     <p class="text-xs text-slate-500 mt-1 uppercase tracking-widest font-mono">FARE COMPARISON</p>
     <p class="text-sm text-slate-400 mt-2">
-      {hasDiscount ? `左侧为官方${priceChartLabel}原价，右侧为使用 ${couponText} 后的最终金额。` : `官方${priceChartLabel}标价。未包含优惠码折扣情况。`}
+      {couponDesc}
     </p>
   </div>
   
@@ -118,8 +140,9 @@ const discountPercentText = activeCoupon?.discount || '';
               省 ¥{saved}
             </div>
             
-            <div class="mt-3 text-[10px] sm:text-xs text-center font-bold text-slate-300 h-8 flex flex-col items-center whitespace-nowrap">
-              {item.label}
+            <div class="mt-3 text-[10px] sm:text-xs text-center font-bold text-slate-300 flex flex-col items-center whitespace-nowrap">
+              <span>{item.label}</span>
+              {item.resolvedCoupon && <span class="text-[8px] sm:text-[9px] text-brand-neon font-mono scale-90 sm:scale-100">{item.resolvedCoupon.code}</span>}
             </div>
           </div>
         );
@@ -135,9 +158,9 @@ const discountPercentText = activeCoupon?.discount || '';
                 ¥{item.value || item.original}
               </span>
             </div>
-            <div class="mt-3 text-[10px] sm:text-xs text-center font-bold text-slate-300 h-8 flex flex-col items-center whitespace-nowrap">
-              {item.label}
-              {isStudent && <span class="text-[8px] text-slate-500 scale-90">无优惠</span>}
+            <div class="mt-3 text-[10px] sm:text-xs text-center font-bold text-slate-300 flex flex-col items-center whitespace-nowrap">
+              <span>{item.label}</span>
+              {!item.resolvedCoupon ? <span class="text-[8px] sm:text-[9px] text-slate-500 scale-90 sm:scale-100">优惠不适用</span> : <span class="text-[8px] sm:text-[9px] text-brand-neon font-mono scale-90 sm:scale-100">{item.resolvedCoupon.code}</span>}
             </div>
           </div>
         );

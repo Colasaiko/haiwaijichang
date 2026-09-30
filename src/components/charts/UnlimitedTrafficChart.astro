@@ -1,36 +1,14 @@
 ---
 import { getActiveCoupon, getBestCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
 const { brand } = Astro.props;
-const activeCoupon = getActiveCoupon(brand);
 
 if (!brand || !brand.visualData || !brand.visualData.unlimitedTraffic) return null;
 
 
-function checkPlanEligibility(planLabel, activeCoupon, visualEligibility) {
-  if (activeCoupon?.type !== 'temporary') return true;
-  
-  // 1. Check activeCoupon explicit lists
-  if (activeCoupon.eligiblePlans && activeCoupon.eligiblePlans.length > 0) {
-    // Exact match or includes (e.g. "月付" or plan name)
-    return activeCoupon.eligiblePlans.some(p => planLabel.includes(p));
-  }
-  if (activeCoupon.excludedPlans && activeCoupon.excludedPlans.length > 0) {
-    if (activeCoupon.excludedPlans.some(p => planLabel.includes(p))) return false;
-  }
-  
-  // 2. Fallback to brand visualData couponEligibility if exists
-  if (visualEligibility) {
-    const matched = visualEligibility.find(e => e.label === planLabel);
-    if (matched && matched.eligible === false) return false;
-  }
-  
-  return true;
-}
-
 let data = brand.visualData.unlimitedTraffic;
 // Support both single object and array
 if (!Array.isArray(data)) data = [data];
-const mult = getDiscountMultiplier(activeCoupon);
+
 data = data.map(d => {
   const planName = d.plan || d.label;
   const pEntry = brand.pricing?.find(p => p.name === planName && (p.period === d.period || p.period === '一次性')) || { name: planName, period: d.period || '一次性' };
@@ -38,14 +16,14 @@ data = data.map(d => {
   const coupon = getBestCouponForPricing(brand, pEntry);
   if (coupon && coupon.type === 'temporary' && d.original) {
     const mult = getDiscountMultiplier(coupon);
-    return { ...d, discounted: parseFloat((d.original * mult).toFixed(2)) };
+    return { ...d, discounted: parseFloat((d.original * mult).toFixed(2)), resolvedCoupon: coupon };
   } else if (!coupon) {
-    return { ...d, discounted: undefined };
+    return { ...d, discounted: undefined, resolvedCoupon: null };
+  } else if (coupon.type === 'standard' && d.original) {
+    return { ...d, resolvedCoupon: coupon };
   }
-  return d;
+  return { ...d, resolvedCoupon: coupon };
 });
-
-const discountLabel = activeCoupon?.discount || '优惠';
 
 ---
 
@@ -82,7 +60,7 @@ const discountLabel = activeCoupon?.discount || '优惠';
             {item.discounted ? (
               <div class="flex flex-col items-end">
                 <span class="text-[10px] text-brand-accent uppercase tracking-widest mb-1 bg-brand-accent/10 px-2 py-0.5 rounded">
-                  {discountLabel}后省 ¥{saved}
+                  {item.resolvedCoupon?.discount || '优惠'}后省 ¥{saved}
                 </span>
                 <span class="text-2xl font-bold text-white font-mono">¥{item.discounted}</span>
               </div>
