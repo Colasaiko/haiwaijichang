@@ -26,11 +26,12 @@ function getBestCouponForPricing(brand, pricingEntry, now = Date.now()) {
   };
 
   let activeTemps = (brand.temporaryCoupons || []).filter(c => {
-    if (c.manualActive === true && !c.expiresAt) {
+    if (c.manualActive === false) return false;
+    if (c.manualActive === true) {
       if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
+      if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
       return true;
     }
-    if (c.manualActive === false) return false;
     if (!c.startsAt || !c.expiresAt) return false;
     return now >= new Date(c.startsAt).getTime() && now <= new Date(c.expiresAt).getTime();
   });

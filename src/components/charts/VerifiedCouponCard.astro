@@ -1,0 +1,79 @@
+---
+const { brand } = Astro.props;
+
+if (!brand || !brand.verifiedCoupons || brand.verifiedCoupons.length === 0) {
+  return null;
+}
+
+const coupons = brand.verifiedCoupons.filter(c => c.status === 'verified-currently-working');
+
+if (coupons.length === 0) {
+  return null;
+}
+---
+
+<div class="mb-8 w-full max-w-4xl">
+  {coupons.map((coupon) => (
+    <div class="bg-brand-navy border border-brand-accent/20 rounded-xl overflow-hidden shadow-lg mb-4 flex flex-col md:flex-row">
+      
+      {/* Left side: Coupon display */}
+      <div class="bg-brand-accent/10 p-6 md:w-1/3 flex flex-col justify-center items-center border-b md:border-b-0 md:border-r border-brand-accent/20">
+        <span class="text-[10px] text-brand-accent uppercase tracking-widest font-mono mb-2 font-bold text-center">
+          OTHER VERIFIED CODE<br/>其他已验证优惠码
+        </span>
+        <div class="text-2xl font-black text-white tracking-widest bg-brand-dark/50 px-4 py-2 rounded-lg border border-brand-accent/30 font-mono text-center break-all w-full">
+          {coupon.code}
+        </div>
+        <div class="text-brand-accent font-bold mt-3 text-lg flex items-center justify-center">
+          <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11"></path></svg>
+          {coupon.discountPercent} / {coupon.discount}
+        </div>
+      </div>
+
+      {/* Right side: Details */}
+      <div class="p-6 md:w-2/3">
+        
+        {/* Important context block */}
+        <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-start mb-4">
+          <svg class="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <p class="text-xs text-amber-500/90 leading-relaxed font-bold">
+            {coupon.eligibilityText || "该优惠码当前经官方结算页面验证可以使用，但官方没有公开它属于新人优惠、长期优惠还是限时活动，也没有公布截止日期。"}
+          </p>
+        </div>
+
+        {/* Info Grid */}
+        <div class="grid grid-cols-2 gap-4 text-xs">
+          <div>
+            <div class="text-slate-500 mb-1">验证状态</div>
+            <div class="text-white font-mono">{coupon.status === 'verified-currently-working' ? '当前结算页已验证' : coupon.status}</div>
+          </div>
+          <div>
+            <div class="text-slate-500 mb-1">验证日期</div>
+            <div class="text-white font-mono">{coupon.verifiedAt || '未记录'}</div>
+          </div>
+          <div>
+            <div class="text-slate-500 mb-1">官方身份</div>
+            <div class="text-white">{coupon.officialIdentity || '未注明'}</div>
+          </div>
+          <div>
+            <div class="text-slate-500 mb-1">截止时间</div>
+            <div class="text-white font-mono">{coupon.expiresAt || '未注明'}</div>
+          </div>
+        </div>
+
+        {coupon.excludedPlans && coupon.excludedPlans.length > 0 && (
+          <div class="mt-4 pt-4 border-t border-white/5">
+            <div class="text-slate-500 text-xs mb-2">当前已验证排除（不可用）套餐：</div>
+            <div class="flex flex-wrap gap-2">
+              {coupon.excludedPlans.map((plan) => (
+                <span class="bg-red-500/10 text-red-400 border border-red-500/20 rounded px-2 py-1 text-[10px] font-mono">
+                  {plan}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  ))}
+</div>

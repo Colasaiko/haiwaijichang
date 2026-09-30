@@ -12,14 +12,12 @@ export function getActiveCoupon(brand, clientDate = new Date()) {
   let activeTemps = [];
   if (brand.temporaryCoupons && Array.isArray(brand.temporaryCoupons)) {
     activeTemps = brand.temporaryCoupons.filter(c => {
-      // Type B: manualActive with no expiresAt
-      if (c.manualActive === true && !c.expiresAt) {
+      if (c.manualActive === false) return false;
+      if (c.manualActive === true) {
         if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
+        if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
         return true;
       }
-      // Explicitly deactivated
-      if (c.manualActive === false) return false;
-      // Type A: time-based
       if (!c.startsAt || !c.expiresAt) return false;
       const start = new Date(c.startsAt).getTime();
       const end = new Date(c.expiresAt).getTime();
@@ -103,14 +101,12 @@ export function getBestCouponForPricing(brand, pricingEntry, clientDate = new Da
   let activeTemps = [];
   if (brand.temporaryCoupons && Array.isArray(brand.temporaryCoupons)) {
     activeTemps = brand.temporaryCoupons.filter(c => {
-      // Type B: manualActive with no expiresAt
-      if (c.manualActive === true && !c.expiresAt) {
+      if (c.manualActive === false) return false;
+      if (c.manualActive === true) {
         if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
+        if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
         return true;
       }
-      // Explicitly deactivated
-      if (c.manualActive === false) return false;
-      // Type A: time-based
       if (!c.startsAt || !c.expiresAt) return false;
       const start = new Date(c.startsAt).getTime();
       const end = new Date(c.expiresAt).getTime();

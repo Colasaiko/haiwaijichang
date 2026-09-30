@@ -21,14 +21,21 @@ const now = Date.now();
 let activeTemps = [];
 if (brand.temporaryCoupons && Array.isArray(brand.temporaryCoupons)) {
   activeTemps = brand.temporaryCoupons.filter(c => {
-    if (c.manualActive === true && !c.expiresAt) {
+    if (c.manualActive === false) return false;
+    if (c.manualActive === true) {
       if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
+      if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
       return true;
     }
-    if (c.manualActive === false) return false;
     if (!c.startsAt || !c.expiresAt) return false;
     return now >= new Date(c.startsAt).getTime() && now <= new Date(c.expiresAt).getTime();
   });
+}
+if (brand.verifiedCoupons && Array.isArray(brand.verifiedCoupons)) {
+  const working = brand.verifiedCoupons.filter(c => c.status === 'verified-currently-working');
+  if (working.length > 0) {
+    facts.push({ label: '其他已验证', value: `${working[0].code} · ${working[0].discount}` });
+  }
 }
 if (activeTemps.length > 0) {
   activeTemps.sort((a, b) => (b.priority || 0) - (a.priority || 0));
