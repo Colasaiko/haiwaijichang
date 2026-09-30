@@ -1,7 +1,7 @@
 ---
 name: "灵猫"
 slug: "lingmao"
-order: 5
+order: 6
 features:
   - "全IPLC专线，不限速，不限制客户端"
   - "原生IP解锁Netflix/Hulu/HBO/Disney等流媒体"

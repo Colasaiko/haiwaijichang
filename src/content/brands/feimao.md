@@ -27,7 +27,7 @@ keywords:
   - 专线机场
   - Clash机场
   - 机场推荐
-order: 1
+order: 2
 featured: true
 features:
   - "全 IPLC 专线"

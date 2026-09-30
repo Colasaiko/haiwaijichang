@@ -1,5 +1,5 @@
 ---
-order: 7
+order: 4
 features:
   - "全IPLC专线，节点速率×1"
   - "稳定全球Chatgpt，Gemini等AI支持"

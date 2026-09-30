@@ -1,5 +1,5 @@
 ---
-order: 11
+order: 12
 features:
   - "海外中转，低延迟"
   - "支持 Netflix / ChatGPT / TikTok"
