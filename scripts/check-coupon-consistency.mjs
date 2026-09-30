@@ -307,6 +307,55 @@ if (sogoBrand) {
 }
 console.log('------------------------------------');
 
+// --- Muguang Consistency Test ---
+let muguangBrand = null;
+if (fs.existsSync(path.join(brandsDir, 'muguang.md'))) {
+  const muguangContent = fs.readFileSync(path.join(brandsDir, 'muguang.md'), 'utf8');
+  muguangBrand = matter(muguangContent).data;
+}
+
+if (muguangBrand) {
+  let muguangEligibleCount = 0;
+  let muguangExcludedCount = 0;
+  let muguangErrors = 0;
+
+  muguangBrand.pricing.forEach(p => {
+    const activeCoupon = getBestCouponForPricing(muguangBrand, p, dateA);
+    const expectedEligible = p.name.includes("基础版") || p.name.includes("标准版") || p.name.includes("旗舰版") || p.name.includes("至尊版");
+    const isExcluded = p.name === "暮光 · 年付轻量版" || p.name.includes("不限时") || p.name === "独享私人定制节点";
+    
+    if (expectedEligible && !isExcluded) {
+      if (activeCoupon?.code === 'mm88') {
+        muguangEligibleCount++;
+      } else {
+        console.error(`ERROR: Muguang ${p.name} (${p.period}) should have mm88, got:`, activeCoupon);
+        muguangErrors++;
+        errors++;
+      }
+    } else if (isExcluded) {
+      if (!activeCoupon) {
+        muguangExcludedCount++;
+      } else {
+        console.error(`ERROR: Muguang excluded plan ${p.name} resolved a coupon:`, activeCoupon);
+        muguangErrors++;
+        errors++;
+      }
+    }
+  });
+
+  if (muguangBrand.pricing.length !== 29) {
+     console.error(`ERROR: Muguang pricing should have 29 entries, found ${muguangBrand.pricing.length}`);
+     muguangErrors++;
+     errors++;
+  } else {
+     console.log('MUGUANG PRICING: PASS');
+  }
+  console.log(`MUGUANG MM88 ELIGIBLE PRICING: ${muguangEligibleCount}/24`);
+  console.log(`MUGUANG EXCLUDED PRICING: ${muguangExcludedCount}/5`);
+  console.log(`MUGUANG COUPON CONSISTENCY: ${muguangErrors === 0 ? 'PASS' : 'FAIL'}`);
+}
+console.log('------------------------------------');
+
 console.log(`BITZNET VERIFIED COUPON: ${bitznetNew9Count > 0 ? 'PASS' : 'FAIL'}`);
 console.log(`NEW9 ELIGIBLE PRICING: ${bitznetNew9Count}/15`);
 console.log(`INVALID VERIFIED PLAN REFERENCES: ${invalidVerifiedPlans}`);
