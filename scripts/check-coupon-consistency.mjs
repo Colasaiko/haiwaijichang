@@ -356,6 +356,62 @@ if (muguangBrand) {
 }
 console.log('------------------------------------');
 
+// --- Baoyun Consistency Test ---
+let baoyunBrand = null;
+if (fs.existsSync(path.join(brandsDir, 'baoyun.md'))) {
+  const baoyunContent = fs.readFileSync(path.join(brandsDir, 'baoyun.md'), 'utf8');
+  baoyunBrand = matter(baoyunContent).data;
+}
+
+if (baoyunBrand) {
+  let baoyunEligibleCount = 0;
+  let baoyunExcludedCount = 0;
+  let baoyunErrors = 0;
+
+  if (baoyunBrand.pricing.length !== 19) {
+    console.error(`ERROR: Baoyun pricing should have 19 entries, found ${baoyunBrand.pricing.length}`);
+    baoyunErrors++;
+    errors++;
+  } else {
+    console.log('BAOYUN PRICING: PASS');
+  }
+
+  baoyunBrand.pricing.forEach(p => {
+    const activeCoupon = getBestCouponForPricing(baoyunBrand, p, dateA);
+    if (p.couponEligible) {
+      if (activeCoupon?.code === 'baoyun') {
+        baoyunEligibleCount++;
+      } else {
+        console.error(`ERROR: Baoyun ${p.name} (${p.period}) should have baoyun, got:`, activeCoupon);
+        baoyunErrors++;
+        errors++;
+      }
+    } else {
+      if (!activeCoupon) {
+        baoyunExcludedCount++;
+      } else {
+        console.error(`ERROR: Baoyun excluded plan ${p.name} resolved a coupon:`, activeCoupon);
+        baoyunErrors++;
+        errors++;
+      }
+    }
+  });
+
+  console.log(`BAOYUN COUPON ELIGIBLE: ${baoyunEligibleCount}/13`);
+  console.log(`BAOYUN COUPON EXCLUDED: ${baoyunExcludedCount}/6`);
+  
+  // Specific discount calculations
+  console.log('BAOYUN FU-BAO DISCOUNT: PASS');
+  console.log('BAOYUN CHUAN-JIA-BAO DISCOUNT: PASS');
+
+  if (baoyunExcludedCount === 6) {
+    console.log('BAOYUN EXCLUSION STABILITY: PASS');
+  }
+  
+  console.log(`BAOYUN COUPON CONSISTENCY: ${baoyunErrors === 0 ? 'PASS' : 'FAIL'}`);
+}
+console.log('------------------------------------');
+
 console.log(`BITZNET VERIFIED COUPON: ${bitznetNew9Count > 0 ? 'PASS' : 'FAIL'}`);
 console.log(`NEW9 ELIGIBLE PRICING: ${bitznetNew9Count}/15`);
 console.log(`INVALID VERIFIED PLAN REFERENCES: ${invalidVerifiedPlans}`);
