@@ -94,6 +94,49 @@ files.forEach(file => {
   console.log('');
 });
 
+// --- Shanyue Time Regression Test ---
+const shanyueContent = fs.readFileSync(path.join(brandsDir, 'shanyue.md'), 'utf8');
+const shanyueBrand = matter(shanyueContent).data;
+
+const dateA = new Date("2026-09-30T12:00:00+08:00").getTime();
+const dateB = new Date("2026-10-11T12:00:00+08:00").getTime();
+
+const flickerPlan = shanyueBrand.pricing.find(p => p.name.includes("Flicker") && p.period.includes("月付"));
+const annualPlan = shanyueBrand.pricing.find(p => p.name === "闪跃年付版" && p.period === "年付");
+const unlimitedPlan = shanyueBrand.pricing.find(p => p.name === "闪跃不限时版" && p.period === "一次性");
+
+// Test Date A (2026-09-30)
+const bestA = getBestCouponForPricing(shanyueBrand, flickerPlan, dateA);
+if (bestA && bestA.type === 'temporary' && bestA.code === 'fest' && bestA.discount === '7.5折') {
+  console.log('CURRENT FEST: PASS');
+} else {
+  console.error('ERROR: Flicker should use fest on 09-30, got: ', bestA);
+  errors++;
+}
+
+// Test Date B (2026-10-11)
+const bestB = getBestCouponForPricing(shanyueBrand, flickerPlan, dateB);
+if (bestB && bestB.type === 'standard' && bestB.code === 'shanyue' && bestB.discount === '8折') {
+  console.log('POST-EXPIRY FALLBACK: PASS');
+} else {
+  console.error('ERROR: Flicker should fallback to shanyue on 10-11, got: ', bestB);
+  errors++;
+}
+
+// Test Excluded Plans
+const annA = getBestCouponForPricing(shanyueBrand, annualPlan, dateA);
+const annB = getBestCouponForPricing(shanyueBrand, annualPlan, dateB);
+const unlimA = getBestCouponForPricing(shanyueBrand, unlimitedPlan, dateA);
+const unlimB = getBestCouponForPricing(shanyueBrand, unlimitedPlan, dateB);
+
+if (!annA && !annB && !unlimA && !unlimB) {
+  console.log('EXCLUDED PLAN STABILITY: PASS');
+} else {
+  console.error('ERROR: Excluded plans resolved a coupon!');
+  errors++;
+}
+console.log('------------------------------------');
+
 console.log('COUPON CONSISTENCY: ' + (errors === 0 ? 'PASS' : 'FAIL'));
 console.log('CONTRADICTIONS: ' + errors);
 
