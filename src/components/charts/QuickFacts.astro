@@ -41,7 +41,8 @@ if (brand.verifiedCoupons && Array.isArray(brand.verifiedCoupons)) {
 }
 if (activeTemps.length > 0) {
   activeTemps.sort((a, b) => (b.priority || 0) - (a.priority || 0));
-  facts.push({ label: '限时优惠', value: `${activeTemps[0].code} · ${activeTemps[0].discount}`, isTemp: true, classes: 'show-if-temp-active' });
+  const tempStrs = activeTemps.map(c => `${c.code} · ${c.discount}`).join(' / ');
+  facts.push({ label: '限时优惠', value: tempStrs, isTemp: true, classes: 'show-if-temp-active' });
   facts.push({ label: '限时优惠', value: '- · -', isTemp: true, classes: 'show-if-temp-expired' });
 } else if (brand.temporaryCoupons && brand.temporaryCoupons.length > 0) {
   facts.push({ label: '限时优惠', value: '- · -', isTemp: true });

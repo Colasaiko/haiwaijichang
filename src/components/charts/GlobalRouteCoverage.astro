@@ -1,10 +1,12 @@
 ---
 const { brand } = Astro.props;
 
-if (!brand || !brand.nodeSnapshot || !brand.nodeSnapshot.regions) return null;
+if (!brand) return null;
 
-const regions = brand.nodeSnapshot.regions;
-const counts = brand.nodeSnapshot.counts || {};
+const hasSnapshot = brand.nodeSnapshot && brand.nodeSnapshot.regions;
+const hasCoverage = brand.nodeCoverage && brand.nodeCoverage.regions && Array.isArray(brand.nodeCoverage.regions);
+
+if (!hasSnapshot && !hasCoverage) return null;
 
 const regionLabels = {
   eastAsia: "East Asia / 东亚",
@@ -25,32 +27,49 @@ const regionLabels = {
     <p class="text-xs text-slate-500 uppercase tracking-widest font-mono">ROUTE COVERAGE</p>
   </div>
   
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-    {Object.keys(regions).map(key => {
-      const nodes = regions[key];
-      if (!nodes || nodes.length === 0) return null;
-      
-      return (
-        <div class="bg-brand-dark p-5 rounded-lg border border-white/5 hover:border-brand-neon/30 transition-colors group">
-          <h3 class="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest border-b border-white/10 pb-2 mb-4 group-hover:text-brand-neon transition-colors">
-            {regionLabels[key] || key}
-          </h3>
-          <div class="flex flex-wrap gap-2">
-            {nodes.map(node => (
-              <span class="inline-flex items-center bg-white/5 border border-white/10 text-slate-300 text-sm px-3 py-1 rounded">
-                {node}
-                {counts[node] && (
-                  <span class="ml-2 text-[10px] text-brand-neon font-mono bg-brand-neon/10 px-1 rounded">×{counts[node]}</span>
-                )}
-              </span>
-            ))}
+  {hasSnapshot ? (
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      {Object.keys(brand.nodeSnapshot.regions).map(key => {
+        const nodes = brand.nodeSnapshot.regions[key];
+        if (!nodes || nodes.length === 0) return null;
+        
+        return (
+          <div class="bg-brand-dark p-5 rounded-lg border border-white/5 hover:border-brand-neon/30 transition-colors group">
+            <h3 class="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest border-b border-white/10 pb-2 mb-4 group-hover:text-brand-neon transition-colors">
+              {regionLabels[key] || key}
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              {nodes.map(node => (
+                <span class="inline-flex items-center bg-white/5 border border-white/10 text-slate-300 text-sm px-3 py-1 rounded">
+                  {node}
+                  {brand.nodeSnapshot.counts && brand.nodeSnapshot.counts[node] && (
+                    <span class="ml-2 text-[10px] text-brand-neon font-mono bg-brand-neon/10 px-1 rounded">×{brand.nodeSnapshot.counts[node]}</span>
+                  )}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
-      );
-    })}
-  </div>
+        );
+      })}
+    </div>
+  ) : (
+    <div class="bg-brand-dark p-5 rounded-lg border border-white/5 hover:border-brand-neon/30 transition-colors group">
+      <h3 class="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest border-b border-white/10 pb-2 mb-4 group-hover:text-brand-neon transition-colors">
+        {brand.nodeCoverage.totalText || '常规'}节点 · 持续扩展
+      </h3>
+      <div class="flex flex-wrap gap-2">
+        {brand.nodeCoverage.regions.map(node => (
+          <span class="inline-flex items-center bg-white/5 border border-white/10 text-slate-300 text-sm px-3 py-1 rounded">
+            {node}
+          </span>
+        ))}
+      </div>
+    </div>
+  )}
   
   <div class="mt-6 pt-4 border-t border-white/10">
-    <p class="text-xs text-slate-500 font-mono">注：节点和线路数量会动态调整，以上为单次快照覆盖情况，以当前后台为准。</p>
+    <p class="text-xs text-slate-500 font-mono">
+      {hasSnapshot ? '注：节点和线路数量会动态调整，以上为单次快照覆盖情况，以当前后台为准。' : '注：节点和线路数量会动态调整，以当前后台为准。'}
+    </p>
   </div>
 </div>
