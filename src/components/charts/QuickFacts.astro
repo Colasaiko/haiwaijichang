@@ -34,7 +34,9 @@ if (brand.temporaryCoupons && Array.isArray(brand.temporaryCoupons)) {
 if (brand.verifiedCoupons && Array.isArray(brand.verifiedCoupons)) {
   const working = brand.verifiedCoupons.filter(c => c.status === 'verified-currently-working');
   if (working.length > 0) {
-    facts.push({ label: '其他已验证', value: `${working[0].code} · ${working[0].discount}` });
+    const c = working[0];
+    const limitStr = (c.usageLimit === 1 || c.usageLimitText) ? ' · 仅1次' : '';
+    facts.push({ label: '已验证优惠', value: `${c.code} · ${c.discount}${limitStr}` });
   }
 }
 if (activeTemps.length > 0) {

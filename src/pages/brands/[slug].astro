@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 import BrandDataDashboard from '../../components/BrandDataDashboard.astro';
-import { getBestCouponForPricing, getStandardCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
+import { getBestCouponForPricing, getStandardCouponForPricing, getVerifiedCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
 
 export async function getStaticPaths() {
   const brandEntries = await getCollection('brands');
@@ -31,7 +31,8 @@ headings.filter(h => h.depth <= 3).forEach(h => {
 });
 
 // Determine tags/features
-const hasIPLC = brand.features.some(f => f.toLowerCase().includes('iplc') || f.includes('专线'));
+const hasIPLC = brand.features.some(f => f.toLowerCase().includes('iplc'));
+const hasIEPL = brand.features.some(f => f.toLowerCase().includes('iepl'));
 const hasNetflix = brand.features.some(f => f.toLowerCase().includes('netflix') || f.includes('流媒体'));
 const hasAI = brand.features.some(f => f.toLowerCase().includes('chatgpt') || f.toLowerCase().includes('ai') || f.toLowerCase().includes('claude'));
 
@@ -110,6 +111,7 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
           </h1>
           <div class="flex flex-wrap gap-2 mb-6">
             {hasIPLC && <span class="text-[0.7rem] font-bold tracking-widest bg-brand-accent text-brand-dark px-3 py-1 rounded-sm uppercase">IPLC 专线</span>}
+            {hasIEPL && <span class="text-[0.7rem] font-bold tracking-widest bg-purple-500 text-white px-3 py-1 rounded-sm uppercase border border-purple-400">IEPL 专线</span>}
             {hasNetflix && <span class="text-[0.7rem] font-bold tracking-widest bg-white/10 text-white px-3 py-1 rounded-sm uppercase border border-white/20">Streaming</span>}
             {hasAI && <span class="text-[0.7rem] font-bold tracking-widest bg-white/10 text-white px-3 py-1 rounded-sm uppercase border border-white/20">AI Ready</span>}
           </div>
@@ -447,7 +449,14 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
                 <td class="px-5 py-3 align-middle text-xs">
                   {(() => {
                     const coupon = getBestCouponForPricing(brand, p);
-                    if (!coupon) return <span class="text-slate-500 bg-slate-800 px-2 py-1 rounded inline-block">不适用</span>;
+                    
+                    if (!coupon) {
+                      const vCoupon = getVerifiedCouponForPricing(brand, p);
+                      if (vCoupon) {
+                        return <span class="text-emerald-400 bg-emerald-400/10 border-emerald-400/20 border px-2 py-1 rounded whitespace-nowrap inline-block">{vCoupon.code} · 一次性{vCoupon.discount}可用</span>;
+                      }
+                      return <span class="text-slate-500 bg-slate-800 px-2 py-1 rounded inline-block">不适用</span>;
+                    }
 
                     let html = [];
                     html.push(
@@ -462,18 +471,29 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
                       const stdCoupon = getStandardCouponForPricing(brand, p);
                       if (stdCoupon) {
                         html.push(
-                          <div class="show-if-temp-expired">
+                          <div class="show-if-temp-expired mt-1">
                             <span class="text-brand-accent bg-brand-accent/10 border-brand-accent/20 border px-2 py-1 rounded whitespace-nowrap inline-block">
                               {stdCoupon.code} · {stdCoupon.discount}
                             </span>
                           </div>
                         );
                       } else {
-                        html.push(
-                          <div class="show-if-temp-expired mt-1">
-                            <span class="text-slate-500 bg-slate-800 px-2 py-1 rounded inline-block">不适用</span>
-                          </div>
-                        );
+                        const vCoupon = getVerifiedCouponForPricing(brand, p);
+                        if (vCoupon) {
+                          html.push(
+                            <div class="show-if-temp-expired mt-1">
+                              <span class="text-emerald-400 bg-emerald-400/10 border-emerald-400/20 border px-2 py-1 rounded whitespace-nowrap inline-block">
+                                {vCoupon.code} · 一次性{vCoupon.discount}可用
+                              </span>
+                            </div>
+                          );
+                        } else {
+                          html.push(
+                            <div class="show-if-temp-expired mt-1">
+                              <span class="text-slate-500 bg-slate-800 px-2 py-1 rounded inline-block">不适用</span>
+                            </div>
+                          );
+                        }
                       }
                     } else {
                       html.push(

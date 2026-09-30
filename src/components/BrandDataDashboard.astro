@@ -2,6 +2,7 @@
 import QuickFacts from './charts/QuickFacts.astro';
 import QuickSelector from './charts/QuickSelector.astro';
 import PlanTrafficChart from './charts/PlanTrafficChart.astro';
+import BandwidthChart from './charts/BandwidthChart.astro';
 import AnnualPriceChart from './charts/AnnualPriceChart.astro';
 import PeriodPriceMatrix from './charts/PeriodPriceMatrix.astro';
 import VerifiedCouponCard from './charts/VerifiedCouponCard.astro';
@@ -28,6 +29,7 @@ if (!brand || !brand.visualData) {
   <QuickFacts brand={brand} />
   <QuickSelector brand={brand} />
   <PlanTrafficChart brand={brand} />
+  <BandwidthChart brand={brand} />
   <AnnualPriceChart brand={brand} />
   <PeriodPriceMatrix brand={brand} />
   <VerifiedCouponCard brand={brand} />

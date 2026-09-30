@@ -1,0 +1,32 @@
+---
+const { brand } = Astro.props;
+
+if (!brand || !brand.visualData || !brand.visualData.bandwidth) {
+  return null;
+}
+
+const data = brand.visualData.bandwidth;
+---
+<div class="mb-8 w-full max-w-4xl bg-brand-dark/30 border border-brand-accent/20 rounded-xl p-6 shadow-[0_0_15px_rgba(56,189,248,0.05)]">
+  <div class="flex items-center mb-6 border-b border-white/5 pb-4">
+    <svg class="w-6 h-6 text-brand-neon mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+    <h3 class="text-lg font-bold text-white tracking-wider">
+      PEAK BANDWIDTH / <span class="text-slate-400">峰值带宽</span>
+    </h3>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+    {data.map((item) => (
+      <div class="bg-brand-navy border border-white/10 rounded-lg p-4 flex flex-col items-center justify-center transition-colors hover:border-brand-neon/50">
+        <div class="text-sm text-slate-400 mb-2 font-mono">{item.label || item.plan}</div>
+        <div class="text-2xl font-black text-brand-neon tracking-wider">{item.display || `${item.value} Mbps`}</div>
+      </div>
+    ))}
+  </div>
+  
+  <p class="text-xs text-slate-500 text-center italic mt-4">
+    * 峰值带宽为官方套餐页面标示，不代表实际连接持续达到该速度。
+  </p>
+</div>

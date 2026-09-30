@@ -154,3 +154,24 @@ export function getDiscountMultiplier(coupon) {
   if (match) return 1 - (parseInt(match[1]) / 100);
   return 1;
 }
+
+/**
+ * Gets a verified coupon for a specific pricing entry (ignoring standard/temp).
+ * Used only for UI rendering to show users that a verified coupon exists for this plan,
+ * but it DOES NOT resolve to the main price (because usage may be limited).
+ */
+export function getVerifiedCouponForPricing(brand, pricingEntry) {
+  if (!brand || !pricingEntry) return null;
+  if (pricingEntry.couponEligible === false) return null;
+
+  if (brand.verifiedCoupons && Array.isArray(brand.verifiedCoupons)) {
+    const workingCoupons = brand.verifiedCoupons.filter(c => c.status === 'verified-currently-working');
+    for (const vc of workingCoupons) {
+      if (isCouponApplicableToPricing(brand, vc, pricingEntry)) {
+        return { type: "verified", ...vc };
+      }
+    }
+  }
+
+  return null;
+}
