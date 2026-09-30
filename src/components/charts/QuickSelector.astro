@@ -37,45 +37,34 @@ const cards = Array.from(planMap.entries()).map(([name, plans]) => {
     else if (traffic.includes('120') || traffic.includes('150') || traffic.includes('80')) desc = '日常网页/视频';
   }
   
-  const periodsWithCoupon = [];
-  const periodsWithoutCoupon = [];
-  let bestCouponName = null;
-  let isTemp = false;
-
-  const stdPeriodsWithCoupon = [];
-  const stdPeriodsWithoutCoupon = [];
-  let stdCouponName = null;
-
-  const verifiedPeriods = [];
-  let vCouponName = null;
-  let vCouponDiscount = null;
+  const activeCouponsMap = new Map();
+  const stdCouponsMap = new Map();
+  const verifiedCouponsMap = new Map();
   
   plans.forEach(p => {
     const activeCoupon = getBestCouponForPricing(brand, p);
     let stdCoupon = getStandardCouponForPricing(brand, p);
+    const vCoupon = getVerifiedCouponForPricing(brand, p);
     
     if (activeCoupon) {
-      periodsWithCoupon.push(p.period);
-      if (!bestCouponName || activeCoupon.type === 'temporary') {
-        bestCouponName = activeCoupon.code;
-        isTemp = activeCoupon.type === 'temporary';
+      if (!activeCouponsMap.has(activeCoupon.code)) {
+        activeCouponsMap.set(activeCoupon.code, { code: activeCoupon.code, isTemp: activeCoupon.type === 'temporary', discount: activeCoupon.discount, periods: [] });
       }
-    } else {
-      periodsWithoutCoupon.push(p.period);
+      activeCouponsMap.get(activeCoupon.code).periods.push(p.period);
     }
     
     if (stdCoupon) {
-      stdPeriodsWithCoupon.push(p.period);
-      stdCouponName = stdCoupon.code;
-    } else {
-      stdPeriodsWithoutCoupon.push(p.period);
+      if (!stdCouponsMap.has(stdCoupon.code)) {
+        stdCouponsMap.set(stdCoupon.code, { code: stdCoupon.code, discount: stdCoupon.discount, periods: [] });
+      }
+      stdCouponsMap.get(stdCoupon.code).periods.push(p.period);
     }
 
-    const vCoupon = getVerifiedCouponForPricing(brand, p);
     if (vCoupon) {
-      verifiedPeriods.push(p.period);
-      vCouponName = vCoupon.code;
-      vCouponDiscount = vCoupon.discount;
+      if (!verifiedCouponsMap.has(vCoupon.code)) {
+        verifiedCouponsMap.set(vCoupon.code, { code: vCoupon.code, discount: vCoupon.discount, periods: [] });
+      }
+      verifiedCouponsMap.get(vCoupon.code).periods.push(p.period);
     }
   });
   
@@ -85,16 +74,9 @@ const cards = Array.from(planMap.entries()).map(([name, plans]) => {
     badge,
     priceStr,
     desc,
-    periodsWithCoupon,
-    periodsWithoutCoupon,
-    bestCouponName,
-    isTemp,
-    stdPeriodsWithCoupon,
-    stdPeriodsWithoutCoupon,
-    stdCouponName,
-    verifiedPeriods,
-    vCouponName,
-    vCouponDiscount
+    activeCoupons: Array.from(activeCouponsMap.values()),
+    stdCoupons: Array.from(stdCouponsMap.values()),
+    verifiedCoupons: Array.from(verifiedCouponsMap.values())
   };
 });
 ---
@@ -119,49 +101,61 @@ const cards = Array.from(planMap.entries()).map(([name, plans]) => {
         </div>
         
         <div class="mt-auto">
-          {card.periodsWithCoupon.length === 0 ? (
-            card.verifiedPeriods.length > 0 ? (
-              <div class="flex flex-col space-y-2">
-                <div class="inline-block self-start px-2 py-1 text-xs rounded border bg-emerald-400/10 text-emerald-400 border-emerald-400/20">
-                  {card.vCouponName} · 一次性{card.vCouponDiscount}可用
-                </div>
-                <div class="text-[10px] text-slate-500">
-                  {card.verifiedPeriods.join(' / ')}
-                </div>
+          {card.activeCoupons.length === 0 ? (
+            card.verifiedCoupons.length > 0 ? (
+              <div class="flex flex-col space-y-3">
+                {card.verifiedCoupons.map(vc => (
+                  <div class="flex flex-col space-y-1">
+                    <div class="inline-block self-start px-2 py-1 text-xs rounded border bg-emerald-400/10 text-emerald-400 border-emerald-400/20">
+                      {vc.code} · 一次性{vc.discount}可用
+                    </div>
+                    <div class="text-[10px] text-slate-500">
+                      {vc.periods.join(' / ')}
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div class="inline-block px-2 py-1 bg-slate-800 text-slate-400 text-xs rounded border border-slate-700">优惠码不适用</div>
             )
           ) : (
             <>
-              <div class="flex-col space-y-2 show-if-temp-active flex">
-                <div class={`inline-block self-start px-2 py-1 text-xs rounded border ${card.isTemp ? 'bg-brand-neon/10 text-brand-neon border-brand-neon/30' : 'bg-brand-accent/10 text-brand-accent border-brand-accent/20'}`}>
-                  {card.bestCouponName} {card.isTemp ? '限时可用' : '可用'}
-                </div>
-                <div class="text-[10px] text-slate-500">
-                  {card.periodsWithCoupon.join(' / ')} {card.periodsWithoutCoupon.length > 0 ? ` (排除 ${card.periodsWithoutCoupon.join('/')})` : ''}
-                </div>
-              </div>
-              <div class="flex-col space-y-2 show-if-temp-expired">
-                {card.stdPeriodsWithCoupon.length > 0 ? (
-                  <>
-                    <div class="inline-block self-start px-2 py-1 text-xs rounded border bg-brand-accent/10 text-brand-accent border-brand-accent/20">
-                      {card.stdCouponName} 可用
+              <div class="flex-col space-y-3 show-if-temp-active flex">
+                {card.activeCoupons.map(ac => (
+                  <div class="flex flex-col space-y-1">
+                    <div class={`inline-block self-start px-2 py-1 text-xs rounded border ${ac.isTemp ? 'bg-brand-neon/10 text-brand-neon border-brand-neon/30' : 'bg-brand-accent/10 text-brand-accent border-brand-accent/20'}`}>
+                      {ac.code} {ac.discount ? `· ${ac.isTemp ? '限时' : ''}${ac.discount}` : (ac.isTemp ? '限时可用' : '可用')}
                     </div>
                     <div class="text-[10px] text-slate-500">
-                      {card.stdPeriodsWithCoupon.join(' / ')} {card.stdPeriodsWithoutCoupon.length > 0 ? ` (排除 ${card.stdPeriodsWithoutCoupon.join('/')})` : ''}
+                      {ac.periods.join(' / ')}
                     </div>
-                  </>
-                ) : (
-                  card.verifiedPeriods.length > 0 ? (
-                    <>
-                      <div class="inline-block self-start px-2 py-1 text-xs rounded border bg-emerald-400/10 text-emerald-400 border-emerald-400/20">
-                        {card.vCouponName} · 一次性{card.vCouponDiscount}可用
+                  </div>
+                ))}
+              </div>
+              <div class="flex-col space-y-3 show-if-temp-expired">
+                {card.stdCoupons.length > 0 ? (
+                  card.stdCoupons.map(sc => (
+                    <div class="flex flex-col space-y-1">
+                      <div class="inline-block self-start px-2 py-1 text-xs rounded border bg-brand-accent/10 text-brand-accent border-brand-accent/20">
+                        {sc.code} {sc.discount ? `· ${sc.discount}` : '可用'}
                       </div>
                       <div class="text-[10px] text-slate-500">
-                        {card.verifiedPeriods.join(' / ')}
+                        {sc.periods.join(' / ')}
                       </div>
-                    </>
+                    </div>
+                  ))
+                ) : (
+                  card.verifiedCoupons.length > 0 ? (
+                    card.verifiedCoupons.map(vc => (
+                      <div class="flex flex-col space-y-1">
+                        <div class="inline-block self-start px-2 py-1 text-xs rounded border bg-emerald-400/10 text-emerald-400 border-emerald-400/20">
+                          {vc.code} · 一次性{vc.discount}可用
+                        </div>
+                        <div class="text-[10px] text-slate-500">
+                          {vc.periods.join(' / ')}
+                        </div>
+                      </div>
+                    ))
                   ) : (
                     <div class="inline-block px-2 py-1 bg-slate-800 text-slate-400 text-xs rounded border border-slate-700">优惠码不适用</div>
                   )

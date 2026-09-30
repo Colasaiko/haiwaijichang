@@ -16,11 +16,14 @@ function getBestCouponForPricing(brand, pricingEntry, now = Date.now()) {
     if (coupon.excludedPlans && coupon.excludedPlans.length > 0) {
       if (coupon.excludedPlans.some(p => planName.includes(p))) return false;
     }
+    const normalizePeriod = value => String(value || '').trim().replace(/\s+/g, '');
+    const normPeriod = normalizePeriod(period);
+
     if (coupon.eligiblePeriods && coupon.eligiblePeriods.length > 0) {
-      if (!coupon.eligiblePeriods.some(p => period.includes(p))) return false;
+      if (!coupon.eligiblePeriods.some(p => normPeriod === normalizePeriod(p))) return false;
     }
     if (coupon.excludedPeriods && coupon.excludedPeriods.length > 0) {
-      if (coupon.excludedPeriods.some(p => period.includes(p))) return false;
+      if (coupon.excludedPeriods.some(p => normPeriod === normalizePeriod(p))) return false;
     }
     return true;
   };
@@ -60,11 +63,14 @@ function getVerifiedCouponForPricing(brand, pricingEntry) {
     if (coupon.excludedPlans && coupon.excludedPlans.length > 0) {
       if (coupon.excludedPlans.some(p => planName.includes(p))) return false;
     }
+    const normalizePeriod = value => String(value || '').trim().replace(/\s+/g, '');
+    const normPeriod = normalizePeriod(period);
+
     if (coupon.eligiblePeriods && coupon.eligiblePeriods.length > 0) {
-      if (!coupon.eligiblePeriods.some(p => period.includes(p))) return false;
+      if (!coupon.eligiblePeriods.some(p => normPeriod === normalizePeriod(p))) return false;
     }
     if (coupon.excludedPeriods && coupon.excludedPeriods.length > 0) {
-      if (coupon.excludedPeriods.some(p => period.includes(p))) return false;
+      if (coupon.excludedPeriods.some(p => normPeriod === normalizePeriod(p))) return false;
     }
     return true;
   };
@@ -136,8 +142,10 @@ files.forEach(file => {
              const isApplicable = () => {
                if (vc.eligiblePlans && vc.eligiblePlans.length > 0 && !vc.eligiblePlans.some(ep => planName.includes(ep))) return false;
                if (vc.excludedPlans && vc.excludedPlans.length > 0 && vc.excludedPlans.some(ep => planName.includes(ep))) return false;
-               if (vc.eligiblePeriods && vc.eligiblePeriods.length > 0 && !vc.eligiblePeriods.some(eperiod => period.includes(eperiod))) return false;
-               if (vc.excludedPeriods && vc.excludedPeriods.length > 0 && vc.excludedPeriods.some(eperiod => period.includes(eperiod))) return false;
+               const normalizePeriod = value => String(value || '').trim().replace(/\s+/g, '');
+               const normPeriod = normalizePeriod(period);
+               if (vc.eligiblePeriods && vc.eligiblePeriods.length > 0 && !vc.eligiblePeriods.some(eperiod => normPeriod === normalizePeriod(eperiod))) return false;
+               if (vc.excludedPeriods && vc.excludedPeriods.length > 0 && vc.excludedPeriods.some(eperiod => normPeriod === normalizePeriod(eperiod))) return false;
                return true;
              };
              // If the coupon logic thinks it applies but couponEligible is false
@@ -225,6 +233,77 @@ if (!annA && !annB && !unlimA && !unlimB) {
 } else {
   console.error('ERROR: Excluded plans resolved a coupon!');
   errors++;
+}
+console.log('------------------------------------');
+
+// --- Sogo Time Regression Test ---
+let sogoBrand = null;
+if (fs.existsSync(path.join(brandsDir, 'sogo.md'))) {
+  const sogoContent = fs.readFileSync(path.join(brandsDir, 'sogo.md'), 'utf8');
+  sogoBrand = matter(sogoContent).data;
+}
+
+if (sogoBrand) {
+  const sogoBaseMonth = sogoBrand.pricing.find(p => p.name === "小包-基础版" && p.period === "月付");
+  const sogoBaseQuarter = sogoBrand.pricing.find(p => p.name === "小包-基础版" && p.period === "季付");
+  const sogoBaseHalf = sogoBrand.pricing.find(p => p.name === "小包-基础版" && p.period === "半年付");
+  const sogoBaseYear = sogoBrand.pricing.find(p => p.name === "小包-基础版" && p.period === "年付");
+  const sogoBase2Year = sogoBrand.pricing.find(p => p.name === "小包-基础版" && p.period === "两年付");
+  const sogoBase3Year = sogoBrand.pricing.find(p => p.name === "小包-基础版" && p.period === "三年付");
+  const sogoSmallYear = sogoBrand.pricing.find(p => p.name === "小包-年付版" && p.period === "年付");
+  const sogoUnlim = sogoBrand.pricing.find(p => p.name === "SOGO基础餐不限时版" && p.period === "一次性");
+
+  // Date A
+  const smA = getBestCouponForPricing(sogoBrand, sogoBaseMonth, dateA);
+  const sqA = getBestCouponForPricing(sogoBrand, sogoBaseQuarter, dateA);
+  const shA = getBestCouponForPricing(sogoBrand, sogoBaseHalf, dateA);
+
+  if (smA?.code === 'sogo85' && sqA?.code === 'sogo85' && shA?.code === 'sogo85') {
+    console.log('SOGO MONTHLY/QUARTER/HALF → SOGO85: PASS');
+  } else {
+    console.error('ERROR: SOGO85 matching failed', smA, sqA, shA);
+    errors++;
+  }
+
+  if (shA?.code === 'sogo85') {
+    console.log('SOGO HALF-YEAR EXACT MATCH: PASS');
+  }
+
+  const syA = getBestCouponForPricing(sogoBrand, sogoBaseYear, dateA);
+  const s2yA = getBestCouponForPricing(sogoBrand, sogoBase2Year, dateA);
+  const s3yA = getBestCouponForPricing(sogoBrand, sogoBase3Year, dateA);
+
+  if (syA?.code === 'sogo80' && s2yA?.code === 'sogo80' && s3yA?.code === 'sogo80') {
+    console.log('SOGO YEAR/2Y/3Y → SOGO80: PASS');
+  } else {
+    console.error('ERROR: SOGO80 matching failed', syA, s2yA, s3yA);
+    errors++;
+  }
+
+  const suA = getBestCouponForPricing(sogoBrand, sogoUnlim, dateA);
+  if (suA?.code === 'sogo10000') {
+    console.log('SOGO UNLIMITED STANDARD COUPON: PASS');
+  } else {
+    console.error('ERROR: SOGO Unlimited standard coupon failed', suA);
+    errors++;
+  }
+
+  const ssmallA = getBestCouponForPricing(sogoBrand, sogoSmallYear, dateA);
+  if (!ssmallA) {
+    console.log('SOGO SMALL-ANNUAL EXCLUSION: PASS');
+  } else {
+    console.error('ERROR: SOGO Small Annual should be excluded', ssmallA);
+    errors++;
+  }
+
+  // Date B
+  const smB = getBestCouponForPricing(sogoBrand, sogoBaseMonth, dateB);
+  if (smB?.code === 'sogo10000') {
+    console.log('SOGO POST-EXPIRY FALLBACK: PASS');
+  } else {
+    console.error('ERROR: SOGO POST EXPIRY fallback failed', smB);
+    errors++;
+  }
 }
 console.log('------------------------------------');
 

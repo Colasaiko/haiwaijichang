@@ -229,40 +229,67 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
                       
                       if (activeTemps.length > 0) {
                         activeTemps.sort((a, b) => (b.priority || 0) - (a.priority || 0));
-                        const best = activeTemps[0];
                         
                         // Populate H1
-                        h1Code.textContent = best.code;
-                        h1Discount.textContent = best.discount;
+                        h1Code.textContent = activeTemps.map(c => c.code).join(' / ');
+                        h1Discount.textContent = activeTemps.map(c => c.discount).join(' / ');
                         
-                        if (best.expiresAt) {
-                          const expDate = new Date(best.expiresAt);
+                        const earliestExpiry = activeTemps.map(c => c.expiresAt).filter(Boolean).sort()[0];
+                        if (earliestExpiry) {
+                          const expDate = new Date(earliestExpiry);
                           h1Expiry.textContent = (expDate.getMonth() + 1) + '月' + expDate.getDate() + '日截止';
                         } else {
                           h1Expiry.textContent = '截止时间以官方公告为准';
                         }
                         h1Expiry.classList.remove('hidden');
                         h1ExpirySep.classList.remove('hidden');
-                        h1Copy.classList.remove('hidden');
-                        h1Copy.classList.add('flex');
-                        
-                        h1Copy.onclick = () => {
-                          navigator.clipboard.writeText(best.code).then(() => {
-                            h1Copy.textContent = '已复制';
-                            setTimeout(() => h1Copy.textContent = '复制', 2000);
-                          });
-                        };
+                        h1Copy.classList.add('hidden'); // disable single copy for multiple
+                        h1Copy.classList.remove('flex');
+                        if(activeTemps.length === 1) {
+                            h1Copy.classList.remove('hidden');
+                            h1Copy.classList.add('flex');
+                            h1Copy.onclick = () => {
+                              navigator.clipboard.writeText(activeTemps[0].code).then(() => {
+                                h1Copy.textContent = '已复制';
+                                setTimeout(() => h1Copy.textContent = '复制', 2000);
+                              });
+                            };
+                        }
                         
                         // Populate Card
                         if (card) {
                           card.style.display = 'flex';
-                          cardName.textContent = best.name;
-                          cardCode.textContent = best.code;
-                          cardDiscount.textContent = best.discount;
-                          cardScope.textContent = best.scope || '-';
                           
-                          if (best.expiresAt) {
-                            const expiresAt = new Date(best.expiresAt).getTime();
+                          if (activeTemps.length === 1) {
+                              const best = activeTemps[0];
+                              cardName.textContent = best.name;
+                              cardCode.textContent = best.code;
+                              cardDiscount.textContent = best.discount;
+                              cardScope.textContent = best.scope || '-';
+                          } else {
+                              cardName.textContent = '双节限时活动';
+                              // Dynamically construct rows for multiple coupons
+                              const container = cardName.nextElementSibling;
+                              if (container) {
+                                  container.innerHTML = activeTemps.map(c => `
+                                      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-2 mb-2 w-full text-center sm:text-left gap-1 last:border-0 last:pb-0 last:mb-0">
+                                          <div class="flex flex-col">
+                                            <span class="text-white text-xs font-bold">${c.scope || '-'}</span>
+                                            <div class="flex items-center justify-center sm:justify-start gap-2 mt-1">
+                                                <code class="text-brand-neon font-bold tracking-wider text-base">${c.code}</code>
+                                                <span class="text-brand-accent font-bold text-sm">${c.discount}</span>
+                                            </div>
+                                          </div>
+                                          <button class="bg-white/10 hover:bg-white/20 text-white text-[10px] px-3 py-1 rounded cursor-pointer transition-colors shrink-0 self-center" onclick="navigator.clipboard.writeText('${c.code}').then(()=>{this.textContent='已复制';setTimeout(()=>this.textContent='复制',2000)})">复制</button>
+                                      </div>
+                                  `).join('');
+                                  // Update layout class so it stacks nicely
+                                  container.className = "flex flex-col justify-center gap-2 w-full";
+                              }
+                          }
+                          
+                          if (earliestExpiry) {
+                            const expiresAt = new Date(earliestExpiry).getTime();
                             const diff = expiresAt - now;
                             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));

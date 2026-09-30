@@ -72,15 +72,18 @@ export function isCouponApplicableToPricing(brand, coupon, pricingEntry) {
     if (isExcluded) return false;
   }
 
+  const normalizePeriod = value => String(value || '').trim().replace(/\s+/g, '');
+  const normPeriod = normalizePeriod(period);
+
   // Check eligiblePeriods
   if (coupon.eligiblePeriods && Array.isArray(coupon.eligiblePeriods) && coupon.eligiblePeriods.length > 0) {
-    const isEligible = coupon.eligiblePeriods.some(p => period.includes(p));
+    const isEligible = coupon.eligiblePeriods.some(p => normPeriod === normalizePeriod(p));
     if (!isEligible) return false;
   }
 
   // Check excludedPeriods
   if (coupon.excludedPeriods && Array.isArray(coupon.excludedPeriods) && coupon.excludedPeriods.length > 0) {
-    const isExcluded = coupon.excludedPeriods.some(p => period.includes(p));
+    const isExcluded = coupon.excludedPeriods.some(p => normPeriod === normalizePeriod(p));
     if (isExcluded) return false;
   }
 
