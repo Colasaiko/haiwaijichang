@@ -2,7 +2,7 @@
 import { getBestCouponForPricing } from '../../utils/coupon.js';
 const { brand } = Astro.props;
 
-if (!brand || !brand.visualData || !brand.visualData.traffic || !brand.visualData.annualPrice) return null;
+if (!brand || !brand.visualData || !brand.visualData.traffic || !brand.pricing) return null;
 
 const planMap = new Map();
 brand.pricing.forEach(p => {
