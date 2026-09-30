@@ -11,6 +11,7 @@ import CouponEligibilityMatrix from './charts/CouponEligibilityMatrix.astro';
 import NodeStatusChart from './charts/NodeStatusChart.astro';
 import GlobalRouteCoverage from './charts/GlobalRouteCoverage.astro';
 import UnlimitedTrafficChart from './charts/UnlimitedTrafficChart.astro';
+import ResetPackageChart from './charts/ResetPackageChart.astro';
 
 const { brand } = Astro.props;
 
@@ -36,6 +37,7 @@ if (!brand || !brand.visualData) {
   <CouponEligibilityMatrix brand={brand} />
   <CouponComparison brand={brand} />
   <UnlimitedTrafficChart brand={brand} />
+  <ResetPackageChart brand={brand} />
   <NodeStatusChart brand={brand} />
   <GlobalRouteCoverage brand={brand} />
 </div>

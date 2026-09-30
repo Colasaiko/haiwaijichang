@@ -1,0 +1,32 @@
+---
+const { brand } = Astro.props;
+
+if (!brand || !brand.resetPackages || brand.resetPackages.length === 0) return null;
+
+const packages = brand.resetPackages;
+---
+
+<div class="mb-12 bg-brand-navy p-6 rounded-xl border border-white/5">
+  <div class="mb-6">
+    <h2 class="text-xl font-bold text-white uppercase tracking-wider font-mono flex items-center">
+      <svg class="w-5 h-5 text-brand-neon mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      重置流量包
+    </h2>
+    <p class="text-xs text-slate-500 mt-1 uppercase tracking-widest font-mono">RESET TRAFFIC</p>
+  </div>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {packages.map(pkg => (
+      <div class="bg-brand-dark border border-white/10 rounded-lg p-4 flex justify-between items-center hover:border-brand-neon/30 transition-colors">
+        <span class="text-sm text-slate-300 font-bold">{pkg.plan}</span>
+        <span class="text-lg text-brand-neon font-mono font-bold">¥{pkg.price}</span>
+      </div>
+    ))}
+  </div>
+  
+  <div class="mt-6 pt-4 border-t border-white/10">
+    <p class="text-[10px] text-slate-500 font-mono leading-relaxed">
+      注：重置流量包属于额外流量重置服务；当前没有证据表明优惠码可用于重置流量包，因此不自动计算优惠。
+    </p>
+  </div>
+</div>

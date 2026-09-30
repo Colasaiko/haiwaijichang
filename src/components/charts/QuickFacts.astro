@@ -6,6 +6,7 @@ if (!brand) return null;
 const facts = [];
 
 if (brand.lineType) facts.push({ label: '线路', value: Array.isArray(brand.lineType) ? brand.lineType.join(' / ') : brand.lineType });
+if (brand.networkArchitecture) facts.push({ label: '网络架构', value: Array.isArray(brand.networkArchitecture) ? brand.networkArchitecture.join(' / ') : brand.networkArchitecture });
 if (brand.protocols) facts.push({ label: '协议', value: Array.isArray(brand.protocols) ? brand.protocols.join(' / ') : brand.protocols });
 if (brand.speedLimit) facts.push({ label: '速度 / 限速', value: brand.speedLimit });
 if (brand.deviceLimit) facts.push({ label: '设备', value: brand.deviceLimit });
