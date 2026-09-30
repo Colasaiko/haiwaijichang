@@ -158,7 +158,7 @@ pricing:
     traffic: "500GB"
     period: "月付"
     originalPrice: "¥550"
-    couponEligible: true
+    couponEligible: false
 purchase:
   label: "快速购买"
   url: "https://flycat1.flycatvipaff.cc/#/?code=UUcH5yh9"

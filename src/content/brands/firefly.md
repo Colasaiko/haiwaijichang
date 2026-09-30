@@ -105,7 +105,7 @@ pricing:
     traffic: "60GB/月"
     period: "年付"
     originalPrice: "¥96"
-    couponEligible: true
+    couponEligible: false
 
   - name: "Firefly Lite"
     traffic: "150GB/月"
@@ -183,7 +183,7 @@ pricing:
     traffic: "100GB总量"
     period: "一次性"
     originalPrice: "¥100"
-    couponEligible: true
+    couponEligible: false
 
 visualData:
   traffic:
