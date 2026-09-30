@@ -1,10 +1,8 @@
 ---
-import { getActiveCoupon } from '../../utils/coupon.js';
 const { brand } = Astro.props;
 
 if (!brand) return null;
 
-const activeCoupon = getActiveCoupon(brand);
 const facts = [];
 
 if (brand.lineType) facts.push({ label: '线路', value: Array.isArray(brand.lineType) ? brand.lineType.join(' / ') : brand.lineType });

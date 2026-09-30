@@ -1,12 +1,13 @@
 ---
-import { getActiveCoupon, getBestCouponForPricing, getDiscountMultiplier } from '../../utils/coupon.js';
+import { isCouponApplicableToPricing } from '../../utils/coupon.js';
 const { brand } = Astro.props;
-const activeCoupon = getActiveCoupon(brand);
 
 if (!brand || !brand.visualData || !brand.visualData.couponEligibility) return null;
+if (!brand.coupon) return null;
 
+const standardCoupon = brand.coupon;
 const data = brand.visualData.couponEligibility;
-const couponCode = activeCoupon?.code || "优惠码";
+const couponCode = standardCoupon.code || "优惠码";
 
 ---
 
@@ -26,7 +27,7 @@ const couponCode = activeCoupon?.code || "优惠码";
       const planName = item.plan || item.label;
       const entries = brand.pricing?.filter(p => p.name === planName) || [{ name: planName, period: '未知' }];
       
-      const periodsWithCoupon = entries.filter(p => getBestCouponForPricing(brand, p));
+      const periodsWithCoupon = entries.filter(p => isCouponApplicableToPricing(brand, standardCoupon, p));
       const isEligible = periodsWithCoupon.length > 0;
       
       return (
