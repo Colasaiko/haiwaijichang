@@ -125,7 +125,7 @@ export function getBestCouponForPricing(brand, pricingEntry, clientDate = new Da
  */
 export function getDiscountMultiplier(coupon) {
   if (!coupon || !coupon.discountPercent) return 1;
-  const match = coupon.discountPercent.match(/(\\d+)/);
+  const match = coupon.discountPercent.match(/(\d+)/);
   if (match) return 1 - (parseInt(match[1]) / 100);
   return 1;
 }

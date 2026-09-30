@@ -27,12 +27,6 @@ function checkPlanEligibility(planLabel, activeCoupon, visualEligibility) {
   return true;
 }
 
-function getDiscountMultiplier(coupon) {
-  if (!coupon || !coupon.discountPercent) return 1;
-  const match = coupon.discountPercent.match(/(\d+)/);
-  if (match) return 1 - (parseInt(match[1]) / 100);
-  return 1;
-}
 let data = { ...brand.visualData.couponExample };
 const pEntry = brand.pricing?.find(p => p.name === data.plan && p.period === data.period) || { name: data.plan, period: data.period };
 const coupon = getBestCouponForPricing(brand, pEntry);
