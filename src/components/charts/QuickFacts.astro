@@ -13,6 +13,8 @@ if (brand.deviceLimit) facts.push({ label: '设备', value: brand.deviceLimit })
 if (brand.nodeMultiplier) facts.push({ label: '节点倍率', value: brand.nodeMultiplier });
 if (brand.maxBandwidth) facts.push({ label: '最大带宽', value: brand.maxBandwidth });
 if (brand.ipType) facts.push({ label: 'IP', value: brand.ipType });
+if (brand.paymentMethods) facts.push({ label: '支付', value: Array.isArray(brand.paymentMethods) ? brand.paymentMethods.join(' / ') : brand.paymentMethods });
+if (brand.customerSupport) facts.push({ label: '客服', value: brand.customerSupport });
 
 if (brand.coupon && brand.coupon.code) {
   const couponLabel = brand.coupon.eligibilityText || '常驻优惠';

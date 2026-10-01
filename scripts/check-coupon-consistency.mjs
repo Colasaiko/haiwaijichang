@@ -576,6 +576,17 @@ if (jiuyunBrand) {
     console.log('JIUYUN EXCLUSION STABILITY: PASS');
   }
   
+  if (jiuyunBrand.paymentMethods && 
+      jiuyunBrand.paymentMethods.includes('支付宝') && 
+      jiuyunBrand.paymentMethods.includes('微信支付') && 
+      !jiuyunBrand.paymentMethods.includes('USDT')) {
+    console.log('JIUYUN PAYMENT METHODS: PASS');
+  } else {
+    console.error('ERROR: JIUYUN PAYMENT METHODS failed');
+    jiuyunErrors++;
+    errors++;
+  }
+  
   console.log(`JIUYUN COUPON CONSISTENCY: ${jiuyunErrors === 0 ? 'PASS' : 'FAIL'}`);
 }
 console.log('------------------------------------');
