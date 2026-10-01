@@ -27,7 +27,7 @@ coupon:
   discountPercent: "30%"
   verified: true
   sourceType: "official/current-checkout"
-  eligibilityText: "新客单"
+  eligibilityText: "新客优惠"
   scope: "当前全部套餐及当前全部购买周期"
 
 lineType: 
@@ -59,7 +59,6 @@ nodeCoverage:
 
 streamingSupport:
   - Netflix
-  - X
   - Disney+
   - YouTube
 
@@ -67,6 +66,9 @@ aiSupport:
   - ChatGPT
   - Gemini
   - Claude
+
+platformSupport:
+  - X
 
 paymentMethods:
   - "支付宝"
@@ -294,11 +296,11 @@ visualData:
 
 ## 神行加速是什么？
 
-神行加速于 2025 年开始运营，属于较新的海外中转提供商。其网络架构采用 IEPL 专线，并基于 VLESS 协议构建，辅以三网优化和智能负载均衡技术，保障全时段的连接质量。节点不仅覆盖了主流的东亚、北美地区，还提供原生家宽 IP，从而更好地支持各种常用流媒体、AI 工具及相关应用的访问。
+神行加速于 2025 年开始运营，属于较新的 IEPL / VLESS 网络加速服务品牌。其网络架构采用 IEPL 专线，并基于 VLESS 协议构建，辅以三网优化和智能负载均衡技术，保障全时段的连接质量。节点不仅覆盖了主流的东亚、北美地区，还提供原生家宽 IP，从而更好地支持各种常用流媒体、AI 工具及相关应用的访问。
 
 ## 网络与线路
 
-官方资料标示最高带宽为 500Mbps。此数据代表官方承诺的理论峰值口径，并不意味着您的所有连接和单线程测速均能持续保持在此极限速度。
+官方资料标示最高带宽为 500Mbps。此数据为官方资料标示的峰值带宽参数，并不意味着您的所有连接和单线程测速均能持续保持在此极限速度。
 
 ## 节点覆盖
 
@@ -418,4 +420,4 @@ visualData:
 品牌资料显示提供自研客户端。如果需要使用 Clash 或 Shadowrocket，请按官方当前说明联系在线客服获取订阅导入方式。
 
 ### 神行是什么时候开始运营？
-2025 年，属于较新的海外中转品牌。
+2025 年，属于较新的 IEPL / VLESS 网络加速服务品牌。

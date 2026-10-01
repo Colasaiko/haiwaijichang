@@ -632,6 +632,14 @@ if (shenxingBrand) {
   console.log(`SHENXING SX0077 ELIGIBLE: ${eligibleCount}/18`);
   console.log(`SHENXING SX0077 EXCLUDED: ${excludedCount}`);
   
+  if (eligibleCount === 18 && excludedCount === 0) {
+    console.log('SHENXING SX0077 ELIGIBILITY: PASS');
+  } else {
+    console.error(`ERROR: SHENXING SX0077 eligibility mismatch: ${eligibleCount}/18, excluded=${excludedCount}`);
+    sxErrors++;
+    errors++;
+  }
+  
   function checkSxDiscount(planName, period, original, expectedAfter) {
      const p = shenxingBrand.pricing.find(x => x.name === planName && x.period === period);
      if (!p) return false;
