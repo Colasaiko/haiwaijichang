@@ -15,7 +15,8 @@ if (brand.maxBandwidth) facts.push({ label: '最大带宽', value: brand.maxBand
 if (brand.ipType) facts.push({ label: 'IP', value: brand.ipType });
 
 if (brand.coupon && brand.coupon.code) {
-  facts.push({ label: '常驻优惠', value: `${brand.coupon.code} · ${brand.coupon.discount}` });
+  const couponLabel = brand.coupon.eligibilityText || '常驻优惠';
+  facts.push({ label: couponLabel, value: `${brand.coupon.code} · ${brand.coupon.discount}` });
 }
 
 const now = Date.now();

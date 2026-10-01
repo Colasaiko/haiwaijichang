@@ -61,6 +61,9 @@ const regionLabels = {
         {brand.nodeCoverage.regions.map(node => (
           <span class="inline-flex items-center bg-white/5 border border-white/10 text-slate-300 text-sm px-3 py-1 rounded">
             {node}
+            {brand.nodeCoverage.counts && brand.nodeCoverage.counts[node] && (
+              <span class="ml-2 text-[10px] text-brand-neon font-mono bg-brand-neon/10 px-1 rounded">×{brand.nodeCoverage.counts[node]}</span>
+            )}
           </span>
         ))}
       </div>
@@ -69,7 +72,7 @@ const regionLabels = {
   
   <div class="mt-6 pt-4 border-t border-white/10">
     <p class="text-xs text-slate-500 font-mono">
-      {hasSnapshot ? '注：节点和线路数量会动态调整，以上为单次快照覆盖情况，以当前后台为准。' : '注：节点和线路数量会动态调整，以当前后台为准。'}
+      {hasSnapshot ? '注：节点和线路数量会动态调整，以上为单次快照覆盖情况，以当前后台为准。' : (brand.nodeCoverage?.note || '注：节点和线路数量会动态调整，以当前后台为准。')}
     </p>
   </div>
 </div>

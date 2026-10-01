@@ -580,6 +580,125 @@ if (jiuyunBrand) {
 }
 console.log('------------------------------------');
 
+// --- Shenxing Consistency Test ---
+let shenxingBrand = null;
+if (fs.existsSync(path.join(brandsDir, 'shenxing.md'))) {
+  const shenxingContent = fs.readFileSync(path.join(brandsDir, 'shenxing.md'), 'utf8');
+  shenxingBrand = matter(shenxingContent).data;
+}
+
+if (shenxingBrand) {
+  let sxErrors = 0;
+  
+  if (shenxingBrand.pricing.length === 18) {
+    console.log('SHENXING PRICING: PASS');
+  } else {
+    console.error(`ERROR: Shenxing pricing should have 18 entries, found ${shenxingBrand.pricing.length}`);
+    sxErrors++;
+    errors++;
+  }
+  
+  if (shenxingBrand.coupon && shenxingBrand.coupon.code === 'sx0077') {
+    console.log('SHENXING COUPON CODE: PASS');
+  } else {
+    console.error('ERROR: Shenxing coupon code should be sx0077');
+    sxErrors++;
+    errors++;
+  }
+  
+  let eligibleCount = 0;
+  let excludedCount = 0;
+  
+  shenxingBrand.pricing.forEach(p => {
+    const coupon = getBestCouponForPricing(shenxingBrand, p, dateA);
+    if (coupon && coupon.code === 'sx0077' && coupon.discount === '7折') {
+      eligibleCount++;
+    } else {
+      excludedCount++;
+    }
+  });
+  
+  console.log(`SHENXING SX0077 ELIGIBLE: ${eligibleCount}/18`);
+  console.log(`SHENXING SX0077 EXCLUDED: ${excludedCount}`);
+  
+  function checkSxDiscount(planName, period, original, expectedAfter) {
+     const p = shenxingBrand.pricing.find(x => x.name === planName && x.period === period);
+     if (!p) return false;
+     const coupon = getBestCouponForPricing(shenxingBrand, p, dateA);
+     let multiplier = 1;
+     if (coupon && coupon.discount === '7折') {
+        multiplier = 0.7;
+     }
+     const after = parseFloat((original * multiplier).toFixed(2));
+     return after === expectedAfter;
+  }
+  
+  if (checkSxDiscount('神行·尝鲜包', '月付', 23, 16.10)) {
+     console.log('SHENXING TRIAL MONTH DISCOUNT: PASS');
+  } else {
+     console.error('ERROR: SHENXING TRIAL MONTH DISCOUNT failed');
+     sxErrors++;
+     errors++;
+  }
+  
+  if (checkSxDiscount('神行·尝鲜包', '两年付', 420, 294.00)) {
+     console.log('SHENXING TRIAL 2Y DISCOUNT: PASS');
+  } else {
+     console.error('ERROR: SHENXING TRIAL 2Y DISCOUNT failed');
+     sxErrors++;
+     errors++;
+  }
+  
+  if (checkSxDiscount('神行·基础包', '月付', 40, 28.00) && checkSxDiscount('神行·基础包', '年付', 384, 268.80)) {
+     console.log('SHENXING BASIC DISCOUNT: PASS');
+  } else {
+     console.error('ERROR: SHENXING BASIC DISCOUNT failed');
+     sxErrors++;
+     errors++;
+  }
+  
+  if (checkSxDiscount('神行·尊享包', '月付', 72, 50.40) && checkSxDiscount('神行·尊享包', '半年付', 389, 272.30) && checkSxDiscount('神行·尊享包', '两年付', 1209, 846.30)) {
+     console.log('SHENXING PREMIUM DISCOUNT: PASS');
+  } else {
+     console.error('ERROR: SHENXING PREMIUM DISCOUNT failed');
+     sxErrors++;
+     errors++;
+  }
+  
+  if (checkSxDiscount('神行-年付特惠版', '年付', 96, 67.20)) {
+     console.log('SHENXING ANNUAL SPECIAL DISCOUNT: PASS');
+  } else {
+     console.error('ERROR: SHENXING ANNUAL SPECIAL DISCOUNT failed');
+     sxErrors++;
+     errors++;
+  }
+  
+  if (shenxingBrand.nodeCoverage && shenxingBrand.nodeCoverage.counts) {
+     console.log('SHENXING NODE COVERAGE: PASS');
+  } else {
+     console.error('ERROR: SHENXING NODE COVERAGE missing counts');
+     sxErrors++;
+     errors++;
+  }
+  
+  if (shenxingBrand.maxBandwidth) {
+     console.log('SHENXING BANDWIDTH: PASS');
+  } else {
+     console.error('ERROR: SHENXING BANDWIDTH missing');
+     sxErrors++;
+     errors++;
+  }
+  
+  if (shenxingBrand.resetPackages && shenxingBrand.resetPackages.length === 3) {
+     console.log('SHENXING RESET PACKAGES: PASS');
+  } else {
+     console.error('ERROR: SHENXING RESET PACKAGES missing or invalid');
+     sxErrors++;
+     errors++;
+  }
+}
+console.log('------------------------------------');
+
 console.log(`BITZNET VERIFIED COUPON: ${bitznetNew9Count > 0 ? 'PASS' : 'FAIL'}`);
 console.log(`NEW9 ELIGIBLE PRICING: ${bitznetNew9Count}/15`);
 console.log(`INVALID VERIFIED PLAN REFERENCES: ${invalidVerifiedPlans}`);
