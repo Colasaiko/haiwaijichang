@@ -399,10 +399,54 @@ if (baoyunBrand) {
 
   console.log(`BAOYUN COUPON ELIGIBLE: ${baoyunEligibleCount}/13`);
   console.log(`BAOYUN COUPON EXCLUDED: ${baoyunExcludedCount}/6`);
+  const expectedExcluded = [
+    "【流量包】365天500G",
+    "【流量包】365天1000G",
+    "年付100G-轻量特惠",
+    "季付500G-轻量特惠",
+    "一次性500G-传世宝",
+    "一次性1000G-传承宝"
+  ];
+  const actualExcluded = baoyunBrand.coupon?.excludedPlans || [];
+  let excludedMatch = expectedExcluded.length === actualExcluded.length && expectedExcluded.every(e => actualExcluded.includes(e));
+  if (excludedMatch) {
+    console.log('BAOYUN EXCLUDED PLAN REFERENCES: PASS');
+  } else {
+    console.error('ERROR: BAOYUN EXCLUDED PLAN REFERENCES failed');
+    baoyunErrors++;
+    errors++;
+  }
   
   // Specific discount calculations
-  console.log('BAOYUN FU-BAO DISCOUNT: PASS');
-  console.log('BAOYUN CHUAN-JIA-BAO DISCOUNT: PASS');
+  function checkDiscount(planName, period, original, expectedAfter) {
+     const p = baoyunBrand.pricing.find(x => x.name === planName && x.period === period);
+     const coupon = getBestCouponForPricing(baoyunBrand, p, dateA);
+     let multiplier = 1;
+     if (coupon && coupon.discount) {
+        const match = coupon.discount.match(/(\d+(?:\.\d+)?)折/);
+        if (match) multiplier = parseFloat(match[1]) / 10;
+     }
+     const after = parseFloat((original * multiplier).toFixed(2));
+     const saved = parseFloat((original - after).toFixed(2));
+     const expectedSaved = parseFloat((original - expectedAfter).toFixed(2));
+     return after === expectedAfter && saved === expectedSaved;
+  }
+
+  if (checkDiscount('福宝', '月付', 4, 3.20)) {
+     console.log('BAOYUN FU-BAO DISCOUNT: PASS');
+  } else {
+     console.error('ERROR: BAOYUN FU-BAO DISCOUNT failed');
+     baoyunErrors++;
+     errors++;
+  }
+
+  if (checkDiscount('一次性200G-传家宝', '一次性', 26, 20.80)) {
+     console.log('BAOYUN CHUAN-JIA-BAO DISCOUNT: PASS');
+  } else {
+     console.error('ERROR: BAOYUN CHUAN-JIA-BAO DISCOUNT failed');
+     baoyunErrors++;
+     errors++;
+  }
 
   if (baoyunExcludedCount === 6) {
     console.log('BAOYUN EXCLUSION STABILITY: PASS');

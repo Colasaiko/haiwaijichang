@@ -60,7 +60,7 @@ data = data.map(d => {
                 <span class="text-[10px] text-brand-accent uppercase tracking-widest mb-1 bg-brand-accent/10 px-2 py-0.5 rounded">
                   {item.resolvedCoupon?.discount || '优惠'}后省 ¥{saved}
                 </span>
-                <span class="text-2xl font-bold text-white font-mono">¥{item.discounted}</span>
+                <span class="text-2xl font-bold text-white font-mono">¥{Number.isInteger(item.discounted) ? item.discounted : item.discounted.toFixed(2)}</span>
               </div>
             ) : (
               <div class="flex flex-col items-end">
