@@ -64,7 +64,7 @@ const blocks = fallbackData
     <div class="w-full md:w-1/3 bg-brand-dark p-6 rounded-lg border border-white/5 flex flex-col items-center relative overflow-hidden group">
       <div class="absolute inset-0 bg-slate-800/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
       <span class="text-xs text-slate-500 uppercase tracking-widest mb-2 font-mono">官方标价</span>
-      <span class="text-3xl font-bold text-slate-400 line-through decoration-brand-accent/50">¥{d.before}</span>
+      <span class="text-2xl lg:text-3xl font-bold text-slate-400 line-through decoration-brand-accent/50">¥{d.before}</span>
     </div>
     
     <!-- Arrow & Badge -->
@@ -79,7 +79,7 @@ const blocks = fallbackData
     <div class="w-full md:w-1/3 bg-brand-dark p-6 rounded-lg border-2 border-brand-neon shadow-[0_0_20px_rgba(56,189,248,0.2)] flex flex-col items-center relative overflow-hidden">
       <div class="absolute top-0 right-0 w-16 h-16 bg-brand-neon/10 rounded-bl-full"></div>
       <span class="text-xs text-brand-neon uppercase tracking-widest mb-2 font-mono font-bold">使用后最终支付</span>
-      <span class="text-4xl font-black text-white">¥{Number.isInteger(d.after) ? d.after : d.after.toFixed(2)}</span>
+      <span class="text-3xl lg:text-4xl font-black text-white truncate max-w-full">¥{Number.isInteger(d.after) ? d.after : d.after.toFixed(2)}</span>
     </div>
 
     <!-- CTA -->
