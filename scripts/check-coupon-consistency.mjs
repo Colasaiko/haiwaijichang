@@ -901,6 +901,127 @@ if (xingBrand) {
 }
 console.log('------------------------------------');
 
+let weituBrand = null;
+if (fs.existsSync(path.join(brandsDir, 'weitu.md'))) {
+  const weituContent = fs.readFileSync(path.join(brandsDir, 'weitu.md'), 'utf8');
+  weituBrand = matter(weituContent).data;
+}
+
+if (weituBrand) {
+  let weituErrors = 0;
+  
+  if (weituBrand.pricing.length === 30) {
+    console.log('WEITU PRICING: PASS');
+  } else {
+    console.error(`ERROR: WEITU pricing length is ${weituBrand.pricing.length}, expected 30`);
+    weituErrors++; errors++;
+  }
+
+  const wDateActive = new Date('2026-10-01T12:00:00+08:00');
+  const wDateExpired = new Date('2026-10-11T12:00:00+08:00');
+
+  let vtfestCount = 0;
+  let vtfestExc = 0;
+  weituBrand.pricing.forEach(p => {
+    const c = getBestCouponForPricing(weituBrand, p, wDateActive);
+    if (c && c.code === 'VTFEST80') vtfestCount++;
+    else if (!c) vtfestExc++;
+  });
+  console.log(`WEITU VTFEST80 ELIGIBLE: ${vtfestCount}/5`);
+  console.log(`WEITU VTFEST80 EXCLUDED: ${vtfestExc}/25`);
+  if (vtfestCount !== 5 || vtfestExc !== 25) { weituErrors++; errors++; }
+
+  let rabbitCount = 0;
+  let rabbitExc = 0;
+  weituBrand.pricing.forEach(p => {
+    const c = getBestCouponForPricing(weituBrand, p, wDateExpired);
+    if (c && c.code === 'rabbit') rabbitCount++;
+    else if (!c) rabbitExc++;
+  });
+  console.log(`WEITU RABBIT ELIGIBLE: ${rabbitCount}/5`);
+  console.log(`WEITU RABBIT EXCLUDED: ${rabbitExc}/25`);
+  if (rabbitCount !== 5 || rabbitExc !== 25) { weituErrors++; errors++; }
+
+  let nonMonthlyPass = true;
+  weituBrand.pricing.forEach(p => {
+    if (p.period !== '月付') {
+       if (getBestCouponForPricing(weituBrand, p, wDateActive)) nonMonthlyPass = false;
+       if (getBestCouponForPricing(weituBrand, p, wDateExpired)) nonMonthlyPass = false;
+    }
+  });
+  if (nonMonthlyPass) console.log('WEITU NON-MONTHLY EXCLUSION: PASS');
+  else { console.error('ERROR: WEITU NON-MONTHLY EXCLUSION failed'); weituErrors++; errors++; }
+
+  // Exact match implicitly tested by non-monthly pass, but let's assert specifically
+  const halfYearPlan = weituBrand.pricing.find(x => x.name === '唯兔云 · 普通版' && x.period === '半年付');
+  if (halfYearPlan && !getBestCouponForPricing(weituBrand, halfYearPlan, wDateActive)) {
+     console.log('WEITU PERIOD EXACT MATCH: PASS');
+  } else {
+     console.error('ERROR: WEITU PERIOD EXACT MATCH failed'); weituErrors++; errors++;
+  }
+
+  function getWDisc(plan, date, original) {
+    const p = weituBrand.pricing.find(x => x.name === plan && x.period === '月付');
+    const c = getBestCouponForPricing(weituBrand, p, date);
+    if (!c) return original;
+    let mult = 1;
+    if (c.discount === '8折') mult = 0.8;
+    return parseFloat((original * mult).toFixed(2));
+  }
+
+  if (getWDisc('唯兔云 · 节假日限时开启', wDateActive, 14.90) === 11.92 &&
+      getWDisc('唯兔云 · 普通版', wDateActive, 19.90) === 15.92 &&
+      getWDisc('唯兔云 · 进阶版', wDateActive, 29.90) === 23.92 &&
+      getWDisc('唯兔云 · 专业版', wDateActive, 59.90) === 47.92 &&
+      getWDisc('唯兔云 · 至尊版', wDateActive, 119.90) === 95.92) {
+      console.log('WEITU FESTIVAL DISCOUNT: PASS');
+  } else {
+      console.error('ERROR: WEITU FESTIVAL DISCOUNT failed'); weituErrors++; errors++;
+  }
+
+  if (getWDisc('唯兔云 · 普通版', wDateExpired, 19.90) === 15.92 &&
+      getWDisc('唯兔云 · 至尊版', wDateExpired, 119.90) === 95.92) {
+      console.log('WEITU RABBIT FALLBACK: PASS');
+  } else {
+      console.error('ERROR: WEITU RABBIT FALLBACK failed'); weituErrors++; errors++;
+  }
+
+  let resetPass = true;
+  if (weituBrand.resetPackages && weituBrand.resetPackages.length === 9) {
+    const pMap = Object.fromEntries(weituBrand.resetPackages.map(r => [r.plan, r.price]));
+    if (pMap['唯兔云 · 年付加强专线'] !== 15) resetPass = false;
+    if (pMap['唯兔云 · 年付版限量款'] !== 15) resetPass = false;
+    if (pMap['唯兔云 · 普通版'] !== 19.9) resetPass = false;
+    if (pMap['唯兔云 · 进阶版'] !== 29.9) resetPass = false;
+    if (pMap['唯兔云 · 专业版'] !== 59.9) resetPass = false;
+    if (pMap['唯兔云 · 至尊版'] !== 119.9) resetPass = false;
+    if (pMap['唯兔云 · 永久不限时100'] !== 90) resetPass = false;
+    if (pMap['唯兔云 · 永久不限时200'] !== 144) resetPass = false;
+    if (pMap['唯兔云 · 永久不限时500'] !== 306) resetPass = false;
+  } else { resetPass = false; }
+  
+  if (resetPass) console.log('WEITU RESET PACKAGES: PASS');
+  else { console.error('ERROR: WEITU RESET PACKAGES failed'); weituErrors++; errors++; }
+
+  let linesPass = true;
+  weituBrand.pricing.forEach(p => {
+    if (p.name === '唯兔云 · 年付加强专线' && p.lineType !== 'IEPL') linesPass = false;
+    if (p.name === '唯兔云 · 年付版限量款' && p.lineType !== 'IPLC') linesPass = false;
+    if (p.name === '唯兔云 · 普通版' && p.lineType !== 'IPLC') linesPass = false;
+    if (p.name === '唯兔云 · 进阶版' && p.lineType !== 'IPLC') linesPass = false;
+    if (p.name === '唯兔云 · 专业版' && p.lineType !== 'IPLC') linesPass = false;
+    if (p.name === '唯兔云 · 至尊版' && p.lineType !== 'IPLC') linesPass = false;
+    if (p.name === '唯兔云 · 永久不限时100' && p.lineType !== 'IPLC') linesPass = false;
+    if (p.name === '唯兔云 · 永久不限时200' && p.lineType !== 'IPLC') linesPass = false;
+    if (p.name === '唯兔云 · 永久不限时500' && p.lineType !== 'IPLC') linesPass = false;
+  });
+  if (linesPass) console.log('WEITU PLAN LINE TYPES: PASS');
+  else { console.error('ERROR: WEITU PLAN LINE TYPES failed'); weituErrors++; errors++; }
+
+  if (weituErrors === 0) console.log('WEITU COUPON CONSISTENCY: PASS');
+}
+console.log('------------------------------------');
+
 console.log(`BITZNET VERIFIED COUPON: ${bitznetNew9Count > 0 ? 'PASS' : 'FAIL'}`);
 console.log(`NEW9 ELIGIBLE PRICING: ${bitznetNew9Count}/15`);
 console.log(`INVALID VERIFIED PLAN REFERENCES: ${invalidVerifiedPlans}`);
