@@ -85,6 +85,7 @@ temporaryCoupons:
     manualActive: true
     expiresAt: "2026-10-10T23:59:59+08:00"
     priority: 200
+    scope: "月付 / 季付 / 半年付"
     eligiblePlans:
       - "星岛梦 · 超量150G"
       - "星岛梦 · 进阶300G"
@@ -101,6 +102,7 @@ temporaryCoupons:
     manualActive: true
     expiresAt: "2026-10-10T23:59:59+08:00"
     priority: 210
+    scope: "年付 / 两年付 / 三年付"
     eligiblePlans:
       - "星岛梦 · 超量150G"
       - "星岛梦 · 进阶300G"

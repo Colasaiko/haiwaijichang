@@ -752,6 +752,13 @@ if (xingBrand) {
   console.log(`XINGDAOMENG NMW888 ELIGIBLE: ${nmwEligibleCount}/24`);
   console.log(`XINGDAOMENG NMW888 EXCLUDED: ${nmwExcludedCount}/7`);
   
+  if (nmwEligibleCount === 24 && nmwExcludedCount === 7) {
+     console.log('XINGDAOMENG NMW888 COUNT ASSERTION: PASS');
+  } else {
+     console.error(`ERROR: XINGDAOMENG NMW888 COUNT ASSERTION failed. Eligible=${nmwEligibleCount}, Excluded=${nmwExcludedCount}`);
+     xingErrors++; errors++;
+  }
+  
   let happy85Count = 0;
   let happy80Count = 0;
   
@@ -766,6 +773,13 @@ if (xingBrand) {
   
   console.log(`XINGDAOMENG 2HAPPY85: ${happy85Count}/12`);
   console.log(`XINGDAOMENG 2HAPPY80: ${happy80Count}/12`);
+  
+  if (happy85Count === 12 && happy80Count === 12) {
+     console.log('XINGDAOMENG TEMP COUNT ASSERTION: PASS');
+  } else {
+     console.error(`ERROR: XINGDAOMENG TEMP COUNT ASSERTION failed. 85=${happy85Count}, 80=${happy80Count}`);
+     xingErrors++; errors++;
+  }
   
   const test150Half = xingBrand.pricing.find(x => x.name === '星岛梦 · 超量150G' && x.period === '半年付');
   const test150Year = xingBrand.pricing.find(x => x.name === '星岛梦 · 超量150G' && x.period === '年付');
@@ -841,7 +855,23 @@ if (xingBrand) {
       xingErrors++; errors++;
   }
   
+  let resetPass = true;
   if (xingBrand.resetPackages && xingBrand.resetPackages.length === 9) {
+      const pMap = Object.fromEntries(xingBrand.resetPackages.map(r => [r.plan, r.price]));
+      if (pMap['星岛梦 · 贴心小包'] !== 17) resetPass = false;
+      if (pMap['星岛梦 · 超量150G'] !== 25) resetPass = false;
+      if (pMap['星岛梦 · 进阶300G'] !== 50) resetPass = false;
+      if (pMap['星岛梦 · 闪光500G'] !== 70) resetPass = false;
+      if (pMap['星岛梦 · 旗舰1T版'] !== 130) resetPass = false;
+      if (pMap['星岛梦 · 永久不限时100'] !== 90) resetPass = false;
+      if (pMap['星岛梦 · 永久不限时300'] !== 270) resetPass = false;
+      if (pMap['星岛梦 · 永久不限时1TB'] !== 540) resetPass = false;
+      if (pMap['星岛梦 · 美国家宽定制'] !== 560) resetPass = false;
+  } else {
+      resetPass = false;
+  }
+  
+  if (resetPass) {
       console.log('XINGDAOMENG RESET PACKAGES: PASS');
   } else {
       console.error('ERROR: XINGDAOMENG RESET PACKAGES failed');
@@ -852,6 +882,10 @@ if (xingBrand) {
   xingBrand.pricing.forEach(p => {
       if (p.name === '星岛梦 · 贴心小包' && p.lineType !== 'IPLC') linesPass = false;
       if (p.name.includes('超量') && p.lineType !== 'IEPL') linesPass = false;
+      if (p.name.includes('进阶') && p.lineType !== 'IEPL') linesPass = false;
+      if (p.name.includes('闪光') && p.lineType !== 'IEPL') linesPass = false;
+      if (p.name.includes('旗舰') && p.lineType !== 'IEPL') linesPass = false;
+      if (p.name.includes('永久不限时') && p.lineType !== 'IPLC') linesPass = false;
       if (p.name === '星岛梦 · 美国家宽定制' && (p.lineType === 'IEPL' || p.lineType === 'IPLC')) linesPass = false;
   });
   if (linesPass) {
