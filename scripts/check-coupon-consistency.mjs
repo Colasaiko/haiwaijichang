@@ -718,6 +718,155 @@ if (shenxingBrand) {
 }
 console.log('------------------------------------');
 
+let xingBrand = null;
+if (fs.existsSync(path.join(brandsDir, 'xingdaomeng.md'))) {
+  const xingContent = fs.readFileSync(path.join(brandsDir, 'xingdaomeng.md'), 'utf8');
+  xingBrand = matter(xingContent).data;
+}
+
+if (xingBrand) {
+  let xingErrors = 0;
+  
+  if (xingBrand.pricing.length === 31) {
+    console.log('XINGDAOMENG PRICING: PASS');
+  } else {
+    console.error(`ERROR: Xingdaomeng pricing length is ${xingBrand.pricing.length}, expected 31`);
+    xingErrors++; errors++;
+  }
+  
+  const dateActive = new Date('2026-10-01T12:00:00+08:00');
+  const dateExpired = new Date('2026-10-11T12:00:00+08:00');
+  
+  let nmwEligibleCount = 0;
+  let nmwExcludedCount = 0;
+  
+  xingBrand.pricing.forEach(p => {
+     const c = getBestCouponForPricing(xingBrand, p, dateExpired);
+     if (c && c.code === 'nmw888') {
+        nmwEligibleCount++;
+     } else {
+        nmwExcludedCount++;
+     }
+  });
+  
+  console.log(`XINGDAOMENG NMW888 ELIGIBLE: ${nmwEligibleCount}/24`);
+  console.log(`XINGDAOMENG NMW888 EXCLUDED: ${nmwExcludedCount}/7`);
+  
+  let happy85Count = 0;
+  let happy80Count = 0;
+  
+  xingBrand.pricing.forEach(p => {
+     const c = getBestCouponForPricing(xingBrand, p, dateActive);
+     if (c && c.code === '2happy85') {
+        happy85Count++;
+     } else if (c && c.code === '2happy80') {
+        happy80Count++;
+     }
+  });
+  
+  console.log(`XINGDAOMENG 2HAPPY85: ${happy85Count}/12`);
+  console.log(`XINGDAOMENG 2HAPPY80: ${happy80Count}/12`);
+  
+  const test150Half = xingBrand.pricing.find(x => x.name === '星岛梦 · 超量150G' && x.period === '半年付');
+  const test150Year = xingBrand.pricing.find(x => x.name === '星岛梦 · 超量150G' && x.period === '年付');
+  
+  const halfC = getBestCouponForPricing(xingBrand, test150Half, dateActive);
+  const yearC = getBestCouponForPricing(xingBrand, test150Year, dateActive);
+  
+  if (halfC && halfC.code === '2happy85' && yearC && yearC.code === '2happy80') {
+     console.log('XINGDAOMENG HALF-YEAR EXACT MATCH: PASS');
+  } else {
+     console.error('ERROR: XINGDAOMENG HALF-YEAR EXACT MATCH failed');
+     xingErrors++; errors++;
+  }
+  
+  const test1T2Y = xingBrand.pricing.find(x => x.name === '星岛梦 · 旗舰1T版' && x.period === '两年付');
+  const test150Month = xingBrand.pricing.find(x => x.name === '星岛梦 · 超量150G' && x.period === '月付');
+  const test150YearEx = getBestCouponForPricing(xingBrand, test150Year, dateExpired);
+  const test150MonthEx = getBestCouponForPricing(xingBrand, test150Month, dateExpired);
+  const test1T2YEx = getBestCouponForPricing(xingBrand, test1T2Y, dateExpired);
+  
+  if (test150YearEx?.code === 'nmw888' && test150MonthEx?.code === 'nmw888' && test1T2YEx?.code === 'nmw888') {
+      console.log('XINGDAOMENG POST-EXPIRY FALLBACK: PASS');
+  } else {
+      console.error('ERROR: XINGDAOMENG POST-EXPIRY FALLBACK failed');
+      xingErrors++; errors++;
+  }
+  
+  const exclusions = ['星岛梦 · 贴心小包', '星岛梦 · 永久不限时100', '星岛梦 · 永久不限时300', '星岛梦 · 永久不限时1TB', '星岛梦 · 美国家宽定制'];
+  let excPass = true;
+  exclusions.forEach(planName => {
+      const p = xingBrand.pricing.find(x => x.name === planName);
+      if (p) {
+          if (getBestCouponForPricing(xingBrand, p, dateActive) !== null || getBestCouponForPricing(xingBrand, p, dateExpired) !== null) {
+              excPass = false;
+          }
+      }
+  });
+  if (excPass) {
+      console.log('XINGDAOMENG EXCLUSION STABILITY: PASS');
+  } else {
+      console.error('ERROR: XINGDAOMENG EXCLUSION STABILITY failed');
+      xingErrors++; errors++;
+  }
+  
+  function getDisc(plan, period, date, original) {
+      const p = xingBrand.pricing.find(x => x.name === plan && x.period === period);
+      const c = getBestCouponForPricing(xingBrand, p, date);
+      let m = 1;
+      if (c && c.discount === '8.5折') m = 0.85;
+      else if (c && c.discount === '8折') m = 0.8;
+      else if (c && c.discount === '9折') m = 0.9;
+      return parseFloat((original * m).toFixed(2));
+  }
+  
+  if (getDisc('星岛梦 · 超量150G', '月付', dateActive, 25) === 21.25) {
+      console.log('XINGDAOMENG SHORT-PERIOD DISCOUNT: PASS');
+  } else {
+      console.error('ERROR: XINGDAOMENG SHORT-PERIOD DISCOUNT failed');
+      xingErrors++; errors++;
+  }
+  
+  if (getDisc('星岛梦 · 超量150G', '年付', dateActive, 240) === 192.00 && getDisc('星岛梦 · 旗舰1T版', '两年付', dateActive, 2339) === 1871.20) {
+      console.log('XINGDAOMENG LONG-PERIOD DISCOUNT: PASS');
+  } else {
+      console.error('ERROR: XINGDAOMENG LONG-PERIOD DISCOUNT failed');
+      xingErrors++; errors++;
+  }
+  
+  if (getDisc('星岛梦 · 超量150G', '月付', dateExpired, 25) === 22.50 && getDisc('星岛梦 · 闪光500G', '年付', dateExpired, 699) === 629.10) {
+      console.log('XINGDAOMENG NMW888 FALLBACK DISCOUNT: PASS');
+  } else {
+      console.error('ERROR: XINGDAOMENG NMW888 FALLBACK DISCOUNT failed');
+      xingErrors++; errors++;
+  }
+  
+  if (xingBrand.resetPackages && xingBrand.resetPackages.length === 9) {
+      console.log('XINGDAOMENG RESET PACKAGES: PASS');
+  } else {
+      console.error('ERROR: XINGDAOMENG RESET PACKAGES failed');
+      xingErrors++; errors++;
+  }
+  
+  let linesPass = true;
+  xingBrand.pricing.forEach(p => {
+      if (p.name === '星岛梦 · 贴心小包' && p.lineType !== 'IPLC') linesPass = false;
+      if (p.name.includes('超量') && p.lineType !== 'IEPL') linesPass = false;
+      if (p.name === '星岛梦 · 美国家宽定制' && (p.lineType === 'IEPL' || p.lineType === 'IPLC')) linesPass = false;
+  });
+  if (linesPass) {
+      console.log('XINGDAOMENG PLAN LINE TYPES: PASS');
+  } else {
+      console.error('ERROR: XINGDAOMENG PLAN LINE TYPES failed');
+      xingErrors++; errors++;
+  }
+  
+  if (xingErrors === 0) {
+     console.log('XINGDAOMENG COUPON CONSISTENCY: PASS');
+  }
+}
+console.log('------------------------------------');
+
 console.log(`BITZNET VERIFIED COUPON: ${bitznetNew9Count > 0 ? 'PASS' : 'FAIL'}`);
 console.log(`NEW9 ELIGIBLE PRICING: ${bitznetNew9Count}/15`);
 console.log(`INVALID VERIFIED PLAN REFERENCES: ${invalidVerifiedPlans}`);

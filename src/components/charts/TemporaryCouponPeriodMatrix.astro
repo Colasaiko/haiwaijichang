@@ -1,0 +1,75 @@
+---
+const { brand } = Astro.props;
+
+if (!brand || !brand.temporaryCoupons || brand.temporaryCoupons.length === 0) return null;
+
+const now = Date.now();
+const isActive = brand.temporaryCoupons.some(c => {
+    if (c.manualActive === false) return false;
+    if (c.manualActive === true) {
+        if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
+        if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
+        return true;
+    }
+    if (!c.startsAt || !c.expiresAt) return false;
+    return now >= new Date(c.startsAt).getTime() && now <= new Date(c.expiresAt).getTime();
+});
+
+let earliestExpiry = null;
+brand.temporaryCoupons.forEach(c => {
+    if (c.expiresAt) {
+        const exp = new Date(c.expiresAt).getTime();
+        if (!earliestExpiry || exp > earliestExpiry) {
+            earliestExpiry = exp;
+        }
+    }
+});
+
+let expiryText = '';
+if (earliestExpiry) {
+    const d = new Date(earliestExpiry);
+    expiryText = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+---
+
+<div class="mb-12 bg-brand-navy p-6 rounded-xl border border-white/5 relative overflow-hidden">
+  {isActive ? (
+      <>
+          <div class="absolute top-0 right-0 w-32 h-32 bg-brand-neon/5 rounded-full blur-3xl -z-10"></div>
+          
+          <div class="mb-8 border-b border-white/10 pb-4">
+            <h2 class="text-xl font-bold text-white uppercase tracking-wider font-mono flex items-center mb-1">
+              <svg class="w-5 h-5 text-brand-neon mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              限时活动规则
+            </h2>
+            <p class="text-xs text-brand-neon tracking-widest font-mono">
+              活动时间截止：{expiryText || '以当前官方公告为准'}
+            </p>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {brand.temporaryCoupons.map((coupon) => (
+                <div class="bg-brand-dark p-5 rounded-lg border border-brand-neon/30 flex flex-col items-center">
+                    <span class="text-xs text-slate-400 mb-2 font-mono">适用周期：{coupon.eligiblePeriods?.join(' / ') || '指定周期'}</span>
+                    <span class="text-2xl font-bold text-white mb-2">{coupon.code}</span>
+                    <span class="text-brand-accent font-black text-lg bg-brand-accent/10 px-3 py-1 rounded">{coupon.discount}</span>
+                </div>
+            ))}
+          </div>
+
+          <div class="mt-6 text-sm text-slate-400">
+             <p><strong>适用套餐：</strong>{brand.temporaryCoupons[0]?.eligiblePlans?.join('、') || '指定常规套餐'}。</p>
+             {brand.temporaryCoupons[0]?.excludedPlans && (
+                <p class="mt-1"><strong>不参与套餐：</strong>{brand.temporaryCoupons[0].excludedPlans.join('、')}。</p>
+             )}
+          </div>
+      </>
+  ) : (
+      <div class="text-center py-6">
+        <h2 class="text-xl font-bold text-slate-500 mb-2">本轮限时活动已结束</h2>
+        <p class="text-sm text-slate-600">
+          当前回退至常驻优惠 {brand.coupon?.code ? `${brand.coupon.code} · ${brand.coupon.discount}` : '原价'}。
+        </p>
+      </div>
+  )}
+</div>

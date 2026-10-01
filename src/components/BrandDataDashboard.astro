@@ -8,6 +8,7 @@ import PeriodPriceMatrix from './charts/PeriodPriceMatrix.astro';
 import VerifiedCouponCard from './charts/VerifiedCouponCard.astro';
 import CouponComparison from './charts/CouponComparison.astro';
 import CouponEligibilityMatrix from './charts/CouponEligibilityMatrix.astro';
+import TemporaryCouponPeriodMatrix from './charts/TemporaryCouponPeriodMatrix.astro';
 import NodeStatusChart from './charts/NodeStatusChart.astro';
 import GlobalRouteCoverage from './charts/GlobalRouteCoverage.astro';
 import UnlimitedTrafficChart from './charts/UnlimitedTrafficChart.astro';
@@ -38,6 +39,7 @@ if (!brand || !brand.visualData) {
   <PeriodPriceMatrix brand={brand} />
   <VerifiedCouponCard brand={brand} />
   <CouponEligibilityMatrix brand={brand} />
+  <TemporaryCouponPeriodMatrix brand={brand} />
   <CouponComparison brand={brand} />
   <UnlimitedTrafficChart brand={brand} />
   <FixedTrafficPackageChart brand={brand} />
