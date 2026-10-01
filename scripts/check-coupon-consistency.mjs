@@ -456,6 +456,130 @@ if (baoyunBrand) {
 }
 console.log('------------------------------------');
 
+// --- Jiuyun Consistency Test ---
+let jiuyunBrand = null;
+if (fs.existsSync(path.join(brandsDir, 'jiuyun.md'))) {
+  const jiuyunContent = fs.readFileSync(path.join(brandsDir, 'jiuyun.md'), 'utf8');
+  jiuyunBrand = matter(jiuyunContent).data;
+}
+
+if (jiuyunBrand) {
+  let jiuyunEligibleCount = 0;
+  let jiuyunExcludedCount = 0;
+  let jiuyunErrors = 0;
+
+  if (jiuyunBrand.pricing.length !== 21) {
+    console.error(`ERROR: Jiuyun pricing should have 21 entries, found ${jiuyunBrand.pricing.length}`);
+    jiuyunErrors++;
+    errors++;
+  } else {
+    console.log('JIUYUN PRICING: PASS');
+  }
+
+  jiuyunBrand.pricing.forEach(p => {
+    const activeCoupon = getBestCouponForPricing(jiuyunBrand, p, dateA);
+    if (p.couponEligible) {
+      if (activeCoupon?.code === '9yun') {
+        jiuyunEligibleCount++;
+      } else {
+        console.error(`ERROR: Jiuyun ${p.name} (${p.period}) should have 9yun, got:`, activeCoupon);
+        jiuyunErrors++;
+        errors++;
+      }
+    } else {
+      if (!activeCoupon) {
+        jiuyunExcludedCount++;
+      } else {
+        console.error(`ERROR: Jiuyun excluded plan ${p.name} resolved a coupon:`, activeCoupon);
+        jiuyunErrors++;
+        errors++;
+      }
+    }
+  });
+
+  console.log(`JIUYUN 9YUN ELIGIBLE: ${jiuyunEligibleCount}/14`);
+  console.log(`JIUYUN 9YUN EXCLUDED: ${jiuyunExcludedCount}/7`);
+  
+  const expectedExcluded = [
+    "【流量包】365天500G",
+    "【流量包】365天1000G",
+    "年付200G【特惠】",
+    "季付200G【特惠】",
+    "年付400G【特惠】"
+  ];
+  const actualExcluded = jiuyunBrand.coupon?.excludedPlans || [];
+  let excludedMatch = expectedExcluded.length === actualExcluded.length && expectedExcluded.every(e => actualExcluded.includes(e));
+  if (excludedMatch) {
+    console.log('JIUYUN EXCLUDED PLAN REFERENCES: PASS');
+  } else {
+    console.error('ERROR: JIUYUN EXCLUDED PLAN REFERENCES failed');
+    jiuyunErrors++;
+    errors++;
+  }
+  
+  // Specific discount calculations
+  function checkDiscount(planName, period, original, expectedAfter) {
+     const p = jiuyunBrand.pricing.find(x => x.name === planName && x.period === period);
+     const coupon = getBestCouponForPricing(jiuyunBrand, p, dateA);
+     let multiplier = 1;
+     if (coupon && coupon.discount) {
+        const match = coupon.discount.match(/(\d+(?:\.\d+)?)折/);
+        if (match) multiplier = parseFloat(match[1]) / 10;
+     }
+     const after = parseFloat((original * multiplier).toFixed(2));
+     const saved = parseFloat((original - after).toFixed(2));
+     const expectedSaved = parseFloat((original - expectedAfter).toFixed(2));
+     return after === expectedAfter && saved === expectedSaved;
+  }
+
+  if (checkDiscount('招财版', '月付', 6, 4.80)) {
+     console.log('JIUYUN ZHAOCAI DISCOUNT: PASS');
+  } else {
+     console.error('ERROR: JIUYUN ZHAOCAI DISCOUNT failed');
+     jiuyunErrors++;
+     errors++;
+  }
+  
+  if (checkDiscount('聚财版', '月付', 9, 7.20)) {
+     console.log('JIUYUN JUCAI DISCOUNT: PASS');
+  } else {
+     console.error('ERROR: JIUYUN JUCAI DISCOUNT failed');
+     jiuyunErrors++;
+     errors++;
+  }
+  
+  if (checkDiscount('旺财版', '月付', 16, 12.80)) {
+     console.log('JIUYUN WANGCAI DISCOUNT: PASS');
+  } else {
+     console.error('ERROR: JIUYUN WANGCAI DISCOUNT failed');
+     jiuyunErrors++;
+     errors++;
+  }
+  
+  if (checkDiscount('不限时100G【来财版】', '一次性', 36, 28.80)) {
+     console.log('JIUYUN LAICAI DISCOUNT: PASS');
+  } else {
+     console.error('ERROR: JIUYUN LAICAI DISCOUNT failed');
+     jiuyunErrors++;
+     errors++;
+  }
+  
+  if (checkDiscount('不限时300G【鸿运版】', '一次性', 99, 79.20)) {
+     console.log('JIUYUN HONGYUN DISCOUNT: PASS');
+  } else {
+     console.error('ERROR: JIUYUN HONGYUN DISCOUNT failed');
+     jiuyunErrors++;
+     errors++;
+  }
+
+  if (jiuyunExcludedCount === 7) {
+    console.log('JIUYUN EXCLUSION STABILITY: PASS');
+  }
+  
+  console.log(`JIUYUN COUPON CONSISTENCY: ${jiuyunErrors === 0 ? 'PASS' : 'FAIL'}`);
+}
+console.log('------------------------------------');
+
 console.log(`BITZNET VERIFIED COUPON: ${bitznetNew9Count > 0 ? 'PASS' : 'FAIL'}`);
 console.log(`NEW9 ELIGIBLE PRICING: ${bitznetNew9Count}/15`);
 console.log(`INVALID VERIFIED PLAN REFERENCES: ${invalidVerifiedPlans}`);

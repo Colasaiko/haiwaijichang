@@ -29,7 +29,7 @@ data = data.map(d => {
       固定总量流量包
     </h2>
     <p class="text-xs text-slate-500 mt-1 uppercase tracking-widest font-mono">FIXED TRAFFIC</p>
-    <p class="text-sm text-slate-400 mt-2">一次性购买的固定总量包；具体有效期请参考下方说明或官方购买页。</p>
+    <p class="text-[10px] text-slate-500 mt-1">如果有带活动标签的套餐，具体活动结束时间和库存以当前购买页面为准。</p>
   </div>
   
   <div class={`grid grid-cols-1 ${data.length > 1 ? 'md:grid-cols-2 lg:grid-cols-3' : ''} gap-6 mt-8`}>
@@ -42,6 +42,12 @@ data = data.map(d => {
           </div>
           
           <h3 class="text-lg font-bold text-white mb-1 truncate">{item.label}</h3>
+          {item.campaignLabel && (
+            <div class="mb-2 inline-flex flex-col items-start">
+              <span class="text-xs font-bold text-brand-accent bg-brand-accent/10 px-2 py-0.5 rounded border border-brand-accent/30">{item.campaignLabel}</span>
+              {item.campaignNote && <span class="text-[10px] text-slate-400 mt-1">{item.campaignNote}</span>}
+            </div>
+          )}
           <div class="text-2xl font-black text-brand-neon mb-2 font-mono">
             {item.traffic}GB <span class="text-xs text-slate-400 font-normal ml-1">总量</span>
           </div>
