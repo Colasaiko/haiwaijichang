@@ -54,7 +54,7 @@ export function isCouponApplicableToPricing(brand, coupon, pricingEntry) {
   const planName = pricingEntry.name || pricingEntry.plan || pricingEntry.label || "";
   const period = pricingEntry.period || "";
   
-  const normalizePeriod = value => String(value || '').trim().replace(/\\s+/g, '');
+  const normalizePeriod = value => String(value || '').trim().replace(/\s+/g, '');
   const normPeriod = normalizePeriod(period);
 
   if (coupon.applicablePairs && Array.isArray(coupon.applicablePairs) && coupon.applicablePairs.length > 0) {
@@ -134,7 +134,7 @@ export function getBestCouponForPricing(brand, pricingEntry, nowParam) {
   applicableCoupons.sort((a, b) => {
     const getMult = (c) => {
       if (!c.discountPercent) return 1;
-      const m = c.discountPercent.match(/(\\d+)/);
+      const m = c.discountPercent.match(/(\d+)/);
       return m ? (1 - parseInt(m[1]) / 100) : 1;
     };
     const multA = getMult(a);
@@ -168,7 +168,7 @@ export function getStandardCouponForPricing(brand, pricingEntry) {
 
 export function getDiscountMultiplier(coupon) {
   if (!coupon || !coupon.discountPercent) return 1;
-  const match = coupon.discountPercent.match(/(\\d+)/);
+  const match = coupon.discountPercent.match(/(\d+)/);
   if (match) return 1 - (parseInt(match[1]) / 100);
   return 1;
 }
