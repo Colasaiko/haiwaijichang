@@ -1234,6 +1234,6 @@ console.log(`INVALID VERIFIED PLAN REFERENCES: ${invalidVerifiedPlans}`);
 console.log(`INVALID VERIFIED PERIOD REFERENCES: ${invalidVerifiedPeriods}`);
 console.log('COUPON CONSISTENCY: ' + (errors === 0 ? 'PASS' : 'FAIL'));
 console.log('CONTRADICTIONS: ' + errors);
-console.log('BUILD ERRORS: 0');
+
 
 if (errors > 0) process.exit(1);
