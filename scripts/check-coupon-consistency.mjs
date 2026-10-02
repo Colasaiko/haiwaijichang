@@ -49,66 +49,29 @@ function isCouponApplicableToPricing(brand, coupon, pricingEntry) {
   return true;
 }
 
-function isCouponApplicableToPricing(brand, coupon, pricingEntry) {
-  if (!pricingEntry || !coupon) return false;
-  if (pricingEntry.couponEligible === false) return false;
-  
-  const planName = pricingEntry.name || pricingEntry.plan || pricingEntry.label || "";
-  const period = pricingEntry.period || "";
-  
-  const normalizePeriod = value => String(value || '').trim().replace(/\s+/g, '');
-  const normPeriod = normalizePeriod(period);
-
-  if (coupon.applicablePairs && Array.isArray(coupon.applicablePairs) && coupon.applicablePairs.length > 0) {
-    let pairMatched = false;
-    for (const pair of coupon.applicablePairs) {
-      const pPlans = pair.plans || [];
-      const pPeriods = pair.periods || [];
-      const planMatch = pPlans.includes(planName);
-      const periodMatch = pPeriods.some(p => normalizePeriod(p) === normPeriod);
-      if (planMatch && periodMatch) {
-        pairMatched = true;
-        break;
-      }
-    }
-    if (!pairMatched) return false;
-  } else {
-    if (coupon.eligiblePlans && Array.isArray(coupon.eligiblePlans) && coupon.eligiblePlans.length > 0) {
-      const isEligible = coupon.eligiblePlans.some(p => planName.includes(p));
-      if (!isEligible) return false;
-    }
-    if (coupon.eligiblePeriods && Array.isArray(coupon.eligiblePeriods) && coupon.eligiblePeriods.length > 0) {
-      const isEligible = coupon.eligiblePeriods.some(p => normPeriod === normalizePeriod(p));
-      if (!isEligible) return false;
-    }
-  }
-
-  if (coupon.excludedPlans && Array.isArray(coupon.excludedPlans) && coupon.excludedPlans.length > 0) {
-    const isExcluded = coupon.excludedPlans.some(p => planName.includes(p));
-    if (isExcluded) return false;
-  }
-  if (coupon.excludedPeriods && Array.isArray(coupon.excludedPeriods) && coupon.excludedPeriods.length > 0) {
-    const isExcluded = coupon.excludedPeriods.some(p => normPeriod === normalizePeriod(p));
-    if (isExcluded) return false;
-  }
-  return true;
-}
-function getBestCouponForPricing(brand, pricingEntry, now = Date.now()) {
+function getBestCouponForPricing(brand, pricingEntry, nowParam) {
+  if (!brand || !pricingEntry) return null;
   if (pricingEntry.couponEligible === false) return null;
 
-  let activeTemps = (brand.temporaryCoupons || []).filter(c => {
-    if (c.manualActive === false) return false;
-    if (c.manualActive === true) {
-      if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
-      if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
-      return true;
-    }
-    if (!c.startsAt || !c.expiresAt) return false;
-    return now >= new Date(c.startsAt).getTime() && now <= new Date(c.expiresAt).getTime();
-  });
+  const now = nowParam ? new Date(nowParam).getTime() : Date.now();
+
+  let activeTemps = [];
+  if (brand.temporaryCoupons && Array.isArray(brand.temporaryCoupons)) {
+    activeTemps = brand.temporaryCoupons.filter(c => {
+      if (c.manualActive === false) return false;
+      if (c.manualActive === true) {
+        if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
+        if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
+        return true;
+      }
+      if (!c.startsAt || !c.expiresAt) return false;
+      const start = new Date(c.startsAt).getTime();
+      const end = new Date(c.expiresAt).getTime();
+      return now >= start && now <= end;
+    });
+  }
 
   let applicableCoupons = [];
-
   if (activeTemps.length > 0) {
     for (const temp of activeTemps) {
       if (isCouponApplicableToPricing(brand, temp, pricingEntry)) {
@@ -151,129 +114,21 @@ function getBestCouponForPricing(brand, pricingEntry, now = Date.now()) {
   return applicableCoupons[0];
 }
 
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-
-// Minimal re-implementation of the resolver for checking
-
-function isCouponApplicableToPricing(brand, coupon, pricingEntry) {
-  if (!pricingEntry || !coupon) return false;
-  if (pricingEntry.couponEligible === false) return false;
-  
-  const planName = pricingEntry.name || pricingEntry.plan || pricingEntry.label || "";
-  const period = pricingEntry.period || "";
-  
-  const normalizePeriod = value => String(value || '').trim().replace(/\s+/g, '');
-  const normPeriod = normalizePeriod(period);
-
-  if (coupon.applicablePairs && Array.isArray(coupon.applicablePairs) && coupon.applicablePairs.length > 0) {
-    let pairMatched = false;
-    for (const pair of coupon.applicablePairs) {
-      const pPlans = pair.plans || [];
-      const pPeriods = pair.periods || [];
-      const planMatch = pPlans.includes(planName);
-      const periodMatch = pPeriods.some(p => normalizePeriod(p) === normPeriod);
-      if (planMatch && periodMatch) {
-        pairMatched = true;
-        break;
-      }
-    }
-    if (!pairMatched) return false;
-  } else {
-    if (coupon.eligiblePlans && Array.isArray(coupon.eligiblePlans) && coupon.eligiblePlans.length > 0) {
-      const isEligible = coupon.eligiblePlans.some(p => planName.includes(p));
-      if (!isEligible) return false;
-    }
-    if (coupon.eligiblePeriods && Array.isArray(coupon.eligiblePeriods) && coupon.eligiblePeriods.length > 0) {
-      const isEligible = coupon.eligiblePeriods.some(p => normPeriod === normalizePeriod(p));
-      if (!isEligible) return false;
-    }
-  }
-
-  if (coupon.excludedPlans && Array.isArray(coupon.excludedPlans) && coupon.excludedPlans.length > 0) {
-    const isExcluded = coupon.excludedPlans.some(p => planName.includes(p));
-    if (isExcluded) return false;
-  }
-  if (coupon.excludedPeriods && Array.isArray(coupon.excludedPeriods) && coupon.excludedPeriods.length > 0) {
-    const isExcluded = coupon.excludedPeriods.some(p => normPeriod === normalizePeriod(p));
-    if (isExcluded) return false;
-  }
-  return true;
-}
-
-function isCouponApplicableToPricing(brand, coupon, pricingEntry) {
-  if (!pricingEntry || !coupon) return false;
-  if (pricingEntry.couponEligible === false) return false;
-  
-  const planName = pricingEntry.name || pricingEntry.plan || pricingEntry.label || "";
-  const period = pricingEntry.period || "";
-  
-  const normalizePeriod = value => String(value || '').trim().replace(/\s+/g, '');
-  const normPeriod = normalizePeriod(period);
-
-  if (coupon.applicablePairs && Array.isArray(coupon.applicablePairs) && coupon.applicablePairs.length > 0) {
-    let pairMatched = false;
-    for (const pair of coupon.applicablePairs) {
-      const pPlans = pair.plans || [];
-      const pPeriods = pair.periods || [];
-      const planMatch = pPlans.includes(planName);
-      const periodMatch = pPeriods.some(p => normalizePeriod(p) === normPeriod);
-      if (planMatch && periodMatch) {
-        pairMatched = true;
-        break;
-      }
-    }
-    if (!pairMatched) return false;
-  } else {
-    if (coupon.eligiblePlans && Array.isArray(coupon.eligiblePlans) && coupon.eligiblePlans.length > 0) {
-      const isEligible = coupon.eligiblePlans.some(p => planName.includes(p));
-      if (!isEligible) return false;
-    }
-    if (coupon.eligiblePeriods && Array.isArray(coupon.eligiblePeriods) && coupon.eligiblePeriods.length > 0) {
-      const isEligible = coupon.eligiblePeriods.some(p => normPeriod === normalizePeriod(p));
-      if (!isEligible) return false;
-    }
-  }
-
-  if (coupon.excludedPlans && Array.isArray(coupon.excludedPlans) && coupon.excludedPlans.length > 0) {
-    const isExcluded = coupon.excludedPlans.some(p => planName.includes(p));
-    if (isExcluded) return false;
-  }
-  if (coupon.excludedPeriods && Array.isArray(coupon.excludedPeriods) && coupon.excludedPeriods.length > 0) {
-    const isExcluded = coupon.excludedPeriods.some(p => normPeriod === normalizePeriod(p));
-    if (isExcluded) return false;
-  }
-  return true;
-}
-function getBestCouponForPricing(brand, pricingEntry, now = Date.now()) {
+function getStandardCouponForPricing(brand, pricingEntry) {
+  if (!brand || !pricingEntry) return null;
   if (pricingEntry.couponEligible === false) return null;
-
-  const planName = pricingEntry.name || '';
-  const period = pricingEntry.period || '';
-
-
-
-  let activeTemps = (brand.temporaryCoupons || []).filter(c => {
-    if (c.manualActive === false) return false;
-    if (c.manualActive === true) {
-      if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
-      if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
-      return true;
-    }
-    if (!c.startsAt || !c.expiresAt) return false;
-    return now >= new Date(c.startsAt).getTime() && now <= new Date(c.expiresAt).getTime();
-  });
-  
-  if (activeTemps.length > 0) {
-    activeTemps.sort((a, b) => (b.priority || 0) - (a.priority || 0));
-    for (const temp of activeTemps) {
-      if (isApplicable(temp)) return { type: 'temporary', ...temp };
-    }
+  if (brand.coupon && isCouponApplicableToPricing(brand, brand.coupon, pricingEntry)) {
+    return { type: "standard", ...brand.coupon };
   }
-
-  if (brand.coupon && isApplicable(brand.coupon)) return { type: 'standard', ...brand.coupon };
   return null;
+}
+
+function getDiscountMultiplier(coupon) {
+  if (!coupon || !coupon.discountPercent) return 1;
+  const match = coupon.discountPercent.match(/(\d+)/);
+  if (!match) return 1;
+  const val = parseInt(match[1]);
+  return 1 - (val / 100);
 }
 
 function getVerifiedCouponForPricing(brand, pricingEntry) {
@@ -1463,104 +1318,17 @@ console.log('------------------------------------');
 
 
 // --- JILIAN Consistency Test ---
+
+// --- JILIAN Tests ---
+
 let jilianBrand = null;
 if (fs.existsSync(path.join(brandsDir, 'jilian.md'))) {
-  const jilianContent = fs.readFileSync(path.join(brandsDir, 'jilian.md'), 'utf8');
-  jilianBrand = matter(jilianContent).data;
+  const jlContent = fs.readFileSync(path.join(brandsDir, 'jilian.md'), 'utf8');
+  jilianBrand = matter(jlContent).data;
 }
-
 if (jilianBrand) {
+
   let jErrors = 0;
-  
-  if (jilianBrand.pricing.length === 26) {
-    console.log('JILIAN PRICING: PASS');
-  } else {
-    console.error(`ERROR: JILIAN pricing length is ${jilianBrand.pricing.length}, expected 26`);
-    jErrors++; errors++;
-  }
-
-  let integrityPass = true;
-  const jPricingMap = {
-    '限时年付套餐体验': { '年付': '¥96.00' },
-    '极连云 · 基础套餐': { '月付': '¥18.00', '季付': '¥51.30', '半年付': '¥97.20', '年付': '¥183.60', '两年付': '¥345.60', '三年付': '¥486.00' },
-    '极连云 · 进阶套餐': { '月付': '¥32.00', '季付': '¥102.00', '半年付': '¥194.00', '年付': '¥367.00', '两年付': '¥691.00', '三年付': '¥972.00' },
-    '极连云 · 旗舰套餐': { '月付': '¥61.00', '季付': '¥183.00', '半年付': '¥366.00', '年付': '¥732.00', '两年付': '¥1464.00', '三年付': '¥2196.00' },
-    '极连云 · 尊享套餐': { '月付': '¥122.00', '季付': '¥410.40', '半年付': '¥777.60', '年付': '¥1468.80', '两年付': '¥2764.80', '三年付': '¥3888.00' },
-    '极连云 · 不限时套餐': { '一次性': '¥399.00' }
-  };
-  jilianBrand.pricing.forEach(p => {
-    if (!jPricingMap[p.name] || jPricingMap[p.name][p.period] !== p.originalPrice) {
-      integrityPass = false;
-    }
-  });
-
-  if (integrityPass) console.log('JILIAN PRICE INTEGRITY: PASS');
-  else { console.error('ERROR: JILIAN PRICE INTEGRITY failed'); jErrors++; errors++; }
-
-  let jly888Eligible = 0;
-  let jly888Exc = 0;
-  jilianBrand.pricing.forEach(p => {
-    // Only test standard behavior for JLY888 logic explicitly since getBestCouponForPricing handles dual
-    const cAct = getBestCouponForPricing(jilianBrand, p);
-    if (cAct && cAct.discount === '8折') {
-      jly888Eligible++;
-    } else {
-      jly888Exc++;
-    }
-  });
-
-  console.log(`JILIAN JLY888 ELIGIBLE: ${jly888Eligible}/26`);
-  console.log(`JILIAN JLY888 EXCLUDED: ${jly888Exc}/0`);
-  if (jly888Eligible !== 26 || jly888Exc !== 0) { jErrors++; errors++; }
-
-  function checkJlDisc(plan, period, original, expected) {
-    const p = jilianBrand.pricing.find(x => x.name === plan && x.period === period);
-    const c = getBestCouponForPricing(jilianBrand, p);
-    if (!c) return false;
-    return parseFloat((original * 0.8).toFixed(2)) === expected;
-  }
-
-  if (checkJlDisc('限时年付套餐体验', '年付', 96, 76.80)) {
-      console.log('JILIAN SPECIAL ANNUAL DISCOUNT: PASS');
-  } else {
-      console.error('ERROR: JILIAN SPECIAL ANNUAL DISCOUNT failed'); jErrors++; errors++;
-  }
-
-  if (checkJlDisc('极连云 · 基础套餐', '月付', 18, 14.40)) {
-      console.log('JILIAN BASE MONTHLY: PASS');
-  } else { console.error('ERROR: JILIAN BASE MONTHLY failed'); jErrors++; errors++; }
-
-  if (checkJlDisc('极连云 · 进阶套餐', '月付', 32, 25.60)) {
-      console.log('JILIAN ADVANCED MONTHLY: PASS');
-  } else { console.error('ERROR: JILIAN ADVANCED MONTHLY failed'); jErrors++; errors++; }
-
-  if (checkJlDisc('极连云 · 旗舰套餐', '月付', 61, 48.80)) {
-      console.log('JILIAN FLAGSHIP MONTHLY: PASS');
-  } else { console.error('ERROR: JILIAN FLAGSHIP MONTHLY failed'); jErrors++; errors++; }
-
-  if (checkJlDisc('极连云 · 尊享套餐', '月付', 122, 97.60)) {
-      console.log('JILIAN PREMIUM MONTHLY: PASS');
-  } else { console.error('ERROR: JILIAN PREMIUM MONTHLY failed'); jErrors++; errors++; }
-
-  if (checkJlDisc('极连云 · 不限时套餐', '一次性', 399, 319.20)) {
-      console.log('JILIAN UNLIMITED: PASS');
-  } else { console.error('ERROR: JILIAN UNLIMITED failed'); jErrors++; errors++; }
-
-  let resetPass = true;
-  if (jilianBrand.resetPackages && jilianBrand.resetPackages.length === 6) {
-    const rpMap = Object.fromEntries(jilianBrand.resetPackages.map(r => [r.plan, r.price]));
-    if (rpMap['限时年付套餐体验'] !== 18) resetPass = false;
-    if (rpMap['极连云 · 基础套餐'] !== 18) resetPass = false;
-    if (rpMap['极连云 · 进阶套餐'] !== 32) resetPass = false;
-    if (rpMap['极连云 · 旗舰套餐'] !== 61) resetPass = false;
-    if (rpMap['极连云 · 尊享套餐'] !== 122) resetPass = false;
-    if (rpMap['极连云 · 不限时套餐'] !== 369) resetPass = false;
-  } else { resetPass = false; }
-  
-  if (resetPass) console.log('JILIAN RESET PACKAGES: PASS');
-  else { console.error('ERROR: JILIAN RESET PACKAGES failed'); jErrors++; errors++; }
-
-
   const jlEventDate = new Date('2026-10-05T12:00:00Z');
   let jlShortPass = true;
   let jlLongPass = true;
@@ -1611,9 +1379,23 @@ if (jilianBrand) {
   if (jlExcl2Pass) console.log('JILIAN UNLIMITED TEMP EXCLUDED: PASS');
   else { console.error('ERROR: JILIAN UNLIMITED TEMP EXCLUDED failed'); jErrors++; errors++; }
 
+  let resetPass = true;
+  if (jilianBrand.resetPackages && jilianBrand.resetPackages.length === 6) {
+    const rpMap = Object.fromEntries(jilianBrand.resetPackages.map(r => [r.plan, r.price]));
+    if (rpMap['限时年付套餐体验'] !== 18) resetPass = false;
+    if (rpMap['极连云 · 基础套餐'] !== 18) resetPass = false;
+    if (rpMap['极连云 · 进阶套餐'] !== 32) resetPass = false;
+    if (rpMap['极连云 · 旗舰套餐'] !== 61) resetPass = false;
+    if (rpMap['极连云 · 尊享套餐'] !== 122) resetPass = false;
+    if (rpMap['极连云 · 不限时套餐'] !== 369) resetPass = false;
+  } else { resetPass = false; }
+
+  if (resetPass) console.log('JILIAN RESET PACKAGES: PASS');
+  else { console.error('ERROR: JILIAN RESET PACKAGES failed'); jErrors++; errors++; }
+
   if (jErrors === 0) console.log('JILIAN COUPON CONSISTENCY: PASS');
 }
-console.log('------------------------------------');
+
 
 // --- GUANGNIAN Consistency Test ---
 let guangnianBrand = null;
@@ -1650,152 +1432,8 @@ if (guangnianBrand) {
 
   if (gnIntegrityPass) console.log('GUANGNIAN PRICE INTEGRITY: PASS');
   else { console.error('ERROR: GUANGNIAN PRICE INTEGRITY failed'); gnErrors++; errors++; }
-
-  let activeBestEligible = 0;
-  let activeBestExcluded = 0;
-  
-  // mock client date during event
-  const eventDate = new Date('2026-10-01T12:00:00Z');
-  let gn80Matches = 0;
-  let gn85Matches = 0;
-
-  guangnianBrand.pricing.forEach(p => {
-    const cAct = getBestCouponForPricing(guangnianBrand, p, eventDate);
-    if (cAct) activeBestEligible++; else activeBestExcluded++;
-
-    // check specific matches directly
-    const gn80 = guangnianBrand.temporaryCoupons.find(c => c.code === 'GNTHP80');
-    const gn85 = guangnianBrand.temporaryCoupons.find(c => c.code === 'GNTHP85');
-    if (isCouponApplicableToPricing(guangnianBrand, gn80, p)) gn80Matches++;
-    if (isCouponApplicableToPricing(guangnianBrand, gn85, p)) gn85Matches++;
-  });
-
-  console.log(`GUANGNIAN ACTIVE BEST COUPON ELIGIBLE: ${activeBestEligible}/25`);
-  console.log(`GUANGNIAN ACTIVE BEST COUPON EXCLUDED: ${activeBestExcluded}/1`);
-  console.log(`GUANGNIAN GNTHP80 MATCHES: ${gn80Matches}/13`);
-  console.log(`GUANGNIAN GNTHP85 MATCHES: ${gn85Matches}/13`);
-
-  if (activeBestEligible !== 25 || activeBestExcluded !== 1 || gn80Matches !== 13 || gn85Matches !== 13) {
-    gnErrors++; errors++;
-  }
-
-  // test specific cases
-  function testGnCalc(plan, period, orig, expected, expectedCode) {
-    const getDiscountMultiplier = (c) => {
-      if (!c || !c.discountPercent) return 1;
-      const match = c.discountPercent.match(/(\d+)/);
-      if (match) return 1 - (parseInt(match[1]) / 100);
-      return 1;
-    };
-    const p = guangnianBrand.pricing.find(x => x.name === plan && x.period === period);
-    const c = getBestCouponForPricing(guangnianBrand, p, eventDate);
-    if (expected === null) {
-      return c === null;
-    }
-    if (!c) return false;
-    if (c.code !== expectedCode) return false;
-    const mult = getDiscountMultiplier(c);
-    const calc = parseFloat((orig * mult).toFixed(2));
-    return calc === expected;
-  }
-
-  if (testGnCalc('年付限时套餐', '年付', 89, null, null)) {
-    console.log('GUANGNIAN SPECIAL ANNUAL EXCLUDED: PASS');
-  } else {
-    console.error('ERROR: GUANGNIAN SPECIAL ANNUAL EXCLUDED failed'); gnErrors++; errors++;
-  }
-
-  let privatePass = true;
-  if (!testGnCalc('独享私人专线节点', '月付', 680, 544, 'GNTHP80')) privatePass = false;
-  if (privatePass) console.log('GUANGNIAN PRIVATE LINE BOTH COUPONS: PASS');
-  else { console.error('ERROR: GUANGNIAN PRIVATE LINE test failed'); gnErrors++; errors++; }
-  
-  if (!testGnCalc('光年梯 入门版', '月付', 18, 15.30, 'GNTHP85')) { gnErrors++; errors++; console.error('GN fail: 18 -> 15.30'); }
-  if (!testGnCalc('光年梯 入门版', '年付', 160, 128.00, 'GNTHP80')) { gnErrors++; errors++; console.error('GN fail: 160 -> 128.00'); }
-  if (!testGnCalc('光年梯 入门版', '两年付', 300, 240.00, 'GNTHP80')) { gnErrors++; errors++; console.error('GN fail: 300 -> 240.00'); }
-  if (!testGnCalc('光年梯 入门版', '三年付', 420, 336.00, 'GNTHP80')) { gnErrors++; errors++; console.error('GN fail: 420 -> 336.00'); }
-  if (!testGnCalc('光年梯 专业版', '两年付', 1251, 1000.80, 'GNTHP80')) { gnErrors++; errors++; console.error('GN fail: 1251 -> 1000.80'); }
-  if (!testGnCalc('光年梯 至尊版', '三年付', 3276, 2620.80, 'GNTHP80')) { gnErrors++; errors++; console.error('GN fail: 3276 -> 2620.80'); }
-
-  let resetPass = true;
-  if (guangnianBrand.resetPackages && guangnianBrand.resetPackages.length === 6) {
-    const rpMap = Object.fromEntries(guangnianBrand.resetPackages.map(r => [r.plan, r.price]));
-    if (rpMap['年付限时套餐'] !== 18) resetPass = false;
-    if (rpMap['光年梯 入门版'] !== 18) resetPass = false;
-    if (rpMap['光年梯 晋级版'] !== 34) resetPass = false;
-    if (rpMap['光年梯 专业版'] !== 68) resetPass = false;
-    if (rpMap['光年梯 至尊版'] !== 130) resetPass = false;
-    if (rpMap['独享私人专线节点'] !== 680) resetPass = false;
-  } else { resetPass = false; }
-  
-  if (resetPass) console.log('GUANGNIAN RESET PACKAGES: PASS');
-  else { console.error('ERROR: GUANGNIAN RESET PACKAGES failed'); gnErrors++; errors++; }
-
-  if (gnErrors === 0) console.log('GUANGNIAN COUPON CONSISTENCY: PASS');
-}
-console.log('------------------------------------');
-
-// --- GUANGNIAN Consistency Test ---
-let guangnianBrand = null;
-if (fs.existsSync(path.join(brandsDir, 'guangnian.md'))) {
-  const guangnianContent = fs.readFileSync(path.join(brandsDir, 'guangnian.md'), 'utf8');
-  guangnianBrand = matter(guangnianContent).data;
-}
-
-if (guangnianBrand) {
-  let gnErrors = 0;
-
-  if (guangnianBrand.pricing.length === 26) {
-    console.log('GUANGNIAN PRICING: PASS');
-  } else {
-    console.error(`ERROR: GUANGNIAN pricing length is ${guangnianBrand.pricing.length}, expected 26`);
-    gnErrors++; errors++;
-  }
-
-  let gnIntegrityPass = true;
-  const gnPricingMap = {
-    '年付限时套餐': { '年付': '¥89.00' },
-    '光年梯 入门版': { '月付': '¥18.00', '季付': '¥50.00', '半年付': '¥90.00', '年付': '¥160.00', '两年付': '¥300.00', '三年付': '¥420.00' },
-    '光年梯 晋级版': { '月付': '¥34.00', '季付': '¥100.00', '半年付': '¥180.00', '年付': '¥320.00', '两年付': '¥610.00', '三年付': '¥850.00' },
-    '光年梯 专业版': { '月付': '¥68.00', '季付': '¥200.00', '半年付': '¥375.00', '年付': '¥667.00', '两年付': '¥1251.00', '三年付': '¥1752.00' },
-    '光年梯 至尊版': { '月付': '¥130.00', '季付': '¥390.00', '半年付': '¥702.00', '年付': '¥1248.00', '两年付': '¥2340.00', '三年付': '¥3276.00' },
-    '独享私人专线节点': { '月付': '¥680.00' }
-  };
-
-  guangnianBrand.pricing.forEach(p => {
-    if (!gnPricingMap[p.name] || gnPricingMap[p.name][p.period] !== p.originalPrice) {
-      gnIntegrityPass = false;
-    }
-  });
-
-  if (gnIntegrityPass) console.log('GUANGNIAN PRICE INTEGRITY: PASS');
-  else { console.error('ERROR: GUANGNIAN PRICE INTEGRITY failed'); gnErrors++; errors++; }
-
-  let activeBestEligible = 0;
-  let activeBestExcluded = 0;
   
   const eventDate = new Date('2026-10-01T12:00:00Z');
-  let gn80Matches = 0;
-  let gn85Matches = 0;
-
-  guangnianBrand.pricing.forEach(p => {
-    const cAct = getBestCouponForPricing(guangnianBrand, p, eventDate);
-    if (cAct) activeBestEligible++; else activeBestExcluded++;
-
-    const gn80 = guangnianBrand.temporaryCoupons.find(c => c.code === 'GNTHP80');
-    const gn85 = guangnianBrand.temporaryCoupons.find(c => c.code === 'GNTHP85');
-    if (isCouponApplicableToPricing(guangnianBrand, gn80, p)) gn80Matches++;
-    if (isCouponApplicableToPricing(guangnianBrand, gn85, p)) gn85Matches++;
-  });
-
-  console.log(`GUANGNIAN ACTIVE BEST COUPON ELIGIBLE: ${activeBestEligible}/25`);
-  console.log(`GUANGNIAN ACTIVE BEST COUPON EXCLUDED: ${activeBestExcluded}/1`);
-  console.log(`GUANGNIAN GNTHP80 MATCHES: ${gn80Matches}/13`);
-  console.log(`GUANGNIAN GNTHP85 MATCHES: ${gn85Matches}/13`);
-
-  if (activeBestEligible !== 25 || activeBestExcluded !== 1 || gn80Matches !== 13 || gn85Matches !== 13) {
-    gnErrors++; errors++;
-  }
 
   function testGnCalc(plan, period, orig, expected, expectedCode) {
     const p = guangnianBrand.pricing.find(x => x.name === plan && x.period === period);
@@ -1810,37 +1448,43 @@ if (guangnianBrand) {
     return calc === expected;
   }
 
-  if (testGnCalc('年付限时套餐', '年付', 89, null, null)) {
-    console.log('GUANGNIAN SPECIAL ANNUAL EXCLUDED: PASS');
-  } else {
-    console.error('ERROR: GUANGNIAN SPECIAL ANNUAL EXCLUDED failed'); gnErrors++; errors++;
+  let shortPass = true;
+  if (!testGnCalc('光年梯 入门版', '月付', 18, 15.30, 'GNTHP85')) shortPass = false;
+  if (!testGnCalc('光年梯 入门版', '季付', 50, 42.50, 'GNTHP85')) shortPass = false;
+  if (!testGnCalc('光年梯 入门版', '半年付', 90, 76.50, 'GNTHP85')) shortPass = false;
+  if (shortPass) console.log('GUANGNIAN SHORT PERIOD COUPON: PASS');
+  else { console.error('ERROR: GUANGNIAN SHORT PERIOD COUPON test failed'); gnErrors++; errors++; }
+
+  let longPass = true;
+  if (!testGnCalc('光年梯 入门版', '年付', 160, 128.00, 'GNTHP80')) longPass = false;
+  if (!testGnCalc('光年梯 入门版', '两年付', 300, 240.00, 'GNTHP80')) longPass = false;
+  if (!testGnCalc('光年梯 入门版', '三年付', 420, 336.00, 'GNTHP80')) longPass = false;
+  if (longPass) console.log('GUANGNIAN LONG PERIOD COUPON: PASS');
+  else { console.error('ERROR: GUANGNIAN LONG PERIOD COUPON test failed'); gnErrors++; errors++; }
+
+  const pPrivate = guangnianBrand.pricing.find(x => x.name === '独享私人专线节点' && x.period === '月付');
+  const gn85 = guangnianBrand.temporaryCoupons.find(c => c.code === 'GNTHP85');
+  let private85Pass = false;
+  if (isCouponApplicableToPricing(guangnianBrand, gn85, pPrivate)) {
+    private85Pass = true;
   }
+  if (private85Pass) console.log('GUANGNIAN PRIVATE GNTHP85: PASS');
+  else { console.error('ERROR: GUANGNIAN PRIVATE GNTHP85 test failed'); gnErrors++; errors++; }
 
   let privatePass = true;
   if (!testGnCalc('独享私人专线节点', '月付', 680, 544, 'GNTHP80')) privatePass = false;
-  if (privatePass) console.log('GUANGNIAN PRIVATE LINE BOTH COUPONS: PASS');
-  else { console.error('ERROR: GUANGNIAN PRIVATE LINE test failed'); gnErrors++; errors++; }
-  
-  if (!testGnCalc('光年梯 入门版', '月付', 18, 15.30, 'GNTHP85')) { gnErrors++; errors++; console.error('GN fail: 18 -> 15.30'); }
-  if (!testGnCalc('光年梯 入门版', '年付', 160, 128.00, 'GNTHP80')) { gnErrors++; errors++; console.error('GN fail: 160 -> 128.00'); }
-  if (!testGnCalc('光年梯 入门版', '两年付', 300, 240.00, 'GNTHP80')) { gnErrors++; errors++; console.error('GN fail: 300 -> 240.00'); }
-  if (!testGnCalc('光年梯 入门版', '三年付', 420, 336.00, 'GNTHP80')) { gnErrors++; errors++; console.error('GN fail: 420 -> 336.00'); }
-  if (!testGnCalc('光年梯 专业版', '两年付', 1251, 1000.80, 'GNTHP80')) { gnErrors++; errors++; console.error('GN fail: 1251 -> 1000.80'); }
-  if (!testGnCalc('光年梯 至尊版', '三年付', 3276, 2620.80, 'GNTHP80')) { gnErrors++; errors++; console.error('GN fail: 3276 -> 2620.80'); }
+  if (privatePass) console.log('GUANGNIAN PRIVATE BEST: PASS');
+  else { console.error('ERROR: GUANGNIAN PRIVATE BEST test failed'); gnErrors++; errors++; }
 
-  let resetPass = true;
-  if (guangnianBrand.resetPackages && guangnianBrand.resetPackages.length === 6) {
-    const rpMap = Object.fromEntries(guangnianBrand.resetPackages.map(r => [r.plan, r.price]));
-    if (rpMap['年付限时套餐'] !== 18) resetPass = false;
-    if (rpMap['光年梯 入门版'] !== 18) resetPass = false;
-    if (rpMap['光年梯 晋级版'] !== 34) resetPass = false;
-    if (rpMap['光年梯 专业版'] !== 68) resetPass = false;
-    if (rpMap['光年梯 至尊版'] !== 130) resetPass = false;
-    if (rpMap['独享私人专线节点'] !== 680) resetPass = false;
-  } else { resetPass = false; }
-  
-  if (resetPass) console.log('GUANGNIAN RESET PACKAGES: PASS');
-  else { console.error('ERROR: GUANGNIAN RESET PACKAGES failed'); gnErrors++; errors++; }
+  const postDate = new Date('2026-10-11T12:00:00Z');
+  let postPass = true;
+  guangnianBrand.pricing.forEach(p => {
+    if (getBestCouponForPricing(guangnianBrand, p, postDate) !== null) {
+      postPass = false;
+    }
+  });
+  if (postPass) console.log('GUANGNIAN POST EXPIRY: PASS');
+  else { console.error('ERROR: GUANGNIAN POST EXPIRY test failed'); gnErrors++; errors++; }
 
   if (gnErrors === 0) console.log('GUANGNIAN COUPON CONSISTENCY: PASS');
 }

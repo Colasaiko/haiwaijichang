@@ -45,11 +45,7 @@ export function getActiveCoupon(brand, clientDate = new Date()) {
 }
 
 /**
- * Checks if a SPECIFIC coupon is applicable to a SPECIFIC pricing entry.
- * @param {Object} brand - The full brand object (to check global rules if needed)
- * @param {Object} coupon - The coupon object (can be standard or temporary)
- * @param {Object} pricingEntry - The pricing entry containing { name, period, couponEligible }
- * @returns {boolean} - True if applicable, false otherwise.
+ * Helper to calculate discount multiplier from a coupon object.
  */
 export function isCouponApplicableToPricing(brand, coupon, pricingEntry) {
   if (!pricingEntry || !coupon) return false;
@@ -58,7 +54,7 @@ export function isCouponApplicableToPricing(brand, coupon, pricingEntry) {
   const planName = pricingEntry.name || pricingEntry.plan || pricingEntry.label || "";
   const period = pricingEntry.period || "";
   
-  const normalizePeriod = value => String(value || '').trim().replace(/\s+/g, '');
+  const normalizePeriod = value => String(value || '').trim().replace(/\\s+/g, '');
   const normPeriod = normalizePeriod(period);
 
   if (coupon.applicablePairs && Array.isArray(coupon.applicablePairs) && coupon.applicablePairs.length > 0) {
@@ -96,11 +92,11 @@ export function isCouponApplicableToPricing(brand, coupon, pricingEntry) {
   return true;
 }
 
-export function getBestCouponForPricing(brand, pricingEntry, clientDate = new Date()) {
+export function getBestCouponForPricing(brand, pricingEntry, nowParam) {
   if (!brand || !pricingEntry) return null;
   if (pricingEntry.couponEligible === false) return null;
 
-  const now = new Date(clientDate).getTime();
+  const now = nowParam ? new Date(nowParam).getTime() : Date.now();
 
   let activeTemps = [];
   if (brand.temporaryCoupons && Array.isArray(brand.temporaryCoupons)) {
@@ -119,18 +115,17 @@ export function getBestCouponForPricing(brand, pricingEntry, clientDate = new Da
   }
 
   let applicableCoupons = [];
-
   if (activeTemps.length > 0) {
     for (const temp of activeTemps) {
       if (isCouponApplicableToPricing(brand, temp, pricingEntry)) {
-        applicableCoupons.push({ type: "temporary", ...temp });
+        applicableCoupons.push({ type: 'temporary', ...temp });
       }
     }
   }
 
   if (brand.coupon) {
     if (isCouponApplicableToPricing(brand, brand.coupon, pricingEntry)) {
-      applicableCoupons.push({ type: "standard", ...brand.coupon });
+      applicableCoupons.push({ type: 'standard', ...brand.coupon });
     }
   }
 
@@ -139,7 +134,7 @@ export function getBestCouponForPricing(brand, pricingEntry, clientDate = new Da
   applicableCoupons.sort((a, b) => {
     const getMult = (c) => {
       if (!c.discountPercent) return 1;
-      const m = c.discountPercent.match(/(\d+)/);
+      const m = c.discountPercent.match(/(\\d+)/);
       return m ? (1 - parseInt(m[1]) / 100) : 1;
     };
     const multA = getMult(a);
@@ -171,12 +166,9 @@ export function getStandardCouponForPricing(brand, pricingEntry) {
   return null;
 }
 
-/**
- * Helper to calculate discount multiplier from a coupon object.
- */
 export function getDiscountMultiplier(coupon) {
   if (!coupon || !coupon.discountPercent) return 1;
-  const match = coupon.discountPercent.match(/(\d+)/);
+  const match = coupon.discountPercent.match(/(\\d+)/);
   if (match) return 1 - (parseInt(match[1]) / 100);
   return 1;
 }
