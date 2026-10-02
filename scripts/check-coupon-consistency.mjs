@@ -1069,6 +1069,153 @@ if (weituBrand) {
 }
 console.log('------------------------------------');
 
+let guangsuBrand = null;
+if (fs.existsSync(path.join(brandsDir, 'guangsu.md'))) {
+  const content = fs.readFileSync(path.join(brandsDir, 'guangsu.md'), 'utf8');
+  guangsuBrand = matter(content).data;
+}
+
+if (guangsuBrand) {
+  let gsErrors = 0;
+  
+  if (guangsuBrand.pricing.length === 27) {
+    console.log('GUANGSU PRICING: PASS');
+  } else {
+    console.error(`ERROR: GUANGSU pricing length is ${guangsuBrand.pricing.length}, expected 27`);
+    gsErrors++; errors++;
+  }
+
+  function checkGsPrice(name, period, expectedStr) {
+    const p = guangsuBrand.pricing.find(x => x.name === name && x.period === period);
+    if (!p) return false;
+    return String(p.originalPrice) === expectedStr;
+  }
+  let integrityPass = true;
+  if (!checkGsPrice('光速云 · 轻量版', '年付', '¥99')) integrityPass = false;
+
+  if (!checkGsPrice('光速云 · 极速版', '月付', '¥23')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 极速版', '季付', '¥64')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 极速版', '半年付', '¥84')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 极速版', '年付', '¥149')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 极速版', '两年付', '¥249')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 极速版', '三年付', '¥349')) integrityPass = false;
+
+  if (!checkGsPrice('光速云 · 流光版', '月付', '¥34')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 流光版', '季付', '¥96')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 流光版', '半年付', '¥149')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 流光版', '年付', '¥249')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 流光版', '两年付', '¥449')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 流光版', '三年付', '¥649')) integrityPass = false;
+
+  if (!checkGsPrice('光速云 · 量子版', '月付', '¥68')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 量子版', '季付', '¥198')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 量子版', '半年付', '¥375')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 量子版', '年付', '¥667')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 量子版', '两年付', '¥1251')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 量子版', '三年付', '¥1752')) integrityPass = false;
+
+  if (!checkGsPrice('光速云 · 无界版', '月付', '¥138')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 无界版', '季付', '¥398')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 无界版', '半年付', '¥702')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 无界版', '年付', '¥1248')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 无界版', '两年付', '¥2340')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 无界版', '三年付', '¥3276')) integrityPass = false;
+
+  if (!checkGsPrice('光速云 · 不限时套餐', '一次性', '¥147')) integrityPass = false;
+  if (!checkGsPrice('光速云 · 定制套餐', '月付', '¥680')) integrityPass = false;
+  
+  // Specific checks required
+  const gsFast = guangsuBrand.pricing.find(x => x.name === '光速云 · 极速版');
+  if (gsFast && gsFast.traffic !== '148GB/月') integrityPass = false;
+  const gsFlow = guangsuBrand.pricing.find(x => x.name === '光速云 · 流光版');
+  if (gsFlow && gsFlow.traffic !== '230GB/月') integrityPass = false;
+  
+  if (integrityPass) console.log('GUANGSU PRICE INTEGRITY: PASS');
+  else { console.error('ERROR: GUANGSU PRICE INTEGRITY failed'); gsErrors++; errors++; }
+
+  let trafficPass = true;
+  const tMap = {};
+  guangsuBrand.pricing.forEach(p => tMap[p.name] = p.traffic);
+  if (tMap['光速云 · 轻量版'] !== '59GB/月') trafficPass = false;
+  if (tMap['光速云 · 极速版'] !== '148GB/月') trafficPass = false;
+  if (tMap['光速云 · 流光版'] !== '230GB/月') trafficPass = false;
+  if (tMap['光速云 · 量子版'] !== '450GB/月') trafficPass = false;
+  if (tMap['光速云 · 无界版'] !== '900GB/月') trafficPass = false;
+  if (tMap['光速云 · 不限时套餐'] !== '347GB总量') trafficPass = false;
+  if (tMap['光速云 · 定制套餐'] !== '按需配置') trafficPass = false;
+  if (trafficPass) console.log('GUANGSU TRAFFIC INTEGRITY: PASS');
+  else { console.error('ERROR: GUANGSU TRAFFIC INTEGRITY failed'); gsErrors++; errors++; }
+
+  let ammCount = 0;
+  let excCount = 0;
+  guangsuBrand.pricing.forEach(p => {
+    const c = getBestCouponForPricing(guangsuBrand, p);
+    if (c && c.code === 'AMM') ammCount++;
+    else if (!c) excCount++;
+  });
+  console.log(`GUANGSU AMM ELIGIBLE: ${ammCount}/24`);
+  console.log(`GUANGSU AMM EXCLUDED: ${excCount}/3`);
+  if (ammCount !== 24 || excCount !== 3) { gsErrors++; errors++; }
+
+  function checkGsDisc(name, original, expected) {
+    const p = guangsuBrand.pricing.find(x => x.name === name && x.period === '月付');
+    const c = getBestCouponForPricing(guangsuBrand, p);
+    if (!c) return false;
+    let mult = 1;
+    if (c.discount === '8折') mult = 0.8;
+    return parseFloat((original * mult).toFixed(2)) === expected;
+  }
+  
+  if (checkGsDisc('光速云 · 极速版', 23, 18.40) &&
+      checkGsDisc('光速云 · 流光版', 34, 27.20) &&
+      checkGsDisc('光速云 · 量子版', 68, 54.40) &&
+      checkGsDisc('光速云 · 无界版', 138, 110.40)) {
+      console.log('GUANGSU VERIFIED MONTHLY DISCOUNTS: PASS');
+  } else {
+      console.error('ERROR: GUANGSU VERIFIED MONTHLY DISCOUNTS failed'); gsErrors++; errors++;
+  }
+
+  const pLight = guangsuBrand.pricing.find(x => x.name === '光速云 · 轻量版');
+  const pUnlim = guangsuBrand.pricing.find(x => x.name === '光速云 · 不限时套餐');
+  const pCustom = guangsuBrand.pricing.find(x => x.name === '光速云 · 定制套餐');
+  if (!getBestCouponForPricing(guangsuBrand, pLight) && 
+      !getBestCouponForPricing(guangsuBrand, pUnlim) &&
+      !getBestCouponForPricing(guangsuBrand, pCustom)) {
+      console.log('GUANGSU EXCLUSION STABILITY: PASS');
+  } else {
+      console.error('ERROR: GUANGSU EXCLUSION STABILITY failed'); gsErrors++; errors++;
+  }
+
+  let resetPass = true;
+  if (guangsuBrand.resetPackages && guangsuBrand.resetPackages.length === 7) {
+    const rpMap = Object.fromEntries(guangsuBrand.resetPackages.map(r => [r.plan, r.price]));
+    if (rpMap['光速云 · 轻量版'] !== 15) resetPass = false;
+    if (rpMap['光速云 · 极速版'] !== 23) resetPass = false;
+    if (rpMap['光速云 · 流光版'] !== 34) resetPass = false;
+    if (rpMap['光速云 · 量子版'] !== 68) resetPass = false;
+    if (rpMap['光速云 · 无界版'] !== 130) resetPass = false;
+    if (rpMap['光速云 · 不限时套餐'] !== 147) resetPass = false;
+    if (rpMap['光速云 · 定制套餐'] !== 680) resetPass = false;
+  } else { resetPass = false; }
+  
+  if (resetPass) console.log('GUANGSU RESET PACKAGES: PASS');
+  else { console.error('ERROR: GUANGSU RESET PACKAGES failed'); gsErrors++; errors++; }
+
+  let linesPass = true;
+  guangsuBrand.pricing.forEach(p => {
+    if (p.name === '光速云 · 极速版' && p.lineType !== 'IPLC') linesPass = false;
+    if (p.name === '光速云 · 流光版' && p.lineType !== 'IPLC') linesPass = false;
+    if (p.name === '光速云 · 量子版' && p.lineType !== 'IPLC') linesPass = false;
+    if (p.name === '光速云 · 无界版' && p.lineType !== 'IPLC') linesPass = false;
+    if (p.name === '光速云 · 定制套餐' && p.lineType !== 'IPLC') linesPass = false;
+  });
+  if (linesPass) console.log('GUANGSU PLAN LINE TYPES: PASS');
+  else { console.error('ERROR: GUANGSU PLAN LINE TYPES failed'); gsErrors++; errors++; }
+
+  if (gsErrors === 0) console.log('GUANGSU COUPON CONSISTENCY: PASS');
+}
+console.log('------------------------------------');
+
 console.log(`BITZNET VERIFIED COUPON: ${bitznetNew9Count > 0 ? 'PASS' : 'FAIL'}`);
 console.log(`NEW9 ELIGIBLE PRICING: ${bitznetNew9Count}/15`);
 console.log(`INVALID VERIFIED PLAN REFERENCES: ${invalidVerifiedPlans}`);
