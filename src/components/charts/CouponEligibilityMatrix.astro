@@ -47,7 +47,7 @@ const couponCode = standardCoupon.code || "优惠码";
             {entries.some(p => p.couponStatus === 'unverified') && (
               <div class="text-[10px] text-slate-500 text-center leading-tight mt-1 border-t border-slate-700 pt-1">
                 <span class="text-yellow-500/80 mr-1">?</span>
-                {entries.filter(p => p.couponStatus === 'unverified').map(p => p.period).join('/')}：未验证
+                {entries.filter(p => p.couponStatus === 'unverified').map(p => p.period).join('/')}：未确认
               </div>
             )}
           </div>
@@ -55,7 +55,7 @@ const couponCode = standardCoupon.code || "优惠码";
           <div class="flex flex-col items-center">
             {entries.every(p => p.couponStatus === 'unverified') ? (
               <div class="inline-flex items-center text-yellow-500/80 text-xs font-bold bg-yellow-900/30 px-2 py-1 rounded-full border border-yellow-700/50">
-                ? 未验证
+                ? 未确认
               </div>
             ) : (
               <div class="inline-flex items-center text-slate-400 text-xs font-bold bg-slate-800 px-2 py-1 rounded-full border border-slate-600">

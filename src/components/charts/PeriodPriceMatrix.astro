@@ -126,7 +126,7 @@ const plans = planNames.map(planName => {
                   <div class="show-if-temp-active">
                     {row.couponStatus === 'unverified' ? (
                       <span class="text-xs font-bold px-2 py-1 rounded border whitespace-nowrap text-yellow-500/80 bg-yellow-900/30 border-yellow-700/50">
-                        {row.coupon ? row.coupon.code + ' ' : ''}状态：未验证
+                        {row.coupon ? row.coupon.code + ' ' : ''}状态：未确认
                       </span>
                     ) : row.coupon ? (
                       <span class={`text-xs font-bold px-2 py-1 rounded border whitespace-nowrap ${row.coupon.type === 'temporary' ? 'text-brand-neon bg-brand-neon/10 border-brand-neon/20' : 'text-brand-accent bg-brand-accent/10 border-brand-accent/20'}`}>
@@ -139,7 +139,7 @@ const plans = planNames.map(planName => {
                   <div class="show-if-temp-expired">
                     {row.couponStatus === 'unverified' ? (
                       <span class="text-xs font-bold px-2 py-1 rounded border whitespace-nowrap text-yellow-500/80 bg-yellow-900/30 border-yellow-700/50">
-                        {row.stdCoupon ? row.stdCoupon.code + ' ' : (brand.coupon ? brand.coupon.code + ' ' : '')}状态：未验证
+                        {row.stdCoupon ? row.stdCoupon.code + ' ' : (brand.coupon ? brand.coupon.code + ' ' : '')}状态：未确认
                       </span>
                     ) : row.stdCoupon ? (
                       <span class={`text-xs font-bold px-2 py-1 rounded border whitespace-nowrap text-brand-accent bg-brand-accent/10 border-brand-accent/20`}>
