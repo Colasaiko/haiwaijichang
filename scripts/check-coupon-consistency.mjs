@@ -1056,9 +1056,9 @@ if (guangsuBrand) {
         excCount++;
     }
   });
-  console.log(`GUANGSU AMM ELIGIBLE: ${eligibleCount}/25`);
-  console.log(`GUANGSU AMM EXCLUDED: ${excCount}/2`);
-  if (eligibleCount !== 25 || excCount !== 2) { gsErrors++; errors++; }
+  console.log(`GUANGSU AMM ELIGIBLE: ${eligibleCount}/24`);
+  console.log(`GUANGSU AMM EXCLUDED: ${excCount}/3`);
+  if (eligibleCount !== 24 || excCount !== 3) { gsErrors++; errors++; }
 
   function checkGsDisc(name, period, original, expected) {
     const p = guangsuBrand.pricing.find(x => x.name === name && x.period === period);
@@ -1072,7 +1072,7 @@ if (guangsuBrand) {
   if (getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 极速版' && x.period === '月付'))?.code === 'AMM' &&
       getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 极速版' && x.period === '三年付'))?.code === 'AMM' &&
       getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 无界版' && x.period === '三年付'))?.code === 'AMM' &&
-      getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 定制套餐' && x.period === '月付'))?.code === 'AMM' &&
+      
       getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 轻量版' && x.period === '年付')) === null &&
       getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 不限时套餐' && x.period === '一次性')) === null) {
       console.log('GUANGSU ALL-PERIOD COUPON RULE: PASS');
@@ -1080,10 +1080,10 @@ if (guangsuBrand) {
       console.error('ERROR: GUANGSU ALL-PERIOD COUPON RULE failed'); gsErrors++; errors++;
   }
 
-  if (checkGsDisc('光速云 · 定制套餐', '月付', 680, 544.00)) {
-      console.log('GUANGSU CUSTOM PLAN DISCOUNT: PASS');
+  if (getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 定制套餐' && x.period === '月付')) === null) {
+      console.log('GUANGSU CUSTOM PLAN COUPON EXCLUDED: PASS');
   } else {
-      console.error('ERROR: GUANGSU CUSTOM PLAN DISCOUNT failed'); gsErrors++; errors++;
+      console.error('ERROR: GUANGSU CUSTOM PLAN COUPON EXCLUDED failed'); gsErrors++; errors++;
   }
   
   if (integrityPass) console.log('GUANGSU PRICE INTEGRITY: PASS');
