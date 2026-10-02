@@ -1709,13 +1709,17 @@ if (edgeBrand) {
   if (edgeExcluded === 1) console.log('EDGE EXCLUDED 1/1');
   else { console.error(`ERROR: EDGE excluded is ${edgeExcluded}`); edgeErrors++; errors++; }
 
-  function testEdgeCalc(plan, period, orig, expected, checkDate) {
+  function testEdgeCalc(plan, period, orig, expected, checkDate, expectedCode = null) {
     const p = edgeBrand.pricing.find(x => x.name === plan && x.period === period);
     const cObj = getBestCouponForPricing(edgeBrand, p, checkDate);
     if (expected === null) {
       return cObj === null;
     }
     if (!cObj) return false;
+    if (expectedCode && cObj.code !== expectedCode) {
+      console.error(`ERROR: EDGE Expected coupon ${expectedCode} for ${plan} ${period}, got ${cObj.code}`);
+      return false;
+    }
     const mult = getDiscountMultiplier(cObj);
     const calc = parseFloat((orig * mult).toFixed(2));
     return calc === expected;
@@ -1738,7 +1742,8 @@ if (edgeBrand) {
   if (!testEdgeCalc('极界·标准套餐', '月付', 22, 18.70, duringEvent)) pricePass = false;
   if (!testEdgeCalc('极界·标准套餐', '半年付', 118, 94.40, duringEvent)) pricePass = false;
   if (!testEdgeCalc('限时年付', '年付', 98, 78.40, duringEvent)) pricePass = false;
-  if (!testEdgeCalc('永久不限时100G', '一次性', 100, 80.00, duringEvent)) pricePass = false;
+  if (!testEdgeCalc('永久不限时100G', '一次性', 100, 80.00, duringEvent, 'EG815')) pricePass = false;
+  if (!testEdgeCalc('永久不限时450G', '一次性', 399, 319.20, duringEvent, 'EG815')) pricePass = false;
   if (!testEdgeCalc('限时体验月付小包', '月付', 15, null, duringEvent)) pricePass = false;
   
   if (!pricePass) {
