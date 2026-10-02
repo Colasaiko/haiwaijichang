@@ -1673,6 +1673,6 @@ if (ermaoBrand) {
   
   if (emErrors === 0) console.log('ERMAO COUPON CONSISTENCY: PASS');
 }
-console.log('COUPON CONSISTENCY: PASS');
+if (errors === 0) console.log('COUPON CONSISTENCY: PASS');
 console.log('CONTRADICTIONS: ' + errors);
 if (errors > 0) process.exit(1);
