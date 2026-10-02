@@ -1137,10 +1137,19 @@ if (u1s1Brand) {
   }
 
   let integrityPass = true;
-  if (u1s1Brand.pricing.find(x => x.name === 'u1s1 · 你以为用不到包' && x.period === '两年付')?.originalPrice !== '¥568.00') integrityPass = false;
-  if (u1s1Brand.pricing.find(x => x.name === 'u1s1 · 瘾大就拉满包' && x.period === '两年付')?.originalPrice !== '¥1920.00') integrityPass = false;
-  if (u1s1Brand.pricing.find(x => x.name === 'u1s1 · 我全都要包' && x.period === '三年付')?.originalPrice !== '¥3888.00') integrityPass = false;
-  if (u1s1Brand.pricing.find(x => x.name === 'u1s1 · 定制包' && x.period === '月付')?.originalPrice !== '¥600.00') integrityPass = false;
+  const uPricingMap = {
+    'u1s1 · 就是好用包': { '年付': '¥96.00', '两年付': '¥180.00', '三年付': '¥270.00' },
+    'u1s1 · 普通人真够了包': { '月付': '¥20.00', '季付': '¥54.00', '半年付': '¥102.00', '年付': '¥192.00', '两年付': '¥336.00', '三年付': '¥432.00' },
+    'u1s1 · 你以为用不到包': { '月付': '¥40.00', '季付': '¥108.00', '半年付': '¥204.00', '年付': '¥384.00', '两年付': '¥568.00', '三年付': '¥864.00' },
+    'u1s1 · 瘾大就拉满包': { '月付': '¥100.00', '季付': '¥270.00', '半年付': '¥510.00', '年付': '¥960.00', '两年付': '¥1920.00', '三年付': '¥2160.00' },
+    'u1s1 · 我全都要包': { '月付': '¥180.00', '季付': '¥486.00', '半年付': '¥918.00', '年付': '¥1728.00', '两年付': '¥3024.00', '三年付': '¥3888.00' },
+    'u1s1 · 定制包': { '月付': '¥600.00' }
+  };
+  u1s1Brand.pricing.forEach(p => {
+    if (!uPricingMap[p.name] || uPricingMap[p.name][p.period] !== p.originalPrice) {
+      integrityPass = false;
+    }
+  });
 
   if (integrityPass) console.log('U1S1 PRICE INTEGRITY: PASS');
   else { console.error('ERROR: U1S1 PRICE INTEGRITY failed'); uErrors++; errors++; }
@@ -1190,7 +1199,11 @@ if (u1s1Brand) {
       checkUDisc('u1s1 · 你以为用不到包', '月付', uDateActive, 40, 32.00) &&
       checkUDisc('u1s1 · 瘾大就拉满包', '月付', uDateActive, 100, 80.00) &&
       checkUDisc('u1s1 · 我全都要包', '月付', uDateActive, 180, 144.00) &&
-      checkUDisc('u1s1 · 定制包', '月付', uDateActive, 600, 480.00)) {
+      checkUDisc('u1s1 · 定制包', '月付', uDateActive, 600, 480.00) &&
+      getBestCouponForPricing(u1s1Brand, u1s1Brand.pricing.find(x => x.name === 'u1s1 · 就是好用包' && x.period === '年付'), uDateActive) === null &&
+      getBestCouponForPricing(u1s1Brand, u1s1Brand.pricing.find(x => x.name === 'u1s1 · 就是好用包' && x.period === '两年付'), uDateActive) === null &&
+      getBestCouponForPricing(u1s1Brand, u1s1Brand.pricing.find(x => x.name === 'u1s1 · 就是好用包' && x.period === '三年付'), uDateActive) === null &&
+      checkUDisc('u1s1 · 你以为用不到包', '两年付', uDateActive, 568, 454.40)) {
       console.log('U1S1 DISCOUNT CALCULATION: PASS');
   } else {
       console.error('ERROR: U1S1 DISCOUNT CALCULATION failed'); uErrors++; errors++;
@@ -1212,6 +1225,8 @@ if (u1s1Brand) {
   if (uErrors === 0) console.log('U1S1 COUPON CONSISTENCY: PASS');
 }
 console.log('------------------------------------');
+
+;
 
 console.log(`BITZNET VERIFIED COUPON: ${bitznetNew9Count > 0 ? 'PASS' : 'FAIL'}`);
 console.log(`NEW9 ELIGIBLE PRICING: ${bitznetNew9Count}/15`);
