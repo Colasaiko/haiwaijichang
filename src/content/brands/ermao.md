@@ -31,7 +31,7 @@ features:
   - "智能路由解析"
   - "全节点支持流媒体/ChatGPT解锁"
 nodeCoverage:
-  total: "45"
+  total: "60+"
   counts:
     香港: 20
     台湾: 5
