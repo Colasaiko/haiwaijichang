@@ -15,7 +15,7 @@ maxBandwidth: "不限速"
 ipType: "未特别标明"
 deviceLimit: "不限制同时在线设备"
 customerSupport: "工单支持"
-trafficReset: "常规套餐每30天重置；不限时包长期有效不重置"
+trafficReset: "不限时包长期有效，不自动重置；常规套餐刷新规则以当前官方后台为准"
 clientSupport: "官方自研客户端（目前不开放第三方通用订阅）"
 streamingSupport:
   - "主流流媒体"
