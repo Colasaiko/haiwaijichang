@@ -95,23 +95,6 @@ temporaryCoupons:
         periods:
           - 一次性
 visualData:
-  resetPackages:
-    - plan: 限时年付
-      price: 10
-    - plan: 极界·标准套餐
-      price: 20
-    - plan: 极界·专享套餐
-      price: 30
-    - plan: 极界·进阶套餐
-      price: 44
-    - plan: 极界·高级套餐
-      price: 90
-    - plan: 极界·极限套餐
-      price: 190
-    - plan: 永久不限时100G
-      price: 90
-    - plan: 永久不限时450G
-      price: 360
   traffic:
     - label: 限时体验月付小包
       plan: 限时体验月付小包
@@ -406,6 +389,23 @@ pricing:
     traffic: 450GB固定总量
     period: 一次性
     price: ¥399.00
+resetPackages:
+  - plan: 限时年付
+    price: 10
+  - plan: 极界·标准套餐
+    price: 20
+  - plan: 极界·专享套餐
+    price: 30
+  - plan: 极界·进阶套餐
+    price: 44
+  - plan: 极界·高级套餐
+    price: 90
+  - plan: 极界·极限套餐
+    price: 190
+  - plan: 永久不限时100G
+    price: 90
+  - plan: 永久不限时450G
+    price: 360
 ---
 
 EdgeNova（边缘节点）是一家主打全 IPLC 专线的优质服务商，官方提供最高 2.5Gbps 峰值带宽。
