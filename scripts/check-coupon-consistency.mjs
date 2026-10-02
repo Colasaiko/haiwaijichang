@@ -1147,13 +1147,13 @@ if (guangsuBrand) {
       if (!c) excCount++;
     }
   });
-  console.log(`GUANGSU AMM VERIFIED MONTHLY: ${verifiedCount}/4`);
-  console.log(`GUANGSU AMM UNVERIFIED PERIODS: ${unverifiedCount}/20`);
+  console.log(`GUANGSU AMM VERIFIED: ${verifiedCount}/16`);
+  console.log(`GUANGSU AMM UNVERIFIED: ${unverifiedCount}/8`);
   console.log(`GUANGSU AMM EXCLUDED: ${excCount}/3`);
-  if (verifiedCount !== 4 || unverifiedCount !== 20 || excCount !== 3) { gsErrors++; errors++; }
+  if (verifiedCount !== 16 || unverifiedCount !== 8 || excCount !== 3) { gsErrors++; errors++; }
 
-  function checkGsDisc(name, original, expected) {
-    const p = guangsuBrand.pricing.find(x => x.name === name && x.period === '月付');
+  function checkGsDisc(name, period, original, expected) {
+    const p = guangsuBrand.pricing.find(x => x.name === name && x.period === period);
     const c = getBestCouponForPricing(guangsuBrand, p);
     if (!c) return false;
     let mult = 1;
@@ -1161,24 +1161,16 @@ if (guangsuBrand) {
     return parseFloat((original * mult).toFixed(2)) === expected;
   }
   
-  if (checkGsDisc('光速云 · 极速版', 23, 18.40) &&
-      checkGsDisc('光速云 · 流光版', 34, 27.20) &&
-      checkGsDisc('光速云 · 量子版', 68, 54.40) &&
-      checkGsDisc('光速云 · 无界版', 138, 110.40)) {
-      console.log('GUANGSU VERIFIED MONTHLY DISCOUNTS: PASS');
+  if (checkGsDisc('光速云 · 极速版', '月付', 23, 18.40) &&
+      checkGsDisc('光速云 · 极速版', '季付', 64, 51.20) &&
+      checkGsDisc('光速云 · 极速版', '半年付', 84, 67.20) &&
+      checkGsDisc('光速云 · 极速版', '年付', 149, 119.20) &&
+      checkGsDisc('光速云 · 流光版', '年付', 249, 199.20) &&
+      checkGsDisc('光速云 · 量子版', '年付', 667, 533.60) &&
+      checkGsDisc('光速云 · 无界版', '年付', 1248, 998.40)) {
+      console.log('GUANGSU VERIFIED DISCOUNTS: PASS');
   } else {
-      console.error('ERROR: GUANGSU VERIFIED MONTHLY DISCOUNTS failed'); gsErrors++; errors++;
-  }
-
-  const pLight = guangsuBrand.pricing.find(x => x.name === '光速云 · 轻量版');
-  const pUnlim = guangsuBrand.pricing.find(x => x.name === '光速云 · 不限时套餐');
-  const pCustom = guangsuBrand.pricing.find(x => x.name === '光速云 · 定制套餐');
-  if (!getBestCouponForPricing(guangsuBrand, pLight) && 
-      !getBestCouponForPricing(guangsuBrand, pUnlim) &&
-      !getBestCouponForPricing(guangsuBrand, pCustom)) {
-      console.log('GUANGSU EXCLUSION STABILITY: PASS');
-  } else {
-      console.error('ERROR: GUANGSU EXCLUSION STABILITY failed'); gsErrors++; errors++;
+      console.error('ERROR: GUANGSU VERIFIED DISCOUNTS failed'); gsErrors++; errors++;
   }
 
   let resetPass = true;
