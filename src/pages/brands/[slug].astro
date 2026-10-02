@@ -415,11 +415,11 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
                       const getDisc = (c) => {
                         if (!c) return null;
                         if (p.discountPrice && c.type !== 'temporary') return p.discountPrice;
-                        const origMatch = basePrice.match(/\d+(\.\d+)?/);
+                        const origMatch = String(basePrice).match(/\d+(\.\d+)?/);
                         if (origMatch) {
                           const val = parseFloat(origMatch[0]);
                           const mult = getDiscountMultiplier(c);
-                          const prefix = basePrice.includes('¥') ? '¥' : '';
+                          const prefix = String(basePrice).includes('¥') ? '¥' : '';
                           return prefix + (val * mult).toFixed(2).replace(/\.00$/, '');
                         }
                         return null;
