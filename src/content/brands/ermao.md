@@ -2,7 +2,10 @@
 name: "二猫云"
 slug: "ermao"
 order: 21
-affiliateUrl: "https://waaa.2maoyunaff.cc/#/?code=c842udvC"
+purchase:
+  label: "快速购买"
+  url: "https://waaa.2maoyunaff.cc/#/?code=c842udvC"
+  cloaked: true
 seoTitle: "二猫云怎么样？IEPL专线原生IP、套餐价格与最新优惠码测评"
 seoDescription: "为您整理二猫云2026年最新套餐价格、单节点2.5Gbps峰值带宽、全IEPL专线、解锁Netflix与ChatGPT等流媒体详情，以及ermao888常驻85折与双节zqj80优惠码信息。"
 h1: "二猫云怎么样？IEPL专线、套餐价格与优惠码"
@@ -37,6 +40,8 @@ nodeCoverage:
 coupon:
   code: "ermao888"
   discountPercent: "15%"
+  discount: "85折"
+  scope: "年付小包 + 白猫/橘猫/牛奶猫/黑猫全部周期"
   label: "全场 85折"
   description: "适用于二猫年付小包及白猫、橘猫、牛奶猫、黑猫的全部现有周期。不适用于不限时包及定制套餐。"
   excludedPlans:
@@ -46,6 +51,8 @@ coupon:
 temporaryCoupons:
   - code: "zqj80"
     discountPercent: "20%"
+    discount: "8折"
+    scope: "白猫/橘猫/牛奶猫/黑猫年付、两年付、三年付"
     label: "双节长周期 8折"
     expiresAt: "2026-10-10T23:59:59+08:00"
     manualActive: true
@@ -72,17 +79,17 @@ resetPackages:
     price: 146
 pricing:
   - name: "二猫年付小包"
-    traffic: "按说明"
+    traffic: "60GB/月"
     period: "年付"
     originalPrice: "¥96.00"
     couponEligible: true
   - name: "二猫年付小包"
-    traffic: "按说明"
+    traffic: "60GB/月"
     period: "两年付"
     originalPrice: "¥175.00"
     couponEligible: true
   - name: "二猫年付小包"
-    traffic: "按说明"
+    traffic: "60GB/月"
     period: "三年付"
     originalPrice: "¥265.00"
     couponEligible: true
@@ -222,48 +229,110 @@ pricing:
     originalPrice: "¥700.00"
     couponEligible: false
 visualData:
-  monthlyTrafficVolume:
-    - plan: "白猫"
-      traffic: 130
-    - plan: "橘猫"
-      traffic: 230
-    - plan: "牛奶猫"
-      traffic: 430
-    - plan: "黑猫"
-      traffic: 850
+  traffic:
+    - label: "白猫"
+      plan: "白猫"
+      value: 130
+      display: "130GB"
+    - label: "橘猫"
+      plan: "橘猫"
+      value: 230
+      display: "230GB"
+    - label: "牛奶猫"
+      plan: "牛奶猫"
+      value: 430
+      display: "430GB"
+    - label: "黑猫"
+      plan: "黑猫"
+      value: 850
+      display: "850GB"
   periodPrices:
     "二猫年付小包":
       - period: 年付
         months: 12
         price: 96
+      - period: 两年付
+        months: 24
+        price: 175
+      - period: 三年付
+        months: 36
+        price: 265
     "白猫":
       - period: 月付
         months: 1
         price: 20
+      - period: 季付
+        months: 3
+        price: 57
+      - period: 半年付
+        months: 6
+        price: 108
       - period: 年付
         months: 12
         price: 204
+      - period: 两年付
+        months: 24
+        price: 384
+      - period: 三年付
+        months: 36
+        price: 504
     "橘猫":
       - period: 月付
         months: 1
         price: 40
+      - period: 季付
+        months: 3
+        price: 114
+      - period: 半年付
+        months: 6
+        price: 216
       - period: 年付
         months: 12
         price: 408
+      - period: 两年付
+        months: 24
+        price: 768
+      - period: 三年付
+        months: 36
+        price: 1008
     "牛奶猫":
       - period: 月付
         months: 1
         price: 80
+      - period: 季付
+        months: 3
+        price: 228
+      - period: 半年付
+        months: 6
+        price: 432
       - period: 年付
         months: 12
         price: 816
+      - period: 两年付
+        months: 24
+        price: 1536
+      - period: 三年付
+        months: 36
+        price: 2016
     "黑猫":
       - period: 月付
         months: 1
         price: 160
+      - period: 季付
+        months: 3
+        price: 456
+      - period: 半年付
+        months: 6
+        price: 864
       - period: 年付
         months: 12
         price: 1632
+      - period: 两年付
+        months: 24
+        price: 3072
+      - period: 三年付
+        months: 36
+        price: 4032
   couponEligibility:
     - plan: "二猫年付小包"
       label: "年付小包"
