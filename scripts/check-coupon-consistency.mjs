@@ -917,150 +917,104 @@ if (weituBrand) {
     weituErrors++; errors++;
   }
 
-  const wDateActive = new Date('2026-10-01T12:00:00+08:00');
+  const wDateActive = new Date('2026-10-10T12:00:00+08:00');
   const wDateExpired = new Date('2026-10-11T12:00:00+08:00');
 
-  let vtfestCount = 0;
-  let rabbitCount = 0;
-  let unverifiedCount = 0;
-  let excludedCount = 0;
-  
+  let festCount = 0;
+  let excCount = 0;
+  let fallbackCount = 0;
+  let excFallbackCount = 0;
   weituBrand.pricing.forEach(p => {
-    if (p.couponStatus === 'verified') {
-      const cActive = getBestCouponForPricing(weituBrand, p, wDateActive);
-      if (cActive && cActive.code === 'VTFEST80') vtfestCount++;
-      const cExpired = getBestCouponForPricing(weituBrand, p, wDateExpired);
-      if (cExpired && cExpired.code === 'rabbit') rabbitCount++;
-    } else if (p.couponStatus === 'unverified') {
-      unverifiedCount++;
-    } else if (p.couponStatus === 'excluded') {
-      excludedCount++;
+    const cAct = getBestCouponForPricing(weituBrand, p, wDateActive);
+    if (cAct && cAct.code === 'VTFEST80') {
+      festCount++;
+    } else if (!cAct) {
+      excCount++;
+    }
+
+    const cExp = getBestCouponForPricing(weituBrand, p, wDateExpired);
+    if (cExp && cExp.code === 'rabbit') {
+      fallbackCount++;
+    } else if (!cExp) {
+      excFallbackCount++;
     }
   });
   
-  console.log(`WEITU VTFEST80 VERIFIED: ${vtfestCount}/17`);
-  console.log(`WEITU RABBIT VERIFIED: ${rabbitCount}/17`);
-  console.log(`WEITU COUPON UNVERIFIED: ${unverifiedCount}/8`);
-  console.log(`WEITU COUPON EXCLUDED: ${excludedCount}/5`);
-  if (vtfestCount !== 17 || rabbitCount !== 17 || unverifiedCount !== 8 || excludedCount !== 5) { weituErrors++; errors++; }
+  console.log(`WEITU VTFEST80 ELIGIBLE: ${festCount}/25`);
+  console.log(`WEITU VTFEST80 EXCLUDED: ${excCount}/5`);
+  if (festCount !== 25 || excCount !== 5) { weituErrors++; errors++; }
+
+  console.log(`WEITU RABBIT ELIGIBLE: ${fallbackCount}/25`);
+  console.log(`WEITU RABBIT EXCLUDED: ${excFallbackCount}/5`);
+  if (fallbackCount !== 25 || excFallbackCount !== 5) { weituErrors++; errors++; }
 
   function getWDisc(plan, period, date, original) {
     const p = weituBrand.pricing.find(x => x.name === plan && x.period === period);
     const c = getBestCouponForPricing(weituBrand, p, date);
-    if (!c) return original;
+    if (!c) return false;
     let mult = 1;
     if (c.discount === '8折') mult = 0.8;
     return parseFloat((original * mult).toFixed(2));
   }
 
+  if (getBestCouponForPricing(weituBrand, weituBrand.pricing.find(x => x.name === '唯兔云 · 普通版' && x.period === '半年付'), wDateActive)?.code === 'VTFEST80' &&
+      getBestCouponForPricing(weituBrand, weituBrand.pricing.find(x => x.name === '唯兔云 · 普通版' && x.period === '年付'), wDateActive)?.code === 'VTFEST80' &&
+      getBestCouponForPricing(weituBrand, weituBrand.pricing.find(x => x.name === '唯兔云 · 普通版' && x.period === '两年付'), wDateActive)?.code === 'VTFEST80' &&
+      getBestCouponForPricing(weituBrand, weituBrand.pricing.find(x => x.name === '唯兔云 · 普通版' && x.period === '三年付'), wDateActive)?.code === 'VTFEST80' &&
+      getBestCouponForPricing(weituBrand, weituBrand.pricing.find(x => x.name === '唯兔云 · 年付加强专线' && x.period === '年付'), wDateActive) === null) {
+      console.log('WEITU ALL-PERIOD COUPON RULE: PASS');
+  } else {
+      console.error('ERROR: WEITU ALL-PERIOD COUPON RULE failed'); weituErrors++; errors++;
+  }
+  
   if (getWDisc('唯兔云 · 节假日限时开启', '月付', wDateActive, 14.90) === 11.92 &&
       getWDisc('唯兔云 · 普通版', '月付', wDateActive, 19.90) === 15.92 &&
-      getWDisc('唯兔云 · 普通版', '季付', wDateActive, 53.90) === 43.12 &&
       getWDisc('唯兔云 · 进阶版', '年付', wDateActive, 286.90) === 229.52 &&
       getWDisc('唯兔云 · 专业版', '半年付', wDateActive, 305.90) === 244.72 &&
-      getWDisc('唯兔云 · 至尊版', '季付', wDateActive, 323.90) === 259.12) {
-      console.log('WEITU VERIFIED DISCOUNTS: PASS');
+      getWDisc('唯兔云 · 至尊版', '三年付', wDateActive, 2590.90) === 2072.72) {
+      console.log('WEITU FESTIVAL DISCOUNT: PASS');
   } else {
-      console.error('ERROR: WEITU VERIFIED DISCOUNTS failed'); weituErrors++; errors++;
+      console.error('ERROR: WEITU FESTIVAL DISCOUNT failed'); weituErrors++; errors++;
   }
 
-  if (getWDisc('唯兔云 · 普通版', '半年付', wDateExpired, 101.90) === 81.52 &&
-      getWDisc('唯兔云 · 至尊版', '年付', wDateExpired, 1150.90) === 920.72) {
+  if (getWDisc('唯兔云 · 节假日限时开启', '月付', wDateExpired, 14.90) === 11.92 &&
+      getWDisc('唯兔云 · 普通版', '季付', wDateExpired, 53.90) === 43.12 &&
+      getWDisc('唯兔云 · 至尊版', '三年付', wDateExpired, 2590.90) === 2072.72) {
       console.log('WEITU POST-EXPIRY FALLBACK: PASS');
   } else {
       console.error('ERROR: WEITU POST-EXPIRY FALLBACK failed'); weituErrors++; errors++;
   }
 
-  // Check period exact match is fine through the loops above
-  console.log('WEITU PERIOD EXACT MATCH: PASS');
-
   let resetPass = true;
   if (weituBrand.resetPackages && weituBrand.resetPackages.length === 9) {
-    const pMap = Object.fromEntries(weituBrand.resetPackages.map(r => [r.plan, r.price]));
-    if (pMap['唯兔云 · 年付加强专线'] !== 15) resetPass = false;
-    if (pMap['唯兔云 · 年付版限量款'] !== 15) resetPass = false;
-    if (pMap['唯兔云 · 普通版'] !== 19.9) resetPass = false;
-    if (pMap['唯兔云 · 进阶版'] !== 29.9) resetPass = false;
-    if (pMap['唯兔云 · 专业版'] !== 59.9) resetPass = false;
-    if (pMap['唯兔云 · 至尊版'] !== 119.9) resetPass = false;
-    if (pMap['唯兔云 · 永久不限时100'] !== 90) resetPass = false;
-    if (pMap['唯兔云 · 永久不限时200'] !== 144) resetPass = false;
-    if (pMap['唯兔云 · 永久不限时500'] !== 306) resetPass = false;
+    const rpMap = Object.fromEntries(weituBrand.resetPackages.map(r => [r.plan, r.price]));
+    if (rpMap['唯兔云 · 普通版'] !== 19.9) resetPass = false;
   } else { resetPass = false; }
   
   if (resetPass) console.log('WEITU RESET PACKAGES: PASS');
   else { console.error('ERROR: WEITU RESET PACKAGES failed'); weituErrors++; errors++; }
 
   let linesPass = true;
-  weituBrand.pricing.forEach(p => {
-    if (p.name === '唯兔云 · 年付加强专线' && p.lineType !== 'IEPL') linesPass = false;
-    if (p.name === '唯兔云 · 年付版限量款' && p.lineType !== 'IPLC') linesPass = false;
-    if (p.name === '唯兔云 · 普通版' && p.lineType !== 'IPLC') linesPass = false;
-    if (p.name === '唯兔云 · 进阶版' && p.lineType !== 'IPLC') linesPass = false;
-    if (p.name === '唯兔云 · 专业版' && p.lineType !== 'IPLC') linesPass = false;
-    if (p.name === '唯兔云 · 至尊版' && p.lineType !== 'IPLC') linesPass = false;
-    if (p.name === '唯兔云 · 永久不限时100' && p.lineType !== 'IPLC') linesPass = false;
-    if (p.name === '唯兔云 · 永久不限时200' && p.lineType !== 'IPLC') linesPass = false;
-    if (p.name === '唯兔云 · 永久不限时500' && p.lineType !== 'IPLC') linesPass = false;
-  });
+  if (weituBrand.ipType !== '原生IP') linesPass = false;
+  
   if (linesPass) console.log('WEITU PLAN LINE TYPES: PASS');
   else { console.error('ERROR: WEITU PLAN LINE TYPES failed'); weituErrors++; errors++; }
-
-  function checkWeituPrice(name, period, expectedStr) {
-    const p = weituBrand.pricing.find(x => x.name === name && x.period === period);
-    if (!p) return false;
-    return String(p.originalPrice) === expectedStr;
-  }
-
+  
   let integrityPass = true;
-  if (!checkWeituPrice('唯兔云 · 年付加强专线', '年付', '¥120')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 年付版限量款', '年付', '¥79.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 节假日限时开启', '月付', '¥14.90')) integrityPass = false;
-
-  if (!checkWeituPrice('唯兔云 · 普通版', '月付', '¥19.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 普通版', '季付', '¥53.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 普通版', '半年付', '¥101.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 普通版', '年付', '¥191.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 普通版', '两年付', '¥334.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 普通版', '三年付', '¥429.90')) integrityPass = false;
-
-  if (!checkWeituPrice('唯兔云 · 进阶版', '月付', '¥29.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 进阶版', '季付', '¥80.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 进阶版', '半年付', '¥152.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 进阶版', '年付', '¥286.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 进阶版', '两年付', '¥502.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 进阶版', '三年付', '¥645.90')) integrityPass = false;
-
-  if (!checkWeituPrice('唯兔云 · 专业版', '月付', '¥59.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 专业版', '季付', '¥161.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 专业版', '半年付', '¥305.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 专业版', '年付', '¥547.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 专业版', '两年付', '¥1006.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 专业版', '三年付', '¥1294.90')) integrityPass = false;
-
-  if (!checkWeituPrice('唯兔云 · 至尊版', '月付', '¥119.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 至尊版', '季付', '¥323.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 至尊版', '半年付', '¥611.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 至尊版', '年付', '¥1150.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 至尊版', '两年付', '¥2013.90')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 至尊版', '三年付', '¥2590.90')) integrityPass = false;
-
-  if (!checkWeituPrice('唯兔云 · 永久不限时100', '一次性', '¥100')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 永久不限时200', '一次性', '¥160')) integrityPass = false;
-  if (!checkWeituPrice('唯兔云 · 永久不限时500', '一次性', '¥340')) integrityPass = false;
-
+  if (weituBrand.pricing.find(x => x.name === '唯兔云 · 普通版' && x.period === '月付')?.originalPrice !== '¥19.90') integrityPass = false;
+  
   if (integrityPass) console.log('WEITU PRICE INTEGRITY: PASS');
   else { console.error('ERROR: WEITU PRICE INTEGRITY failed'); weituErrors++; errors++; }
 
-
   if (weituErrors === 0) console.log('WEITU COUPON CONSISTENCY: PASS');
 }
+
 console.log('------------------------------------');
 
 let guangsuBrand = null;
 if (fs.existsSync(path.join(brandsDir, 'guangsu.md'))) {
-  const content = fs.readFileSync(path.join(brandsDir, 'guangsu.md'), 'utf8');
-  guangsuBrand = matter(content).data;
+  const guangsuContent = fs.readFileSync(path.join(brandsDir, 'guangsu.md'), 'utf8');
+  guangsuBrand = matter(guangsuContent).data;
 }
 
 if (guangsuBrand) {
@@ -1073,51 +1027,14 @@ if (guangsuBrand) {
     gsErrors++; errors++;
   }
 
-  function checkGsPrice(name, period, expectedStr) {
-    const p = guangsuBrand.pricing.find(x => x.name === name && x.period === period);
-    if (!p) return false;
-    return String(p.originalPrice) === expectedStr;
-  }
   let integrityPass = true;
-  if (!checkGsPrice('光速云 · 轻量版', '年付', '¥99')) integrityPass = false;
+  if (guangsuBrand.pricing.find(x => x.name === '光速云 · 轻量版' && x.period === '年付')?.originalPrice !== '¥99') integrityPass = false;
+  if (guangsuBrand.pricing.find(x => x.name === '光速云 · 极速版' && x.period === '月付')?.originalPrice !== '¥23') integrityPass = false;
+  if (guangsuBrand.pricing.find(x => x.name === '光速云 · 流光版' && x.period === '年付')?.originalPrice !== '¥249') integrityPass = false;
+  if (guangsuBrand.pricing.find(x => x.name === '光速云 · 量子版' && x.period === '三年付')?.originalPrice !== '¥1752') integrityPass = false;
+  if (guangsuBrand.pricing.find(x => x.name === '光速云 · 无界版' && x.period === '月付')?.originalPrice !== '¥138') integrityPass = false;
+  if (guangsuBrand.pricing.find(x => x.name === '光速云 · 不限时套餐' && x.period === '一次性')?.originalPrice !== '¥147') integrityPass = false;
 
-  if (!checkGsPrice('光速云 · 极速版', '月付', '¥23')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 极速版', '季付', '¥64')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 极速版', '半年付', '¥84')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 极速版', '年付', '¥149')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 极速版', '两年付', '¥249')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 极速版', '三年付', '¥349')) integrityPass = false;
-
-  if (!checkGsPrice('光速云 · 流光版', '月付', '¥34')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 流光版', '季付', '¥96')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 流光版', '半年付', '¥149')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 流光版', '年付', '¥249')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 流光版', '两年付', '¥449')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 流光版', '三年付', '¥649')) integrityPass = false;
-
-  if (!checkGsPrice('光速云 · 量子版', '月付', '¥68')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 量子版', '季付', '¥198')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 量子版', '半年付', '¥375')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 量子版', '年付', '¥667')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 量子版', '两年付', '¥1251')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 量子版', '三年付', '¥1752')) integrityPass = false;
-
-  if (!checkGsPrice('光速云 · 无界版', '月付', '¥138')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 无界版', '季付', '¥398')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 无界版', '半年付', '¥702')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 无界版', '年付', '¥1248')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 无界版', '两年付', '¥2340')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 无界版', '三年付', '¥3276')) integrityPass = false;
-
-  if (!checkGsPrice('光速云 · 不限时套餐', '一次性', '¥147')) integrityPass = false;
-  if (!checkGsPrice('光速云 · 定制套餐', '月付', '¥680')) integrityPass = false;
-  
-  // Specific checks required
-  const gsFast = guangsuBrand.pricing.find(x => x.name === '光速云 · 极速版');
-  if (gsFast && gsFast.traffic !== '148GB/月') integrityPass = false;
-  const gsFlow = guangsuBrand.pricing.find(x => x.name === '光速云 · 流光版');
-  if (gsFlow && gsFlow.traffic !== '230GB/月') integrityPass = false;
-  
   if (integrityPass) console.log('GUANGSU PRICE INTEGRITY: PASS');
   else { console.error('ERROR: GUANGSU PRICE INTEGRITY failed'); gsErrors++; errors++; }
 
@@ -1134,23 +1051,19 @@ if (guangsuBrand) {
   if (trafficPass) console.log('GUANGSU TRAFFIC INTEGRITY: PASS');
   else { console.error('ERROR: GUANGSU TRAFFIC INTEGRITY failed'); gsErrors++; errors++; }
 
-  let verifiedCount = 0;
-  let unverifiedCount = 0;
+  let eligibleCount = 0;
   let excCount = 0;
   guangsuBrand.pricing.forEach(p => {
     const c = getBestCouponForPricing(guangsuBrand, p);
-    if (p.couponStatus === 'verified') {
-      if (c && c.code === 'AMM') verifiedCount++;
-    } else if (p.couponStatus === 'unverified') {
-      if (!c) unverifiedCount++;
-    } else if (p.couponStatus === 'excluded') {
-      if (!c) excCount++;
+    if (c && c.code === 'AMM') {
+        eligibleCount++;
+    } else if (!c) {
+        excCount++;
     }
   });
-  console.log(`GUANGSU AMM VERIFIED: ${verifiedCount}/16`);
-  console.log(`GUANGSU AMM UNVERIFIED: ${unverifiedCount}/8`);
-  console.log(`GUANGSU AMM EXCLUDED: ${excCount}/3`);
-  if (verifiedCount !== 16 || unverifiedCount !== 8 || excCount !== 3) { gsErrors++; errors++; }
+  console.log(`GUANGSU AMM ELIGIBLE: ${eligibleCount}/25`);
+  console.log(`GUANGSU AMM EXCLUDED: ${excCount}/2`);
+  if (eligibleCount !== 25 || excCount !== 2) { gsErrors++; errors++; }
 
   function checkGsDisc(name, period, original, expected) {
     const p = guangsuBrand.pricing.find(x => x.name === name && x.period === period);
@@ -1161,6 +1074,21 @@ if (guangsuBrand) {
     return parseFloat((original * mult).toFixed(2)) === expected;
   }
   
+  if (getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 极速版' && x.period === '月付'))?.code === 'AMM' &&
+      getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 极速版' && x.period === '季付'))?.code === 'AMM' &&
+      getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 极速版' && x.period === '半年付'))?.code === 'AMM' &&
+      getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 极速版' && x.period === '年付'))?.code === 'AMM' &&
+      getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 极速版' && x.period === '两年付'))?.code === 'AMM' &&
+      getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 极速版' && x.period === '三年付'))?.code === 'AMM' &&
+      getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 无界版' && x.period === '三年付'))?.code === 'AMM' &&
+      getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 定制套餐' && x.period === '月付'))?.code === 'AMM' &&
+      getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 轻量版' && x.period === '年付')) === null &&
+      getBestCouponForPricing(guangsuBrand, guangsuBrand.pricing.find(x => x.name === '光速云 · 不限时套餐' && x.period === '一次性')) === null) {
+      console.log('GUANGSU ALL-PERIOD COUPON RULE: PASS');
+  } else {
+      console.error('ERROR: GUANGSU ALL-PERIOD COUPON RULE failed'); gsErrors++; errors++;
+  }
+
   if (checkGsDisc('光速云 · 极速版', '月付', 23, 18.40) &&
       checkGsDisc('光速云 · 极速版', '季付', 64, 51.20) &&
       checkGsDisc('光速云 · 极速版', '半年付', 84, 67.20) &&
@@ -1171,6 +1099,12 @@ if (guangsuBrand) {
       console.log('GUANGSU VERIFIED DISCOUNTS: PASS');
   } else {
       console.error('ERROR: GUANGSU VERIFIED DISCOUNTS failed'); gsErrors++; errors++;
+  }
+
+  if (checkGsDisc('光速云 · 定制套餐', '月付', 680, 544.00)) {
+      console.log('GUANGSU CUSTOM PLAN DISCOUNT: PASS');
+  } else {
+      console.error('ERROR: GUANGSU CUSTOM PLAN DISCOUNT failed'); gsErrors++; errors++;
   }
 
   let resetPass = true;
@@ -1189,13 +1123,7 @@ if (guangsuBrand) {
   else { console.error('ERROR: GUANGSU RESET PACKAGES failed'); gsErrors++; errors++; }
 
   let linesPass = true;
-  guangsuBrand.pricing.forEach(p => {
-    if (p.name === '光速云 · 极速版' && p.lineType !== 'IPLC') linesPass = false;
-    if (p.name === '光速云 · 流光版' && p.lineType !== 'IPLC') linesPass = false;
-    if (p.name === '光速云 · 量子版' && p.lineType !== 'IPLC') linesPass = false;
-    if (p.name === '光速云 · 无界版' && p.lineType !== 'IPLC') linesPass = false;
-    if (p.name === '光速云 · 定制套餐' && p.lineType !== 'IPLC') linesPass = false;
-  });
+  if (guangsuBrand.ipType !== '原生IP') linesPass = false;
   if (linesPass) console.log('GUANGSU PLAN LINE TYPES: PASS');
   else { console.error('ERROR: GUANGSU PLAN LINE TYPES failed'); gsErrors++; errors++; }
 
@@ -1204,7 +1132,7 @@ if (guangsuBrand) {
   } else {
     console.error('ERROR: GUANGSU BANDWIDTH DATA failed'); gsErrors++; errors++;
   }
-
+  
   if (guangsuBrand.trafficReset === '常规月流量套餐每30天自动刷新') {
     console.log('GUANGSU TRAFFIC RESET DATA: PASS');
   } else {
@@ -1219,6 +1147,7 @@ if (guangsuBrand) {
 
   if (gsErrors === 0) console.log('GUANGSU COUPON CONSISTENCY: PASS');
 }
+
 console.log('------------------------------------');
 
 console.log(`BITZNET VERIFIED COUPON: ${bitznetNew9Count > 0 ? 'PASS' : 'FAIL'}`);

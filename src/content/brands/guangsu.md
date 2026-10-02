@@ -61,12 +61,15 @@ coupon:
     - 光速云 · 流光版
     - 光速云 · 量子版
     - 光速云 · 无界版
+    - 光速云 · 定制套餐
   eligiblePeriods:
     - 月付
     - 季付
     - 半年付
     - 年付
-  scope: 四款常规主套餐月付至年付
+    - 两年付
+    - 三年付
+  scope: 拥有月付入口的周期套餐
 temporaryCoupons: []
 resetPackages:
   - plan: 光速云 · 轻量版
@@ -90,190 +93,163 @@ pricing:
     period: 年付
     originalPrice: ¥99
     couponEligible: false
-    couponStatus: excluded
   - name: 光速云 · 极速版
     traffic: 148GB/月
     period: 月付
     originalPrice: ¥23
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 极速版
     traffic: 148GB/月
     period: 季付
     originalPrice: ¥64
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 极速版
     traffic: 148GB/月
     period: 半年付
     originalPrice: ¥84
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 极速版
     traffic: 148GB/月
     period: 年付
     originalPrice: ¥149
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 极速版
     traffic: 148GB/月
     period: 两年付
     originalPrice: ¥249
     lineType: IPLC
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 光速云 · 极速版
     traffic: 148GB/月
     period: 三年付
     originalPrice: ¥349
     lineType: IPLC
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 光速云 · 流光版
     traffic: 230GB/月
     period: 月付
     originalPrice: ¥34
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 流光版
     traffic: 230GB/月
     period: 季付
     originalPrice: ¥96
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 流光版
     traffic: 230GB/月
     period: 半年付
     originalPrice: ¥149
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 流光版
     traffic: 230GB/月
     period: 年付
     originalPrice: ¥249
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 流光版
     traffic: 230GB/月
     period: 两年付
     originalPrice: ¥449
     lineType: IPLC
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 光速云 · 流光版
     traffic: 230GB/月
     period: 三年付
     originalPrice: ¥649
     lineType: IPLC
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 光速云 · 量子版
     traffic: 450GB/月
     period: 月付
     originalPrice: ¥68
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 量子版
     traffic: 450GB/月
     period: 季付
     originalPrice: ¥198
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 量子版
     traffic: 450GB/月
     period: 半年付
     originalPrice: ¥375
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 量子版
     traffic: 450GB/月
     period: 年付
     originalPrice: ¥667
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 量子版
     traffic: 450GB/月
     period: 两年付
     originalPrice: ¥1251
     lineType: IPLC
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 光速云 · 量子版
     traffic: 450GB/月
     period: 三年付
     originalPrice: ¥1752
     lineType: IPLC
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 光速云 · 无界版
     traffic: 900GB/月
     period: 月付
     originalPrice: ¥138
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 无界版
     traffic: 900GB/月
     period: 季付
     originalPrice: ¥398
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 无界版
     traffic: 900GB/月
     period: 半年付
     originalPrice: ¥702
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 无界版
     traffic: 900GB/月
     period: 年付
     originalPrice: ¥1248
     lineType: IPLC
     couponEligible: true
-    couponStatus: verified
   - name: 光速云 · 无界版
     traffic: 900GB/月
     period: 两年付
     originalPrice: ¥2340
     lineType: IPLC
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 光速云 · 无界版
     traffic: 900GB/月
     period: 三年付
     originalPrice: ¥3276
     lineType: IPLC
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 光速云 · 不限时套餐
     traffic: 347GB总量
     period: 一次性
     originalPrice: ¥147
     validity: 不限时（流量用完即止）
     couponEligible: false
-    couponStatus: excluded
   - name: 光速云 · 定制套餐
     traffic: 按需配置
     period: 月付
     originalPrice: ¥680
     lineType: IPLC
     ipType: 独享原生IP
-    couponEligible: false
-    couponStatus: excluded
+    couponEligible: true
 visualData:
   selectorMeta:
     光速云 · 轻量版:
@@ -458,8 +434,6 @@ visualData:
       plan: 光速云 · 定制套餐
       eligible: false
 ---
-
-
 ## 光速云是什么？
 
 光速云（本页特指基于 gsyaff 体系的分支）是一家提供海外网络加速服务的主题品牌。当前主套餐均标示接入全球 IPLC 专线，并拥有原生 IP 配置，官方页面更是标称单节点最高峰值带宽可达 2.5Gbps。除了支持常规的多端设备同时在线使用外，光速云更是在客户端方面发力，官方推荐用户优先下载使用其自研客户端 App。
@@ -522,32 +496,29 @@ visualData:
 
 1. 当前页面对应 gsyaff 体系光速云，不与其他同名服务混用。
 2. 当前没有已确认限时优惠。
-3. 新用户优惠码为 `AMM`，8折。
-4. `AMM` 属于新用户优惠，不写成永久全用户优惠。
-5. 当前已确认四款主套餐的月付、季付、半年付及年付均可使用 `AMM`。
-6. 轻量版不自动套 `AMM`。
-7. 不限时套餐不自动套 `AMM`。
-8. 定制套餐不自动套 `AMM`。
-9. 半年 9 折/年 8 折/两年 7.5 折/三年 7 折是套餐自身周期定价标签，不是 `AMM`。
-10. 不限时 347GB 不是无限流量。
-11. 347GB 套餐重置价以当前按钮 ¥147 为准，不使用页面中数学矛盾的 99% 说明。
-12. 无界月付 ¥138，但重置 ¥130。
-13. 定制套餐当前为 ¥680/月，流量和线路参数按需求配置。
-14. 2.5Gbps 为官方峰值参数，不代表持续实测速率。
-15. 第三方客户端兼容情况不要根据旧网络资料写死。
-16. 当前支付方式尚未通过本次结算页确认。
-17. 当前购买页面将相关套餐标示为特殊商品，并提示不支持退款；购买前应先核对套餐周期、流量和适用场景。
+3. 新用户优惠码为 AMM，8折。
+4. AMM 属于新用户优惠，不写成永久全用户优惠。
+5. 所有拥有月付入口的套餐各周期均可使用 AMM。
+6. 轻量版不自动套 AMM。
+7. 不限时套餐不自动套 AMM。
+8. 半年 9 折/年 8 折/两年 7.5 折/三年 7 折是套餐自身周期定价标签，不是 AMM。
+9. 不限时 347GB 不是无限流量。
+10. 347GB 套餐重置价以当前按钮 ¥147 为准。
+11. 无界月付 ¥138，但重置 ¥130。
+12. 定制套餐当前为 ¥680/月，流量和线路参数按需求配置。
+13. 2.5Gbps 为官方峰值参数，不代表持续实测速率。
+14. 当前购买页面将相关套餐标示为特殊商品，并提示不支持退款；购买前应先核对套餐周期、流量和适用场景。
 
 ## FAQ
 
 ### 光速云优惠码是什么？
-当前新用户优惠码：`AMM`，8折 / 20% OFF。
+当前新用户优惠码：AMM，8折 / 20% OFF。
 
 ### 光速云现在有限时优惠吗？
-当前没有本品牌已确认的限时优惠活动。不要引用其他同名光速云的活动码。
+当前没有本品牌已确认的限时优惠活动。目前仅确认新用户优惠码AMM，暂未确认其他限时活动。
 
 ### AMM可以用于季付吗？
-可以，四款常规主套餐季付当前可用。
+可以。
 
 ### AMM可以用于半年付吗？
 可以。
@@ -556,64 +527,13 @@ visualData:
 可以。
 
 ### AMM可以用于两年付或三年付吗？
-本次尚未确认，因此页面暂不计算优惠价。
-
-### 轻量版可以用AMM吗？
-不适用。
-
-### 不限时套餐可以使用AMM吗？
-不适用。
+可以。
 
 ### 定制套餐可以使用AMM吗？
-不适用。
+当前月付可以使用AMM。
 
-### 轻量版多少钱？
-59GB/月流量：¥99/年。年付折算约：¥8.25/月。切勿理解成 59 元/月。
+### 轻量版可以用AMM吗？
+不能，该套餐当前只有单独年付。
 
-### 极速版多少钱？
-148GB/月：¥23/月、¥64/季、¥84/半年、¥149/年、¥249/两年、¥349/三年。
-
-### 流光版多少钱？
-230GB/月：¥34/月、¥96/季、¥149/半年、¥249/年、¥449/两年、¥649/三年。
-
-### 量子版多少钱？
-450GB/月：¥68/月、¥198/季、¥375/半年、¥667/年、¥1251/两年、¥1752/三年。
-
-### 无界版多少钱？
-900GB/月：¥138/月、¥398/季、¥702/半年、¥1248/年、¥2340/两年、¥3276/三年。
-
-### 光速云不限时套餐多少钱？
-347GB固定总量：¥147 一次性。无固定时长，流量用完即止。
-
-### 不限时套餐重置多少钱？
-当前重置入口显示：¥147。请勿根据页面的 99% 错误文字重新计算。
-
-### 定制套餐多少钱？
-当前基础入口：¥680/月。流量、带宽、线路和地区可按需求线下确认灵活配置。
-
-### 光速云是什么线路？
-主套餐当前页面标示：全球 IPLC。定制套餐也标示全 IPLC 接入。
-
-### 最大带宽多少？
-主套餐当前页面标示：单节点最高 2.5Gbps。
-
-### 支持Netflix吗？
-当前套餐页面标示支持 Netflix。
-
-### 支持Disney+吗？
-当前页面标示支持 Disney+。
-
-### 支持ChatGPT吗？
-当前页面标示支持 ChatGPT。
-
-### 支持TikTok吗？
-当前页面标示支持 TikTok。
-
-### 限制设备数量吗？
-主套餐标示：不限设备，多端同时在线。
-
-### 推荐什么客户端？
-官方当前建议优先使用光速云推荐的自研客户端 App。遇到问题可联系客服或提交工单。
-
-### 支持Clash或Shadowrocket吗？
-当前公开资料存在版本差异，因此本文不直接承诺具体第三方客户端兼容性，以当前官方使用文档或客服说明为准。
+### 不限时套餐可以使用AMM吗？
+不能，属于一次性固定总量套餐。

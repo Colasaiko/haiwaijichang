@@ -70,7 +70,7 @@ coupon:
   discountPercent: 20%
   verified: true
   sourceType: official/current-checkout
-  scope: 常规套餐月付至年付
+  scope: 常规周期套餐
   eligiblePlans:
     - 唯兔云 · 节假日限时开启
     - 唯兔云 · 普通版
@@ -82,6 +82,9 @@ coupon:
     - 季付
     - 半年付
     - 年付
+    - 两年付
+    - 三年付
+  eligibilityText: 常驻优惠
 temporaryCoupons:
   - name: 中秋国庆双节优惠
     code: VTFEST80
@@ -90,7 +93,7 @@ temporaryCoupons:
     manualActive: true
     expiresAt: '2026-10-10T23:59:59+08:00'
     priority: 200
-    scope: 常规套餐月付 / 季付 / 半年付 / 年付
+    scope: 常规周期套餐
     eligiblePlans:
       - 唯兔云 · 节假日限时开启
       - 唯兔云 · 普通版
@@ -102,6 +105,8 @@ temporaryCoupons:
       - 季付
       - 半年付
       - 年付
+      - 两年付
+      - 三年付
 resetPackages:
   - plan: 唯兔云 · 年付加强专线
     price: 15
@@ -128,7 +133,6 @@ pricing:
     originalPrice: ¥120
     lineType: IEPL
     couponEligible: false
-    couponStatus: excluded
   - name: 唯兔云 · 年付版限量款
     traffic: 45GB/月
     period: 年付
@@ -136,14 +140,12 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: false
-    couponStatus: excluded
   - name: 唯兔云 · 节假日限时开启
     traffic: 100GB/月
     period: 月付
     originalPrice: ¥14.90
     couponEligible: true
     availabilityNote: 节假日限时开启，是否继续开放以当前购买页为准
-    couponStatus: verified
   - name: 唯兔云 · 普通版
     traffic: 150GB/月
     period: 月付
@@ -151,7 +153,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 普通版
     traffic: 150GB/月
     period: 季付
@@ -159,7 +160,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 普通版
     traffic: 150GB/月
     period: 半年付
@@ -167,7 +167,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 普通版
     traffic: 150GB/月
     period: 年付
@@ -175,23 +174,20 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 普通版
     traffic: 150GB/月
     period: 两年付
     originalPrice: ¥334.90
     lineType: IPLC
     protocol: VLESS
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 唯兔云 · 普通版
     traffic: 150GB/月
     period: 三年付
     originalPrice: ¥429.90
     lineType: IPLC
     protocol: VLESS
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 唯兔云 · 进阶版
     traffic: 200GB/月
     period: 月付
@@ -199,7 +195,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 进阶版
     traffic: 200GB/月
     period: 季付
@@ -207,7 +202,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 进阶版
     traffic: 200GB/月
     period: 半年付
@@ -215,7 +209,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 进阶版
     traffic: 200GB/月
     period: 年付
@@ -223,23 +216,20 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 进阶版
     traffic: 200GB/月
     period: 两年付
     originalPrice: ¥502.90
     lineType: IPLC
     protocol: VLESS
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 唯兔云 · 进阶版
     traffic: 200GB/月
     period: 三年付
     originalPrice: ¥645.90
     lineType: IPLC
     protocol: VLESS
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 唯兔云 · 专业版
     traffic: 500GB/月
     period: 月付
@@ -247,7 +237,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 专业版
     traffic: 500GB/月
     period: 季付
@@ -255,7 +244,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 专业版
     traffic: 500GB/月
     period: 半年付
@@ -263,7 +251,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 专业版
     traffic: 500GB/月
     period: 年付
@@ -271,23 +258,20 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 专业版
     traffic: 500GB/月
     period: 两年付
     originalPrice: ¥1006.90
     lineType: IPLC
     protocol: VLESS
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 唯兔云 · 专业版
     traffic: 500GB/月
     period: 三年付
     originalPrice: ¥1294.90
     lineType: IPLC
     protocol: VLESS
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 唯兔云 · 至尊版
     traffic: 1000GB/月
     period: 月付
@@ -295,7 +279,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 至尊版
     traffic: 1000GB/月
     period: 季付
@@ -303,7 +286,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 至尊版
     traffic: 1000GB/月
     period: 半年付
@@ -311,7 +293,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 至尊版
     traffic: 1000GB/月
     period: 年付
@@ -319,23 +300,20 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: true
-    couponStatus: verified
   - name: 唯兔云 · 至尊版
     traffic: 1000GB/月
     period: 两年付
     originalPrice: ¥2013.90
     lineType: IPLC
     protocol: VLESS
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 唯兔云 · 至尊版
     traffic: 1000GB/月
     period: 三年付
     originalPrice: ¥2590.90
     lineType: IPLC
     protocol: VLESS
-    couponEligible: false
-    couponStatus: unverified
+    couponEligible: true
   - name: 唯兔云 · 永久不限时100
     traffic: 100GB总量
     period: 一次性
@@ -344,7 +322,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: false
-    couponStatus: excluded
   - name: 唯兔云 · 永久不限时200
     traffic: 200GB总量
     period: 一次性
@@ -353,7 +330,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: false
-    couponStatus: excluded
   - name: 唯兔云 · 永久不限时500
     traffic: 500GB总量
     period: 一次性
@@ -362,7 +338,6 @@ pricing:
     lineType: IPLC
     protocol: VLESS
     couponEligible: false
-    couponStatus: excluded
 visualData:
   couponExample:
     plan: 唯兔云 · 普通版
@@ -539,8 +514,6 @@ visualData:
     - label: 永久500
       plan: 唯兔云 · 永久不限时500
       eligible: false
-
-
 ---
 ## 唯兔云是什么？
 
@@ -565,7 +538,7 @@ visualData:
 
 ## 唯兔云优惠码适用周期
 
-当前已确认普通版、进阶版、专业版、至尊版的月付、季付、半年付和年付均可使用优惠码；两年付与三年付本次尚未完成结算验证，因此暂不计算优惠。
+对于普通版、进阶版、专业版和至尊版，只要属于当前套餐提供的正常购买周期，包括月付、季付、半年付、年付、两年付和三年付，均可使用优惠码。节假日限时套餐当前仅提供月付，因此其月付同样可以使用。单独年付的年付加强专线、年付版限量款，以及一次性永久套餐不参与优惠码。
 
 ## 长周期系统折扣
 
@@ -611,17 +584,16 @@ visualData:
 1. 年付加强专线当前是 IEPL，不是 IPLC。
 2. 主体套餐为 IPLC/VLESS。
 3. 请勿轻信早期“全 IPLC”的概括。
-4. `rabbit` 当前 8 折，实测月付、季付、半年付、年付均可用。
-5. `VTFEST80` 当前 8 折，实测月付、季付、半年付、年付均可用。
+4. `rabbit` 当前 8 折，实测拥有月付入口的套餐各周期均可用。
+5. `VTFEST80` 当前 8 折，实测拥有月付入口的套餐各周期均可用。
 6. 双节活动截止至 2026-10-10。
 7. 活动结束后自动 fallback 至 `rabbit`。
-8. 两年付、三年付本次尚未确认是否可用，因此不计算。
-9. 年付 8 折/两年 7 折/三年 6 折属于系统自身周期定价。
-10. 永久包不能使用 `rabbit` 或 `VTFEST80`。
-11. 永久不限时不等于无限流量。
-12. 重置流量包不自动叠加优惠码。
-13. 节假日 100G 目前仅确认月付 ¥14.90，停售时间以购买页为准。
-14. 网络支付方式只作为公开资料参考，不冒充本次购买页确认。
+8. 年付 8 折/两年 7 折/三年 6 折属于系统自身周期定价。
+9. 永久包不能使用 `rabbit` 或 `VTFEST80`。
+10. 永久不限时不等于无限流量。
+11. 重置流量包不自动叠加优惠码。
+12. 节假日 100G 目前仅确认月付 ¥14.90，停售时间以购买页为准。
+13. 网络支付方式只作为公开资料参考，不冒充本次购买页确认。
 
 ## FAQ
 
@@ -644,7 +616,7 @@ visualData:
 可以。
 
 ### rabbit可以用于两年付/三年付吗？
-本次尚未确认，因此页面不自动计算折后价。
+可以。
 
 ### 年付加强专线能用优惠码吗？
 不能。
