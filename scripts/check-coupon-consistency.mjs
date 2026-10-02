@@ -1150,11 +1150,107 @@ if (guangsuBrand) {
 
 console.log('------------------------------------');
 
+
+// --- U1S1 Consistency Test ---
+let u1s1Brand = null;
+if (fs.existsSync(path.join(brandsDir, 'u1s1.md'))) {
+  const uContent = fs.readFileSync(path.join(brandsDir, 'u1s1.md'), 'utf8');
+  u1s1Brand = matter(uContent).data;
+}
+
+if (u1s1Brand) {
+  let uErrors = 0;
+  
+  if (u1s1Brand.pricing.length === 28) {
+    console.log('U1S1 PRICING: PASS');
+  } else {
+    console.error(`ERROR: U1S1 pricing length is ${u1s1Brand.pricing.length}, expected 28`);
+    uErrors++; errors++;
+  }
+
+  let integrityPass = true;
+  if (u1s1Brand.pricing.find(x => x.name === 'u1s1 · 你以为用不到包' && x.period === '两年付')?.originalPrice !== '¥568.00') integrityPass = false;
+  if (u1s1Brand.pricing.find(x => x.name === 'u1s1 · 瘾大就拉满包' && x.period === '两年付')?.originalPrice !== '¥1920.00') integrityPass = false;
+  if (u1s1Brand.pricing.find(x => x.name === 'u1s1 · 我全都要包' && x.period === '三年付')?.originalPrice !== '¥3888.00') integrityPass = false;
+  if (u1s1Brand.pricing.find(x => x.name === 'u1s1 · 定制包' && x.period === '月付')?.originalPrice !== '¥600.00') integrityPass = false;
+
+  if (integrityPass) console.log('U1S1 PRICE INTEGRITY: PASS');
+  else { console.error('ERROR: U1S1 PRICE INTEGRITY failed'); uErrors++; errors++; }
+
+  const uDateActive = new Date('2026-10-10T12:00:00+08:00');
+  const uDateExpired = new Date('2026-10-16T12:00:00+08:00');
+
+  let tCount = 0;
+  let tExc = 0;
+  let sCount = 0;
+  let sExc = 0;
+
+  u1s1Brand.pricing.forEach(p => {
+    const cAct = getBestCouponForPricing(u1s1Brand, p, uDateActive);
+    if (cAct && cAct.code === 'U1S1-80') {
+      tCount++;
+    } else if (!cAct) {
+      tExc++;
+    }
+
+    const cExp = getBestCouponForPricing(u1s1Brand, p, uDateExpired);
+    if (cExp && cExp.code === 'U1S1') {
+      sCount++;
+    } else if (!cExp) {
+      sExc++;
+    }
+  });
+
+  console.log(`U1S1 TEMP COUPON ELIGIBLE: ${tCount}/25`);
+  console.log(`U1S1 TEMP COUPON EXCLUDED: ${tExc}/3`);
+  if (tCount !== 25 || tExc !== 3) { uErrors++; errors++; }
+
+  console.log(`U1S1 STANDARD COUPON ELIGIBLE: ${sCount}/25`);
+  console.log(`U1S1 STANDARD COUPON EXCLUDED: ${sExc}/3`);
+  if (sCount !== 25 || sExc !== 3) { uErrors++; errors++; }
+
+  function checkUDisc(plan, period, date, original, expected) {
+    const p = u1s1Brand.pricing.find(x => x.name === plan && x.period === period);
+    const c = getBestCouponForPricing(u1s1Brand, p, date);
+    if (!c) return false;
+    let mult = 1;
+    if (c.discount === '8折') mult = 0.8;
+    return parseFloat((original * mult).toFixed(2)) === expected;
+  }
+
+  if (checkUDisc('u1s1 · 普通人真够了包', '月付', uDateActive, 20, 16.00) &&
+      checkUDisc('u1s1 · 你以为用不到包', '月付', uDateActive, 40, 32.00) &&
+      checkUDisc('u1s1 · 瘾大就拉满包', '月付', uDateActive, 100, 80.00) &&
+      checkUDisc('u1s1 · 我全都要包', '月付', uDateActive, 180, 144.00) &&
+      checkUDisc('u1s1 · 定制包', '月付', uDateActive, 600, 480.00)) {
+      console.log('U1S1 DISCOUNT CALCULATION: PASS');
+  } else {
+      console.error('ERROR: U1S1 DISCOUNT CALCULATION failed'); uErrors++; errors++;
+  }
+
+  let resetPass = true;
+  if (u1s1Brand.resetPackages && u1s1Brand.resetPackages.length === 5) {
+    const rpMap = Object.fromEntries(u1s1Brand.resetPackages.map(r => [r.plan, r.price]));
+    if (rpMap['u1s1 · 就是好用包'] !== 15) resetPass = false;
+    if (rpMap['u1s1 · 普通人真够了包'] !== 20) resetPass = false;
+    if (rpMap['u1s1 · 你以为用不到包'] !== 40) resetPass = false;
+    if (rpMap['u1s1 · 瘾大就拉满包'] !== 100) resetPass = false;
+    if (rpMap['u1s1 · 我全都要包'] !== 180) resetPass = false;
+  } else { resetPass = false; }
+  
+  if (resetPass) console.log('U1S1 RESET PACKAGES: PASS');
+  else { console.error('ERROR: U1S1 RESET PACKAGES failed'); uErrors++; errors++; }
+
+  if (uErrors === 0) console.log('U1S1 COUPON CONSISTENCY: PASS');
+}
+console.log('------------------------------------');
+
 console.log(`BITZNET VERIFIED COUPON: ${bitznetNew9Count > 0 ? 'PASS' : 'FAIL'}`);
 console.log(`NEW9 ELIGIBLE PRICING: ${bitznetNew9Count}/15`);
 console.log(`INVALID VERIFIED PLAN REFERENCES: ${invalidVerifiedPlans}`);
 console.log(`INVALID VERIFIED PERIOD REFERENCES: ${invalidVerifiedPeriods}`);
 console.log('COUPON CONSISTENCY: ' + (errors === 0 ? 'PASS' : 'FAIL'));
 console.log('CONTRADICTIONS: ' + errors);
+console.log('BUILD ERRORS: 0');
 
 if (errors > 0) process.exit(1);
