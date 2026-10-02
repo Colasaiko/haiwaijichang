@@ -19,11 +19,10 @@ if (!standardCoupon && !useBestCoupons) return null;
 const data = brand.visualData.couponEligibility;
 const titleText = standardCoupon ? `${standardCoupon.code || "优惠码"} 可以用在哪些套餐？` : "当前活动优惠可以用在哪些套餐？";
 
-const isTestEnv = import.meta.env ? false : true;
-const clientDate = new Date('2026-10-01T12:00:00Z');
+const clientDate = new Date();
 ---
 
-<div class="mb-12 bg-brand-navy p-6 rounded-xl border border-white/5">
+<div class={`mb-12 bg-brand-navy p-6 rounded-xl border border-white/5 ${!standardCoupon && useBestCoupons ? "show-if-temp-active" : ""}`}>
   <div class="mb-6">
     <h2 class="text-xl font-bold text-white uppercase tracking-wider font-mono flex items-center">
       <svg class="w-5 h-5 text-brand-neon mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -116,3 +115,19 @@ const clientDate = new Date('2026-10-01T12:00:00Z');
     })}
   </div>
 </div>
+
+{!standardCoupon && useBestCoupons && (
+  <div class="mb-12 bg-brand-navy p-6 rounded-xl border border-white/5 show-if-temp-expired hidden">
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-white uppercase tracking-wider font-mono flex items-center">
+        <svg class="w-5 h-5 text-brand-neon mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        当前活动优惠可以用在哪些套餐？
+      </h2>
+      <p class="text-xs text-slate-500 mt-1 uppercase tracking-widest font-mono">COUPON ELIGIBILITY</p>
+      <p class="text-sm text-slate-400 mt-2">一目了然的优惠码适用范围。不同套餐的优惠资格不同，以下根据当前已确认规则显示；最终是否可用以官方结算页面实际结果为准。</p>
+    </div>
+    <div class="text-center py-10 bg-slate-800/50 rounded-lg border border-slate-700">
+      <div class="text-slate-400">本轮活动已结束，当前暂无已确认常驻优惠码。</div>
+    </div>
+  </div>
+)}

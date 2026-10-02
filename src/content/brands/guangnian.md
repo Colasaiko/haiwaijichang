@@ -10,7 +10,7 @@ purchase:
 seoTitle: "光年梯怎么样？2026 IPLC套餐价格、GNTHP80/GNTHP85优惠码 | 海外机场"
 seoDescription: "整理2026光年梯最新套餐价格、IPLC专线、最高2.5Gbps、原生IP、流媒体与ChatGPT支持，以及GNTHP80双节8折、GNTHP85双节85折活动和独享私人专线资料。"
 h1: "光年梯怎么样？IPLC专线、套餐价格与双节优惠码"
-heroDescription: "光年梯提供全程 IPLC 专线，原生IP，官方标示最高2.5Gbps。当前暂无已确认常驻优惠码，双节期间提供GNTHP80与GNTHP85活动优惠。，但正开展双节期间 GNTHP80 与 GNTHP85 活动，适用于常规长短周期与私人专线。"
+heroDescription: "光年梯提供全程IPLC专线、原生IP，官方标示最高2.5Gbps。当前暂无已确认常驻优惠码，双节期间提供GNTHP80与GNTHP85活动优惠，适用于对应常规周期及已实测的私人专线。"
 lineType: "全程 IPLC 专线"
 maxBandwidth: "官方标示最高2.5Gbps"
 ipType: "原生IP"
