@@ -37,6 +37,12 @@ const cards = Array.from(planMap.entries()).map(([name, plans]) => {
     else if (traffic.includes('120') || traffic.includes('150') || traffic.includes('80')) desc = '日常网页/视频';
   }
   
+  if (brand.visualData && brand.visualData.selectorMeta && brand.visualData.selectorMeta[name]) {
+    const meta = brand.visualData.selectorMeta[name];
+    if (meta.desc) desc = meta.desc;
+    if (meta.badge) badge = meta.badge;
+  }
+  
   const activeCouponsMap = new Map();
   const stdCouponsMap = new Map();
   const verifiedCouponsMap = new Map();

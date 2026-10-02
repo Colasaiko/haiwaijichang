@@ -10,6 +10,7 @@ if (brand.networkArchitecture) facts.push({ label: '网络架构', value: Array.
 if (brand.protocols) facts.push({ label: '协议', value: Array.isArray(brand.protocols) ? brand.protocols.join(' / ') : brand.protocols });
 if (brand.speedLimit) facts.push({ label: '速度 / 限速', value: brand.speedLimit });
 if (brand.deviceLimit) facts.push({ label: '设备', value: brand.deviceLimit });
+if (brand.trafficReset) facts.push({ label: '流量刷新', value: brand.trafficReset });
 if (brand.nodeMultiplier) facts.push({ label: '节点倍率', value: brand.nodeMultiplier });
 if (brand.maxBandwidth) facts.push({ label: '最大带宽', value: brand.maxBandwidth });
 if (brand.ipType) facts.push({ label: 'IP', value: brand.ipType });

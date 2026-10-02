@@ -1146,16 +1146,23 @@ if (guangsuBrand) {
   if (trafficPass) console.log('GUANGSU TRAFFIC INTEGRITY: PASS');
   else { console.error('ERROR: GUANGSU TRAFFIC INTEGRITY failed'); gsErrors++; errors++; }
 
-  let ammCount = 0;
+  let verifiedCount = 0;
+  let unverifiedCount = 0;
   let excCount = 0;
   guangsuBrand.pricing.forEach(p => {
     const c = getBestCouponForPricing(guangsuBrand, p);
-    if (c && c.code === 'AMM') ammCount++;
-    else if (!c) excCount++;
+    if (p.couponStatus === 'verified') {
+      if (c && c.code === 'AMM') verifiedCount++;
+    } else if (p.couponStatus === 'unverified') {
+      if (!c) unverifiedCount++;
+    } else if (p.couponStatus === 'excluded') {
+      if (!c) excCount++;
+    }
   });
-  console.log(`GUANGSU AMM ELIGIBLE: ${ammCount}/24`);
+  console.log(`GUANGSU AMM VERIFIED MONTHLY: ${verifiedCount}/4`);
+  console.log(`GUANGSU AMM UNVERIFIED PERIODS: ${unverifiedCount}/20`);
   console.log(`GUANGSU AMM EXCLUDED: ${excCount}/3`);
-  if (ammCount !== 24 || excCount !== 3) { gsErrors++; errors++; }
+  if (verifiedCount !== 4 || unverifiedCount !== 20 || excCount !== 3) { gsErrors++; errors++; }
 
   function checkGsDisc(name, original, expected) {
     const p = guangsuBrand.pricing.find(x => x.name === name && x.period === '月付');
@@ -1211,6 +1218,24 @@ if (guangsuBrand) {
   });
   if (linesPass) console.log('GUANGSU PLAN LINE TYPES: PASS');
   else { console.error('ERROR: GUANGSU PLAN LINE TYPES failed'); gsErrors++; errors++; }
+
+  if (guangsuBrand.visualData && guangsuBrand.visualData.bandwidth && guangsuBrand.visualData.bandwidth.length > 0) {
+    console.log('GUANGSU BANDWIDTH DATA: PASS');
+  } else {
+    console.error('ERROR: GUANGSU BANDWIDTH DATA failed'); gsErrors++; errors++;
+  }
+
+  if (guangsuBrand.trafficReset === '常规月流量套餐每30天自动刷新') {
+    console.log('GUANGSU TRAFFIC RESET DATA: PASS');
+  } else {
+    console.error('ERROR: GUANGSU TRAFFIC RESET DATA failed'); gsErrors++; errors++;
+  }
+
+  if (guangsuBrand.visualData && guangsuBrand.visualData.customPlan && guangsuBrand.visualData.customPlan.name === '光速云 · 定制套餐') {
+    console.log('GUANGSU CUSTOM PLAN DATA: PASS');
+  } else {
+    console.error('ERROR: GUANGSU CUSTOM PLAN DATA failed'); gsErrors++; errors++;
+  }
 
   if (gsErrors === 0) console.log('GUANGSU COUPON CONSISTENCY: PASS');
 }

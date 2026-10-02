@@ -17,6 +17,7 @@ heroDescription: "光速云提供轻量年付方案、148GB至900GB常规月流�
 lineType: "IPLC（主套餐）"
 ipType: "原生IP"
 deviceLimit: "主套餐不限设备，多端同时在线"
+trafficReset: "常规月流量套餐每30天自动刷新"
 customerSupport: "专业运维 · 7×24支持"
 maxBandwidth: "官方标示单节点最高2.5Gbps"
 
@@ -71,11 +72,6 @@ coupon:
     - "光速云 · 无界版"
   eligiblePeriods:
     - "月付"
-    - "季付"
-    - "半年付"
-    - "年付"
-    - "两年付"
-    - "三年付"
 
 temporaryCoupons: []
 
@@ -102,6 +98,7 @@ pricing:
     period: "年付"
     originalPrice: "¥99"
     couponEligible: false
+    couponStatus: "excluded"
 
   - name: "光速云 · 极速版"
     traffic: "148GB/月"
@@ -109,36 +106,42 @@ pricing:
     originalPrice: "¥23"
     lineType: "IPLC"
     couponEligible: true
+    couponStatus: "verified"
   - name: "光速云 · 极速版"
     traffic: "148GB/月"
     period: "季付"
     originalPrice: "¥64"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 极速版"
     traffic: "148GB/月"
     period: "半年付"
     originalPrice: "¥84"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 极速版"
     traffic: "148GB/月"
     period: "年付"
     originalPrice: "¥149"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 极速版"
     traffic: "148GB/月"
     period: "两年付"
     originalPrice: "¥249"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 极速版"
     traffic: "148GB/月"
     period: "三年付"
     originalPrice: "¥349"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
 
   - name: "光速云 · 流光版"
     traffic: "230GB/月"
@@ -146,36 +149,42 @@ pricing:
     originalPrice: "¥34"
     lineType: "IPLC"
     couponEligible: true
+    couponStatus: "verified"
   - name: "光速云 · 流光版"
     traffic: "230GB/月"
     period: "季付"
     originalPrice: "¥96"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 流光版"
     traffic: "230GB/月"
     period: "半年付"
     originalPrice: "¥149"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 流光版"
     traffic: "230GB/月"
     period: "年付"
     originalPrice: "¥249"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 流光版"
     traffic: "230GB/月"
     period: "两年付"
     originalPrice: "¥449"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 流光版"
     traffic: "230GB/月"
     period: "三年付"
     originalPrice: "¥649"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
 
   - name: "光速云 · 量子版"
     traffic: "450GB/月"
@@ -183,36 +192,42 @@ pricing:
     originalPrice: "¥68"
     lineType: "IPLC"
     couponEligible: true
+    couponStatus: "verified"
   - name: "光速云 · 量子版"
     traffic: "450GB/月"
     period: "季付"
     originalPrice: "¥198"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 量子版"
     traffic: "450GB/月"
     period: "半年付"
     originalPrice: "¥375"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 量子版"
     traffic: "450GB/月"
     period: "年付"
     originalPrice: "¥667"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 量子版"
     traffic: "450GB/月"
     period: "两年付"
     originalPrice: "¥1251"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 量子版"
     traffic: "450GB/月"
     period: "三年付"
     originalPrice: "¥1752"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
 
   - name: "光速云 · 无界版"
     traffic: "900GB/月"
@@ -220,36 +235,42 @@ pricing:
     originalPrice: "¥138"
     lineType: "IPLC"
     couponEligible: true
+    couponStatus: "verified"
   - name: "光速云 · 无界版"
     traffic: "900GB/月"
     period: "季付"
     originalPrice: "¥398"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 无界版"
     traffic: "900GB/月"
     period: "半年付"
     originalPrice: "¥702"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 无界版"
     traffic: "900GB/月"
     period: "年付"
     originalPrice: "¥1248"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 无界版"
     traffic: "900GB/月"
     period: "两年付"
     originalPrice: "¥2340"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
   - name: "光速云 · 无界版"
     traffic: "900GB/月"
     period: "三年付"
     originalPrice: "¥3276"
     lineType: "IPLC"
-    couponEligible: true
+    couponEligible: false
+    couponStatus: "unverified"
 
   - name: "光速云 · 不限时套餐"
     traffic: "347GB总量"
@@ -257,6 +278,7 @@ pricing:
     originalPrice: "¥147"
     validity: "不限时（流量用完即止）"
     couponEligible: false
+    couponStatus: "excluded"
 
   - name: "光速云 · 定制套餐"
     traffic: "按需配置"
@@ -265,8 +287,58 @@ pricing:
     lineType: "IPLC"
     ipType: "独享原生IP"
     couponEligible: false
+    couponStatus: "excluded"
 
 visualData:
+  selectorMeta:
+    "光速云 · 轻量版":
+      desc: "轻量办公 / 查资料 / 备用使用"
+      badge: "年付轻量"
+    "光速云 · 极速版":
+      desc: "148GB/月 · 日常使用与轻度流媒体"
+      badge: "入门主套餐"
+    "光速云 · 流光版":
+      desc: "230GB/月 · 日常流媒体与多端使用"
+      badge: "均衡流量"
+    "光速云 · 量子版":
+      desc: "450GB/月 · 中高流量使用"
+      badge: "高流量"
+    "光速云 · 无界版":
+      desc: "900GB/月 · 大流量与多端场景"
+      badge: "大流量"
+    "光速云 · 不限时套餐":
+      desc: "347GB固定总量 · 不限使用期限 · 用完即止"
+      badge: "固定总量"
+    "光速云 · 定制套餐":
+      desc: "按需配置流量/带宽/地区 · 独享原生IP · 企业场景"
+      badge: "企业定制"
+
+  bandwidth:
+    - label: "主套餐官方单节点峰值"
+      value: 2500
+      display: "2.5 Gbps"
+
+  customPlan:
+    name: "光速云 · 定制套餐"
+    price: 680
+    period: "月付起"
+    traffic: "按需配置"
+    lineType: "IPLC"
+    ipType: "独享原生IP"
+    features:
+      - "流量按需配置"
+      - "带宽按需配置"
+      - "线路按需配置"
+      - "地区按需配置"
+      - "独立带宽"
+      - "1对1技术支持"
+    scenarios:
+      - "跨境电商"
+      - "TikTok直播"
+      - "社媒运营"
+      - "远程办公"
+      - "内网访问"
+
   couponExample:
     plan: "光速云 · 极速版"
     period: "月付"

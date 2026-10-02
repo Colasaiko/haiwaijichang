@@ -15,6 +15,7 @@ import UnlimitedTrafficChart from './charts/UnlimitedTrafficChart.astro';
 import ResetPackageChart from './charts/ResetPackageChart.astro';
 import DeviceLimitChart from './charts/DeviceLimitChart.astro';
 import FixedTrafficPackageChart from './charts/FixedTrafficPackageChart.astro';
+import CustomPlanCard from './charts/CustomPlanCard.astro';
 
 const { brand } = Astro.props;
 
@@ -43,6 +44,7 @@ if (!brand || !brand.visualData) {
   <CouponComparison brand={brand} />
   <UnlimitedTrafficChart brand={brand} />
   <FixedTrafficPackageChart brand={brand} />
+  <CustomPlanCard brand={brand} />
   <ResetPackageChart brand={brand} />
   <NodeStatusChart brand={brand} />
   <GlobalRouteCoverage brand={brand} />

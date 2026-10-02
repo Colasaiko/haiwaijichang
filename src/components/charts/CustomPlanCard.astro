@@ -1,0 +1,113 @@
+---
+const { brand } = Astro.props;
+
+if (!brand || !brand.visualData || !brand.visualData.customPlan) {
+  return null;
+}
+
+const plan = brand.visualData.customPlan;
+---
+
+<div class="bg-brand-dark/50 border border-white/5 rounded-xl overflow-hidden mt-8">
+  <div class="px-6 py-4 bg-brand-neon/10 border-b border-brand-neon/20 flex items-center justify-between">
+    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+      {plan.name}
+    </h3>
+    {plan.period && <span class="text-xs text-brand-neon border border-brand-neon/30 px-2 py-1 rounded-md bg-brand-neon/10">定制化服务</span>}
+  </div>
+  
+  <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="flex flex-col justify-center">
+      <div class="text-4xl font-bold text-white mb-2">
+        ¥{plan.price}<span class="text-lg text-slate-400 font-normal ml-1">/{plan.period || '月'}</span>
+      </div>
+      <div class="text-brand-accent text-sm font-medium mb-6">
+        基础定制入口价格
+      </div>
+      
+      <div class="space-y-4">
+        {plan.traffic && (
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+              </svg>
+            </div>
+            <div>
+              <div class="text-xs text-slate-400">可用流量</div>
+              <div class="text-sm text-white font-medium">{plan.traffic}</div>
+            </div>
+          </div>
+        )}
+        
+        {plan.lineType && (
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <div class="text-xs text-slate-400">专线接入</div>
+              <div class="text-sm text-white font-medium">{plan.lineType}</div>
+            </div>
+          </div>
+        )}
+        
+        {plan.ipType && (
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              </svg>
+            </div>
+            <div>
+              <div class="text-xs text-slate-400">IP配置</div>
+              <div class="text-sm text-white font-medium">{plan.ipType}</div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+    
+    <div class="flex flex-col justify-center space-y-6 md:border-l md:border-white/10 md:pl-8">
+      {plan.features && plan.features.length > 0 && (
+        <div>
+          <div class="text-xs font-bold tracking-widest text-slate-500 uppercase mb-3">支持特性</div>
+          <div class="grid grid-cols-2 gap-2">
+            {plan.features.map(f => (
+              <div class="flex items-start gap-2 text-sm text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-neon mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                {f}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {plan.scenarios && plan.scenarios.length > 0 && (
+        <div>
+          <div class="text-xs font-bold tracking-widest text-slate-500 uppercase mb-3">适用场景</div>
+          <div class="flex flex-wrap gap-2">
+            {plan.scenarios.map(s => (
+              <span class="bg-white/5 border border-white/10 text-slate-300 text-xs px-2.5 py-1 rounded-full">
+                {s}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+  
+  <div class="bg-black/30 p-3 text-center border-t border-white/5">
+    <p class="text-xs text-slate-500">
+      * 具体方案与价格配置以1对1确认结果为准。
+    </p>
+  </div>
+</div>

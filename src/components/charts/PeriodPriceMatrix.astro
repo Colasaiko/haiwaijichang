@@ -22,24 +22,29 @@ const plans = planNames.map(planName => {
     let stdEqMonthlyDisc = null;
 
     if (coupon) {
-      const mult = getDiscountMultiplier(coupon);
-      discounted = parseFloat((pd.price * mult).toFixed(2));
-      
-      if (coupon.type === 'temporary' && brand.coupon) {
-        const isApplicable = (c, p) => {
-          if (p.couponEligible === false) return false;
-          if (c.excludedPlans && c.excludedPlans.some(x => p.name.includes(x))) return false;
-          return true;
-        };
-        if (isApplicable(brand.coupon, pe)) {
-          stdCoupon = { type: 'standard', ...brand.coupon };
-          const stdMult = getDiscountMultiplier(stdCoupon);
-          stdDiscounted = parseFloat((pd.price * stdMult).toFixed(2));
-          if (pd.months > 0) stdEqMonthlyDisc = parseFloat((stdDiscounted / pd.months).toFixed(2));
-        }
+      if (pe.couponStatus === 'unverified') {
+        // Do not calculate discount
+        stdCoupon = null; // We will handle the display manually
       } else {
-        stdCoupon = coupon;
-        stdDiscounted = discounted;
+        const mult = getDiscountMultiplier(coupon);
+        discounted = parseFloat((pd.price * mult).toFixed(2));
+        
+        if (coupon.type === 'temporary' && brand.coupon) {
+          const isApplicable = (c, p) => {
+            if (p.couponEligible === false) return false;
+            if (c.excludedPlans && c.excludedPlans.some(x => p.name.includes(x))) return false;
+            return true;
+          };
+          if (isApplicable(brand.coupon, pe)) {
+            stdCoupon = { type: 'standard', ...brand.coupon };
+            const stdMult = getDiscountMultiplier(stdCoupon);
+            stdDiscounted = parseFloat((pd.price * stdMult).toFixed(2));
+            if (pd.months > 0) stdEqMonthlyDisc = parseFloat((stdDiscounted / pd.months).toFixed(2));
+          }
+        } else {
+          stdCoupon = coupon;
+          stdDiscounted = discounted;
+        }
       }
     }
     
@@ -55,7 +60,8 @@ const plans = planNames.map(planName => {
       stdDiscounted,
       eqMonthly,
       eqMonthlyDisc,
-      stdEqMonthlyDisc
+      stdEqMonthlyDisc,
+      couponStatus: pe.couponStatus
     };
   });
 
@@ -118,7 +124,11 @@ const plans = planNames.map(planName => {
                 </td>
                 <td class="px-4 py-3">
                   <div class="show-if-temp-active">
-                    {row.coupon ? (
+                    {row.couponStatus === 'unverified' ? (
+                      <span class="text-xs font-bold px-2 py-1 rounded border whitespace-nowrap text-yellow-500/80 bg-yellow-900/30 border-yellow-700/50">
+                        {row.coupon ? row.coupon.code + ' ' : ''}状态：未验证
+                      </span>
+                    ) : row.coupon ? (
                       <span class={`text-xs font-bold px-2 py-1 rounded border whitespace-nowrap ${row.coupon.type === 'temporary' ? 'text-brand-neon bg-brand-neon/10 border-brand-neon/20' : 'text-brand-accent bg-brand-accent/10 border-brand-accent/20'}`}>
                         {row.coupon.code} · {row.coupon.type === 'temporary' ? '限时' : ''}{row.coupon.discount}
                       </span>
@@ -127,7 +137,11 @@ const plans = planNames.map(planName => {
                     )}
                   </div>
                   <div class="show-if-temp-expired">
-                    {row.stdCoupon ? (
+                    {row.couponStatus === 'unverified' ? (
+                      <span class="text-xs font-bold px-2 py-1 rounded border whitespace-nowrap text-yellow-500/80 bg-yellow-900/30 border-yellow-700/50">
+                        {row.stdCoupon ? row.stdCoupon.code + ' ' : (brand.coupon ? brand.coupon.code + ' ' : '')}状态：未验证
+                      </span>
+                    ) : row.stdCoupon ? (
                       <span class={`text-xs font-bold px-2 py-1 rounded border whitespace-nowrap text-brand-accent bg-brand-accent/10 border-brand-accent/20`}>
                         {row.stdCoupon.code} · {row.stdCoupon.discount}
                       </span>
