@@ -1178,13 +1178,13 @@ if (u1s1Brand) {
     }
   });
 
-  console.log(`U1S1 TEMP COUPON ELIGIBLE: ${tCount}/25`);
-  console.log(`U1S1 TEMP COUPON EXCLUDED: ${tExc}/3`);
-  if (tCount !== 25 || tExc !== 3) { uErrors++; errors++; }
+  console.log(`U1S1 TEMP COUPON ELIGIBLE: ${tCount}/24`);
+  console.log(`U1S1 TEMP COUPON EXCLUDED: ${tExc}/4`);
+  if (tCount !== 24 || tExc !== 4) { uErrors++; errors++; }
 
-  console.log(`U1S1 STANDARD COUPON ELIGIBLE: ${sCount}/25`);
-  console.log(`U1S1 STANDARD COUPON EXCLUDED: ${sExc}/3`);
-  if (sCount !== 25 || sExc !== 3) { uErrors++; errors++; }
+  console.log(`U1S1 STANDARD COUPON ELIGIBLE: ${sCount}/24`);
+  console.log(`U1S1 STANDARD COUPON EXCLUDED: ${sExc}/4`);
+  if (sCount !== 24 || sExc !== 4) { uErrors++; errors++; }
 
   function checkUDisc(plan, period, date, original, expected) {
     const p = u1s1Brand.pricing.find(x => x.name === plan && x.period === period);
@@ -1199,12 +1199,19 @@ if (u1s1Brand) {
       checkUDisc('u1s1 · 你以为用不到包', '月付', uDateActive, 40, 32.00) &&
       checkUDisc('u1s1 · 瘾大就拉满包', '月付', uDateActive, 100, 80.00) &&
       checkUDisc('u1s1 · 我全都要包', '月付', uDateActive, 180, 144.00) &&
-      checkUDisc('u1s1 · 定制包', '月付', uDateActive, 600, 480.00) &&
+      
       getBestCouponForPricing(u1s1Brand, u1s1Brand.pricing.find(x => x.name === 'u1s1 · 就是好用包' && x.period === '年付'), uDateActive) === null &&
       getBestCouponForPricing(u1s1Brand, u1s1Brand.pricing.find(x => x.name === 'u1s1 · 就是好用包' && x.period === '两年付'), uDateActive) === null &&
       getBestCouponForPricing(u1s1Brand, u1s1Brand.pricing.find(x => x.name === 'u1s1 · 就是好用包' && x.period === '三年付'), uDateActive) === null &&
       checkUDisc('u1s1 · 你以为用不到包', '两年付', uDateActive, 568, 454.40)) {
       console.log('U1S1 DISCOUNT CALCULATION: PASS');
+  } else {
+      console.error('ERROR: U1S1 DISCOUNT CALCULATION failed'); uErrors++; errors++;
+  }
+
+  if (getBestCouponForPricing(u1s1Brand, u1s1Brand.pricing.find(x => x.name === 'u1s1 · 定制包' && x.period === '月付'), uDateActive) === null && getBestCouponForPricing(u1s1Brand, u1s1Brand.pricing.find(x => x.name === 'u1s1 · 定制包' && x.period === '月付'), uDateExpired) === null) {
+      console.log('U1S1 CUSTOM PLAN COUPON EXCLUDED: PASS');
+
   } else {
       console.error('ERROR: U1S1 DISCOUNT CALCULATION failed'); uErrors++; errors++;
   }
