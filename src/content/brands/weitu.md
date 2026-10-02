@@ -17,6 +17,11 @@ heroDescription: "唯兔云提供年付轻量方案、150GB至1TB常规月流量
 lineType: "IEPL / IPLC（按套餐）"
 protocols:
   - "VLESS（主体套餐）"
+ipType: "原生IP"
+deviceLimit: "主体套餐不限制客户端数量"
+nodeMultiplier: "×1"
+customerSupport: "全天在线指导"
+speedLimit: "主体套餐不限速"
 
 features:
   - "IEPL / IPLC线路按套餐区分，主体套餐使用VLESS"
@@ -85,7 +90,8 @@ coupon:
     - "月付"
 
 temporaryCoupons:
-  - code: "VTFEST80"
+  - name: "中秋国庆双节优惠"
+    code: "VTFEST80"
     discount: "8折"
     discountPercent: "20%"
     manualActive: true
@@ -552,7 +558,7 @@ visualData:
 
 ## 长周期系统折扣
 
-既然优惠码不能用于非月付，那么买长周期划算吗？官方长周期套餐自带了系统性的价格递减：1年付8折、2年付7折、3年付6折。当前页面显示的季付及以上价格（例如普通版年付 ¥191.90）已经体现了对应周期在原单价基础上的长线优惠，属于系统自身长期周期定价结构。因此本文不再对这些长周期价格二次套用优惠码进行误导。
+既然优惠码不能用于非月付，那么买长周期划算吗？官方长周期套餐自带了系统性的价格递减：1年付8折、2年付7折、3年付6折。当前页面显示的年付、两年付、三年付价格已经体现对应长周期定价结构。因此本文不再对这些长周期价格二次套用优惠码进行误导。
 
 ## 永久不限时套餐
 

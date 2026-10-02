@@ -1018,6 +1018,53 @@ if (weituBrand) {
   if (linesPass) console.log('WEITU PLAN LINE TYPES: PASS');
   else { console.error('ERROR: WEITU PLAN LINE TYPES failed'); weituErrors++; errors++; }
 
+  function checkWeituPrice(name, period, expectedStr) {
+    const p = weituBrand.pricing.find(x => x.name === name && x.period === period);
+    if (!p) return false;
+    return String(p.originalPrice) === expectedStr;
+  }
+
+  let integrityPass = true;
+  if (!checkWeituPrice('唯兔云 · 年付加强专线', '年付', '¥120')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 年付版限量款', '年付', '¥79.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 节假日限时开启', '月付', '¥14.90')) integrityPass = false;
+
+  if (!checkWeituPrice('唯兔云 · 普通版', '月付', '¥19.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 普通版', '季付', '¥53.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 普通版', '半年付', '¥101.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 普通版', '年付', '¥191.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 普通版', '两年付', '¥334.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 普通版', '三年付', '¥429.90')) integrityPass = false;
+
+  if (!checkWeituPrice('唯兔云 · 进阶版', '月付', '¥29.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 进阶版', '季付', '¥80.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 进阶版', '半年付', '¥152.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 进阶版', '年付', '¥286.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 进阶版', '两年付', '¥502.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 进阶版', '三年付', '¥645.90')) integrityPass = false;
+
+  if (!checkWeituPrice('唯兔云 · 专业版', '月付', '¥59.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 专业版', '季付', '¥161.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 专业版', '半年付', '¥305.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 专业版', '年付', '¥547.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 专业版', '两年付', '¥1006.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 专业版', '三年付', '¥1294.90')) integrityPass = false;
+
+  if (!checkWeituPrice('唯兔云 · 至尊版', '月付', '¥119.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 至尊版', '季付', '¥323.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 至尊版', '半年付', '¥611.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 至尊版', '年付', '¥1150.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 至尊版', '两年付', '¥2013.90')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 至尊版', '三年付', '¥2590.90')) integrityPass = false;
+
+  if (!checkWeituPrice('唯兔云 · 永久不限时100', '一次性', '¥100')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 永久不限时200', '一次性', '¥160')) integrityPass = false;
+  if (!checkWeituPrice('唯兔云 · 永久不限时500', '一次性', '¥340')) integrityPass = false;
+
+  if (integrityPass) console.log('WEITU PRICE INTEGRITY: PASS');
+  else { console.error('ERROR: WEITU PRICE INTEGRITY failed'); weituErrors++; errors++; }
+
+
   if (weituErrors === 0) console.log('WEITU COUPON CONSISTENCY: PASS');
 }
 console.log('------------------------------------');

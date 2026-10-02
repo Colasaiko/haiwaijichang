@@ -262,7 +262,7 @@ const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
                           
                           if (activeTemps.length === 1) {
                               const best = activeTemps[0];
-                              cardName.textContent = best.name;
+                              cardName.textContent = best.name || '限时优惠';
                               cardCode.textContent = best.code;
                               cardDiscount.textContent = best.discount;
                               cardScope.textContent = best.scope || '-';
