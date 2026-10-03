@@ -1,4 +1,6 @@
----
+import fs from 'fs';
+
+const content = `---
 name: "快狸"
 slug: "kuaili"
 order: 25
@@ -198,3 +200,5 @@ resetPackages:
 - **专业客户支持**：官方承诺提供专业客服与快速响应支持。
 - **流量刷新**：每 30 天自动刷新流量。
 - **优惠折扣说明**：当前购买页面明确提示使用 **uufly888** 优惠码可享 8折（20% OFF）优惠，全部套餐适用，实测可用（有效期及规则以结算页为准）。另外，长期购买通常会有基础折扣（如年付 8 折、两年付 7 折、三年付 6 折），具体最终价格以官网结算页为准。
+`;
+fs.writeFileSync('src/content/brands/kuaili.md', content);

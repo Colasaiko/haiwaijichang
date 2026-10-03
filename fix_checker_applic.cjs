@@ -1,0 +1,75 @@
+const fs = require('fs');
+
+let c = fs.readFileSync('scripts/check-coupon-consistency.mjs', 'utf8');
+
+const oldIsApplicable = `  const isApplicable = (coupon) => {
+    if (coupon.eligiblePlans && coupon.eligiblePlans.length > 0) {
+      if (!coupon.eligiblePlans.some(p => planName.includes(p))) return false;
+    }
+    if (coupon.excludedPlans && coupon.excludedPlans.length > 0) {
+      if (coupon.excludedPlans.some(p => planName.includes(p))) return false;
+    }
+    const normalizePeriod = value => String(value || '').trim().replace(/\\s+/g, '');
+    const normPeriod = normalizePeriod(period);
+
+    if (coupon.eligiblePeriods && coupon.eligiblePeriods.length > 0) {
+      if (!coupon.eligiblePeriods.some(p => normPeriod === normalizePeriod(p))) return false;
+    }
+    if (coupon.excludedPeriods && coupon.excludedPeriods.length > 0) {
+      if (coupon.excludedPeriods.some(p => normPeriod === normalizePeriod(p))) return false;
+    }
+    return true;
+  };`;
+
+const newIsApplicable = `
+function isCouponApplicableToPricing(brand, coupon, pricingEntry) {
+  if (!pricingEntry || !coupon) return false;
+  if (pricingEntry.couponEligible === false) return false;
+  
+  const planName = pricingEntry.name || pricingEntry.plan || pricingEntry.label || "";
+  const period = pricingEntry.period || "";
+  
+  const normalizePeriod = value => String(value || '').trim().replace(/\\s+/g, '');
+  const normPeriod = normalizePeriod(period);
+
+  if (coupon.applicablePairs && Array.isArray(coupon.applicablePairs) && coupon.applicablePairs.length > 0) {
+    let pairMatched = false;
+    for (const pair of coupon.applicablePairs) {
+      const pPlans = pair.plans || [];
+      const pPeriods = pair.periods || [];
+      const planMatch = pPlans.includes(planName);
+      const periodMatch = pPeriods.some(p => normalizePeriod(p) === normPeriod);
+      if (planMatch && periodMatch) {
+        pairMatched = true;
+        break;
+      }
+    }
+    if (!pairMatched) return false;
+  } else {
+    if (coupon.eligiblePlans && Array.isArray(coupon.eligiblePlans) && coupon.eligiblePlans.length > 0) {
+      const isEligible = coupon.eligiblePlans.some(p => planName.includes(p));
+      if (!isEligible) return false;
+    }
+    if (coupon.eligiblePeriods && Array.isArray(coupon.eligiblePeriods) && coupon.eligiblePeriods.length > 0) {
+      const isEligible = coupon.eligiblePeriods.some(p => normPeriod === normalizePeriod(p));
+      if (!isEligible) return false;
+    }
+  }
+
+  if (coupon.excludedPlans && Array.isArray(coupon.excludedPlans) && coupon.excludedPlans.length > 0) {
+    const isExcluded = coupon.excludedPlans.some(p => planName.includes(p));
+    if (isExcluded) return false;
+  }
+  if (coupon.excludedPeriods && Array.isArray(coupon.excludedPeriods) && coupon.excludedPeriods.length > 0) {
+    const isExcluded = coupon.excludedPeriods.some(p => normPeriod === normalizePeriod(p));
+    if (isExcluded) return false;
+  }
+  return true;
+}
+
+  const isApplicable = (coupon) => {
+    return isCouponApplicableToPricing(brand, coupon, pricingEntry);
+  };`;
+
+c = c.replace(oldIsApplicable, newIsApplicable);
+fs.writeFileSync('scripts/check-coupon-consistency.mjs', c);
