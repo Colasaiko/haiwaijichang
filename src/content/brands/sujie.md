@@ -14,7 +14,9 @@ purchase:
   url: 'https://work.speedworldaff.cc/#/?code=q1enwrOd'
   cloaked: true
 coupon:
-  discount: sujie888（8折)
+  code: sujie888
+  discountPercent: 20%
+  discount: 8折
 pricing:
   - name: 限时年付
     traffic: 50 GB
