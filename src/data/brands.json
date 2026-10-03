@@ -951,36 +951,37 @@
     "aff": "https://work.kuailicloud.cc/#/?code=9RhZkrkV"
   },
   {
-    "name": "飞V",
-    "discount": "fly20（8折)",
+    "name": "FlyV (飞V)",
+    "discount": "fly20（8折，新客专属）",
     "features": [
-      "云端多链路即时优化 + 全链路专线架构",
-      "流媒体全家桶全面覆盖，原生IP直通",
-      "ChatGPT 4 / GitHub Copilot 完整支持"
+      "多链路 BGP 调度及专线架构",
+      "提供原生 IP，支持 Netflix 等全面流媒体解锁",
+      "支持高阶 AI 开发者场景（如 ChatGPT 4, Claude Opus）",
+      "不限制在线设备数（常规套餐）"
     ],
     "pricing": [
       {
         "name": "入门方案",
         "traffic": "150 GB",
-        "price": "¥25.00/月"
+        "price": "¥25.00/月 | ¥255.00/年"
       },
       {
         "name": "进阶方案",
         "traffic": "380 GB",
-        "price": "¥50.00/月 | ¥62.00/季 | ¥255.00/年"
+        "price": "¥50.00/月 | ¥510.00/年"
       },
       {
         "name": "高端方案",
         "traffic": "800 GB",
-        "price": "¥110.00/月 | ¥103.00/季 | ¥415.00/年"
+        "price": "¥110.00/月 | ¥1122.00/年"
       },
       {
         "name": "商业方案",
         "traffic": "1.8 TB",
-        "price": "¥190.00/月 | ¥290.00/季 | ¥1025.00/年"
+        "price": "¥190.00/月 | ¥1938.00/年"
       }
     ],
-    "slug": "v",
+    "slug": "feiv",
     "aff": "https://varnexa.flyvaff.com/#/?code=6ae5FH9i"
   },
   {
