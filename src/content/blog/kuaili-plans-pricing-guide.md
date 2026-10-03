@@ -1,7 +1,7 @@
 ---
 title: "快狸多少钱？套餐价格、流量与付款周期完整指南"
 description: "快狸最新价格表与套餐详情，涵盖30GB到1000GB各档次流量，包含uufly888优惠码信息与付款周期真实价格对比。"
-pubDate: "2026-10-04"
+pubDate: "2026-10-03"
 category: "airport-observation"
 brands:
   - brand-8

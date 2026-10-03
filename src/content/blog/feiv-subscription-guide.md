@@ -1,7 +1,7 @@
 ---
 title: "FlyV 订阅怎么用？获取、导入、更新与节点问题指南"
 description: "详解 FlyV 订阅链接的获取与导入更新方法，解答订阅失败的常见问题，帮助您轻松管理 FlyV 节点。"
-pubDate: "2026-10-04"
+pubDate: "2026-10-03"
 category: "airport-observation"
 brands:
   - brand-20

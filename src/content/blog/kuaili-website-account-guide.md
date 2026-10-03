@@ -1,7 +1,7 @@
 ---
 title: "快狸怎么购买？注册、套餐选择、优惠码与续费指南"
 description: "手把手教您如何在快狸官网完成账号注册、购买套餐、填写优惠码以及后续续费与重置流量包。"
-pubDate: "2026-10-04"
+pubDate: "2026-10-03"
 category: "airport-observation"
 brands:
   - brand-8

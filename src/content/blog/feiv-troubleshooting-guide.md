@@ -1,7 +1,7 @@
 ---
 title: "FlyV 连不上怎么办？节点超时、订阅失败与速度异常排查"
 description: "FlyV 连不上怎么办？本文提供完整的故障排查指南，从节点超时、DNS 解析、系统代理冲突到本地网络（Wi-Fi/移动网络）故障，帮您快速定位问题。"
-pubDate: "2026-10-04"
+pubDate: "2026-10-03"
 category: "airport-observation"
 brands:
   - brand-20

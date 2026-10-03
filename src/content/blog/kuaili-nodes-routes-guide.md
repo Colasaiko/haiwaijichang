@@ -1,7 +1,7 @@
 ---
 title: "快狸节点怎么选？IEPL 线路、地区与延迟选择指南"
 description: "深度分析快狸的全IEPL专线网络，覆盖香港、台湾、日本、美国等节点地区配置，教您如何智能路由自动择优。"
-pubDate: "2026-10-04"
+pubDate: "2026-10-03"
 category: "airport-observation"
 brands:
   - brand-8

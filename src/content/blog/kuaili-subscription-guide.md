@@ -1,7 +1,7 @@
 ---
 title: "快狸订阅链接怎么用？订阅获取、导入、更新与常见问题指南"
-description: "详解快狸订阅链接的获取与导入方法，涵盖Clash、Shadowrocket等工具的配置步骤，并解答订阅更新失败等常见问题。"
-pubDate: "2026-10-04"
+description: "详解快狸订阅链接的获取与导入方法，，并解答订阅更新失败等常见问题。"
+pubDate: "2026-10-03"
 category: "airport-observation"
 brands:
   - brand-8

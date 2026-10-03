@@ -1,7 +1,7 @@
 ---
 title: "FlyV 多少钱？9 个套餐价格、流量与 fly20 优惠指南"
 description: "想知道 FlyV 多少钱？本文整理最新 FlyV 价格，包含 65GB、150GB 至 1.8TB 月付年付套餐，以及一次性流量包和 fly20 优惠码适用范围解析。"
-pubDate: "2026-10-04"
+pubDate: "2026-10-03"
 category: "airport-observation"
 brands:
   - brand-20

@@ -1,7 +1,7 @@
 ---
 title: "FlyV 节点和线路怎么样？BGP、IEPL / IPLC 与节点选择指南"
 description: "分析 FlyV 的真实线路架构，解析 BGP 多链路调度机制与 IEPL/IPLC 专线表现，为您在不同套餐和场景中挑选合适的节点提供建议。"
-pubDate: "2026-10-04"
+pubDate: "2026-10-03"
 category: "airport-observation"
 brands:
   - brand-20

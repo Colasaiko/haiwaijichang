@@ -1,7 +1,7 @@
 ---
 title: "快狸连不上怎么办？节点超时、订阅失败与速度异常排查指南"
 description: "全方位解答快狸连不上、单节点超时、连接成功但无法打开网页等常见问题，助您快速排查并恢复网络。"
-pubDate: "2026-10-04"
+pubDate: "2026-10-03"
 category: "airport-observation"
 brands:
   - brand-8
