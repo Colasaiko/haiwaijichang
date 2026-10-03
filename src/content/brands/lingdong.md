@@ -1,13 +1,13 @@
 ---
-name: 灵动网络
+name: 灵动云
 slug: lingdong
 order: 27
-seoTitle: 灵动网络 怎么样？2026 最新套餐价格与优惠码实测
+seoTitle: 灵动云 怎么样？2026 最新套餐价格与优惠码实测
 seoDescription: >-
-  灵动网络采用纯专线+BGP三网优化，晚高峰不限速，全节点1x倍率。支持Netflix、Disney+、ChatGPT等，提供Shadowsocks原生纯净IP。
-h1: 灵动网络 怎么样？纯专线与原生IP、套餐与最新优惠码
+  灵动云采用纯专线+BGP三网优化，晚高峰不限速，全节点1x倍率。支持Netflix、Disney+、ChatGPT等，提供Shadowsocks原生纯净IP。
+h1: 灵动云 怎么样？纯专线与原生IP、套餐与最新优惠码
 heroDescription: >-
-  灵动网络凭借纯专线+BGP三网优化的强力架构，确保晚高峰期间依然不限速。所有节点均为 1x 倍率，多设备同时在线无压力。原生纯净 IP 完美解锁各类流媒体及
+  灵动云凭借纯专线+BGP三网优化的强力架构，确保晚高峰期间依然不限速。所有节点均为 1x 倍率，多设备同时在线无压力。原生纯净 IP 完美解锁各类流媒体及
   AI 应用。
 lineType: 纯专线+BGP三网优化
 maxBandwidth: 晚高峰不限速
@@ -58,6 +58,7 @@ temporaryCoupons:
           - 年付
           - 二年付
           - 三年付
+    startsAt: '2026-09-24T00:00:00+08:00'
   - code: zq85
     discountPercent: 15%
     discount: 85折
@@ -76,6 +77,7 @@ temporaryCoupons:
           - 月付
           - 季付
           - 半年付
+    startsAt: '2026-09-24T00:00:00+08:00'
 pricing:
   - name: 穿云
     traffic: 79GB/月
@@ -342,7 +344,7 @@ visualData:
         months: 1
         price: 680
 ---
-根据当前收录的官方品牌资料，**灵动网络** 提供极为强悍的网络加速服务，其出色的网络架构和纯净的原生 IP ，为需要极致稳定体验的用户带来了完美解决方案。
+根据当前收录的官方品牌资料，**灵动云** 提供极为强悍的网络加速服务，其出色的网络架构和纯净的原生 IP ，为需要极致稳定体验的用户带来了完美解决方案。
 
 ### 已知服务特征
 - **纯专线 + BGP三网优化**：全线采用高端专线，无惧晚高峰拥堵，全程不限速。
