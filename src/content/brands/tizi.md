@@ -3,14 +3,13 @@ name: 梯子云
 slug: tizi
 order: 25
 seoTitle: 梯子云 怎么样？2026 最新套餐价格与 tiziyun 优惠码实测
-seoDescription: 详细介绍梯子云机场，基础中转与多入口智能调度，全程不限速，全节点1x倍率。原生解锁 Netflix 与 ChatGPT，附最新 9 个套餐及优惠码指南。
+seoDescription: 详细介绍梯子云机场，基础中转与多入口智能调度，全程不限速，全节点1x倍率。解锁 Netflix 与 ChatGPT，附最新 9 个套餐及优惠码指南。
 h1: 梯子云 怎么样？基础中转架构、套餐价格与最新优惠码
 heroDescription: >-
   梯子云提供基础中转加多入口智能调度，所有节点均 1x 倍率。无设备并发限制，全程不限速，完美支持 Netflix、YouTube 和 ChatGPT，使用
   Shadowsocks 协议，提供极致稳定的网络体验。
 lineType: 基础中转+多入口智能调度
 maxBandwidth: 不限速
-ipType: 流媒体解锁
 deviceLimit: 不限同时在线设备数
 customerSupport: 官方技术支持
 trafficReset: 根据套餐周期
@@ -18,8 +17,11 @@ clientSupport: 具体兼容性以官方当前支持情况为准
 streamingSupport:
   - Netflix
   - YouTube
+  - Disney+
+  - TikTok
 aiSupport:
   - ChatGPT
+  - Claude
 features:
   - 基础中转 + 多入口智能调度
   - 全程不限速
@@ -48,7 +50,7 @@ temporaryCoupons:
     discountPercent: 20%
     discount: 8折
     manualActive: true
-    expiresAt: '2026-10-10T23:59:59Z'
+    expiresAt: '2026-10-10T23:59:59+08:00'
     description: 双节优惠：适用于4个常规套餐的年付、二年付、三年付。
     applicablePairs:
       - plans:
@@ -64,7 +66,7 @@ temporaryCoupons:
     discountPercent: 15%
     discount: 85折
     manualActive: true
-    expiresAt: '2026-10-10T23:59:59Z'
+    expiresAt: '2026-10-10T23:59:59+08:00'
     description: 双节优惠：适用于4个常规套餐的月付、季付、半年付。
     applicablePairs:
       - plans:
@@ -341,6 +343,18 @@ visualData:
       - period: 月付
         months: 1
         price: 680
+established: '2025'
+nodeCoverage:
+  total: 60+
+  regions:
+    - 香港
+    - 日本
+    - 新加坡
+    - 美国
+    - 台湾
+paymentMethods:
+  - 支付宝
+  - USDT
 ---
 
 根据当前收录的官方品牌资料，**梯子云** 提供了适合不同需求用户的网络加速方案。请注意，目前站内对该品牌的独立测试数据仍在完善中，实际体验可能受限于您所在地区的网络环境和运营商（如电信、联通、移动）的路由差异。
@@ -348,7 +362,7 @@ visualData:
 ### 已知服务特征
 - 基础中转 + 多入口智能调度
 - 全程不限速，全节点 1x 计费倍率
-- 原生 IP 解锁 Netflix、YouTube、ChatGPT
+-  解锁 Netflix、YouTube、ChatGPT
 - 全面采用 Shadowsocks 协议
 - 不限制同时在线设备数量
 
