@@ -1,42 +1,341 @@
 ---
-order: 28
+name: 浪网 WaveNet
+slug: wavenet
+order: 26
+seoTitle: 浪网 WaveNet 怎么样？2026 最新套餐价格与优惠码实测
+seoDescription: >-
+  浪网 WaveNet 采用 BGP多线智能调度 + 专线出口，全程不限速，提供 Shadowsocks 节点。完美支持 Netflix/Disney+ 和
+  ChatGPT 解锁。
+h1: 浪网 WaveNet 怎么样？BGP与专线出口、套餐与最新优惠码
+heroDescription: >-
+  浪网 WaveNet 采用 BGP多线智能调度结合专线出口，所有节点均为 1x 倍率。无设备并发限制（除部分小包），全程不限速，流媒体支持卓越，同时支持多款
+  AI 工具，满足高要求的网络加速体验。
+lineType: BGP多线智能调度+专线出口
+maxBandwidth: 不限速
+nodeCoverage:
+  total: 约60+
+  regions:
+    - 日本
+    - 新加坡
+    - 美国
+    - 香港
+    - 台湾
+paymentMethods:
+  - 支付宝
+  - USDT
+deviceLimit: 常规套餐不限同时在线设备数
+customerSupport: 官方技术支持
+trafficReset: 根据套餐周期
+clientSupport: 具体兼容性以官方当前支持情况为准
+streamingSupport:
+  - Netflix
+  - Disney+
+  - HBO Max
+aiSupport:
+  - ChatGPT
+  - Claude
 features:
-  - "三网智能优化+纯专线出口"
-  - "主流流媒体与内容平台全解锁，4K/8K 稳定播放"
-  - "企业级 BGP 智能路由，不限速"
-name: "WaveNet"
-slug: "wavenet"
-title: "WaveNet 怎么样？2026 套餐价格与测评 | 海外机场"
-description: "为您整理 WaveNet 机场最新的套餐价格、优惠码以及线路特色。"
-featured: false
+  - BGP 多线智能调度 + 专线出口
+  - 全程不限速
+  - 全节点 1x 计费倍率
+  - 采用 Shadowsocks 协议
+  - 约 60 节点，覆盖日本、新加坡、美国、香港、台湾
+  - 支持支付宝与 USDT 支付
+  - 流媒体解锁：支持 Netflix、Disney+、HBO Max
+  - AI 解锁：支持 ChatGPT、Claude
+  - 常规套餐不限同时在线设备数
+  - 小流量包限 1 台设备
+  - 定制线路提供独立公网 IP 与独占带宽
 purchase:
-  label: "快速购买"
-  url: "https://varnexa.wavenetaff.com/#/?code=pcFhy7Lb"
+  label: 快速购买
+  url: 'https://varnexa.wavenetaff.com/#/?code=pcFhy7Lb'
   cloaked: true
 coupon:
-  discount: "lw888（8折)"
+  code: lw888
+  discountPercent: 20%
+  discount: 8折
+  scope: 新户专属，常规套餐专用
+  description: lw888 8折新户专属优惠码，仅适用于浪网 入门、浪网 进阶、浪网 高端、浪网 商业四个常规套餐的全部付款周期。其余特殊套餐及流量包不适用。
+  label: 新户专属 8 折
+  eligiblePlans:
+    - 浪网 入门
+    - 浪网 进阶
+    - 浪网 高端
+    - 浪网 商业
 pricing:
-  - name: "浪网 年付标准"
-    traffic: "80 GB"
-    price: "¥119.00/年"
-  - name: "浪网 入门"
-    traffic: "150 GB"
-    price: "¥30.00/月 | ¥85.50/季"
-  - name: "浪网 进阶"
-    traffic: "400 GB"
-    price: "¥70.00/月 | ¥199.50/季 | ¥378.00/半年"
-  - name: "浪网 高端"
-    traffic: "800 GB"
-    price: "¥120.00/月 | ¥342.00/季 | ¥1224.00/年"
-  - name: "浪网 商业"
-    traffic: "2.0 TB"
-    price: "¥200.00/月 | ¥570.00/季 | ¥2040.00/年"
+  - name: 浪网 年付标准
+    traffic: 80GB/月
+    period: 年付
+    price: ¥119.00
+  - name: 浪网 入门
+    traffic: 150GB/月
+    period: 月付
+    price: ¥30.00
+  - name: 浪网 入门
+    traffic: 150GB/月
+    period: 季付
+    price: ¥85.50
+  - name: 浪网 入门
+    traffic: 150GB/月
+    period: 半年付
+    price: ¥162.00
+  - name: 浪网 入门
+    traffic: 150GB/月
+    period: 年付
+    price: ¥306.00
+  - name: 浪网 入门
+    traffic: 150GB/月
+    period: 二年付
+    price: ¥576.00
+  - name: 浪网 入门
+    traffic: 150GB/月
+    period: 三年付
+    price: ¥810.00
+  - name: 浪网 进阶
+    traffic: 400GB/月
+    period: 月付
+    price: ¥70.00
+  - name: 浪网 进阶
+    traffic: 400GB/月
+    period: 季付
+    price: ¥199.50
+  - name: 浪网 进阶
+    traffic: 400GB/月
+    period: 半年付
+    price: ¥378.00
+  - name: 浪网 进阶
+    traffic: 400GB/月
+    period: 年付
+    price: ¥714.00
+  - name: 浪网 进阶
+    traffic: 400GB/月
+    period: 二年付
+    price: ¥1344.00
+  - name: 浪网 进阶
+    traffic: 400GB/月
+    period: 三年付
+    price: ¥1890.00
+  - name: 浪网 高端
+    traffic: 800GB/月
+    period: 月付
+    price: ¥120.00
+  - name: 浪网 高端
+    traffic: 800GB/月
+    period: 季付
+    price: ¥342.00
+  - name: 浪网 高端
+    traffic: 800GB/月
+    period: 半年付
+    price: ¥648.00
+  - name: 浪网 高端
+    traffic: 800GB/月
+    period: 年付
+    price: ¥1224.00
+  - name: 浪网 高端
+    traffic: 800GB/月
+    period: 二年付
+    price: ¥2304.00
+  - name: 浪网 高端
+    traffic: 800GB/月
+    period: 三年付
+    price: ¥3240.00
+  - name: 浪网 商业
+    traffic: 2TB/月
+    period: 月付
+    price: ¥200.00
+  - name: 浪网 商业
+    traffic: 2TB/月
+    period: 季付
+    price: ¥570.00
+  - name: 浪网 商业
+    traffic: 2TB/月
+    period: 半年付
+    price: ¥1080.00
+  - name: 浪网 商业
+    traffic: 2TB/月
+    period: 年付
+    price: ¥2040.00
+  - name: 浪网 商业
+    traffic: 2TB/月
+    period: 二年付
+    price: ¥3840.00
+  - name: 浪网 商业
+    traffic: 2TB/月
+    period: 三年付
+    price: ¥5400.00
+  - name: 浪网 小流量包
+    traffic: 180GB
+    period: 一次性
+    price: ¥239.00
+  - name: 浪网 标准流量包
+    traffic: 450GB
+    period: 一次性
+    price: ¥569.00
+  - name: 浪网 精英流量包
+    traffic: 900GB
+    period: 一次性
+    price: ¥1099.00
+  - name: 浪网 定制线路
+    traffic: 500GB/月
+    period: 月付
+    price: ¥680.00
+resetPackages:
+  - plan: 浪网 年付标准
+    price: 89
+  - plan: 浪网 入门
+    price: 30
+  - plan: 浪网 进阶
+    price: 68
+  - plan: 浪网 高端
+    price: 120
+  - plan: 浪网 商业
+    price: 195
+  - plan: 浪网 定制线路
+    price: 680
+visualData:
+  traffic:
+    - label: 年付标准
+      plan: 浪网 年付标准
+      value: 80
+      display: 80GB
+    - label: 入门
+      plan: 浪网 入门
+      value: 150
+      display: 150GB
+    - label: 小流量包
+      plan: 浪网 小流量包
+      value: 180
+      display: 180GB
+    - label: 进阶
+      plan: 浪网 进阶
+      value: 400
+      display: 400GB
+    - label: 标准流量包
+      plan: 浪网 标准流量包
+      value: 450
+      display: 450GB
+    - label: 定制线路
+      plan: 浪网 定制线路
+      value: 500
+      display: 500GB
+    - label: 高端
+      plan: 浪网 高端
+      value: 800
+      display: 800GB
+    - label: 精英流量包
+      plan: 浪网 精英流量包
+      value: 900
+      display: 900GB
+    - label: 商业
+      plan: 浪网 商业
+      value: 2048
+      display: 2TB
+  periodPrices:
+    浪网 年付标准:
+      - period: 年付
+        months: 12
+        price: 119
+    浪网 入门:
+      - period: 月付
+        months: 1
+        price: 30
+      - period: 季付
+        months: 3
+        price: 85.5
+      - period: 半年付
+        months: 6
+        price: 162
+      - period: 年付
+        months: 12
+        price: 306
+      - period: 二年付
+        months: 24
+        price: 576
+      - period: 三年付
+        months: 36
+        price: 810
+    浪网 进阶:
+      - period: 月付
+        months: 1
+        price: 70
+      - period: 季付
+        months: 3
+        price: 199.5
+      - period: 半年付
+        months: 6
+        price: 378
+      - period: 年付
+        months: 12
+        price: 714
+      - period: 二年付
+        months: 24
+        price: 1344
+      - period: 三年付
+        months: 36
+        price: 1890
+    浪网 高端:
+      - period: 月付
+        months: 1
+        price: 120
+      - period: 季付
+        months: 3
+        price: 342
+      - period: 半年付
+        months: 6
+        price: 648
+      - period: 年付
+        months: 12
+        price: 1224
+      - period: 二年付
+        months: 24
+        price: 2304
+      - period: 三年付
+        months: 36
+        price: 3240
+    浪网 商业:
+      - period: 月付
+        months: 1
+        price: 200
+      - period: 季付
+        months: 3
+        price: 570
+      - period: 半年付
+        months: 6
+        price: 1080
+      - period: 年付
+        months: 12
+        price: 2040
+      - period: 二年付
+        months: 24
+        price: 3840
+      - period: 三年付
+        months: 36
+        price: 5400
+    浪网 小流量包:
+      - period: 一次性
+        months: 0
+        price: 239
+    浪网 标准流量包:
+      - period: 一次性
+        months: 0
+        price: 569
+    浪网 精英流量包:
+      - period: 一次性
+        months: 0
+        price: 1099
+    浪网 定制线路:
+      - period: 月付
+        months: 1
+        price: 680
 ---
+根据当前收录的官方品牌资料，**浪网 WaveNet** 提供了稳定高速的网络加速方案。从常规流量套餐到特殊定制线路，满足了普通浏览、流媒体重度用户甚至企业级定制的需求。
 
-根据当前收录的官方品牌资料，**WaveNet** 提供了适合不同需求用户的网络加速方案。请注意，目前站内对该品牌的独立测试数据仍在完善中，实际体验可能受限于您所在地区的网络环境和运营商（如电信、联通、移动）的路由差异。
+### 已知服务特征
+- **BGP多线智能调度 + 专线出口**：结合 BGP 与专线优势，优化延迟和稳定性。
+- **全程不限速，全节点 1x 计费**：确保高峰期带宽，且无多倍率节点造成的流量焦虑。
+- **协议与设备支持**：采用 Shadowsocks 协议，常规套餐不限制在线设备数（小流量包限制 1 台）。
+- **节点覆盖**：提供约 60 个节点，主要覆盖香港、台湾、日本、新加坡、美国等核心区域。
+- **解锁支持**：有效解锁 Netflix、Disney+、HBO Max 及 ChatGPT、Claude 等海外流媒体与 AI 应用。
+- **支付与定制**：支持支付宝和 USDT，高级定制线路享有独立公网 IP 与独占带宽。
 
-### 已知服务特性
-
-- 三网智能优化+纯专线出口
-- 主流流媒体与内容平台全解锁，4K/8K 稳定播放
-- 企业级 BGP 智能路由，不限速
+优惠码特别说明：当前 **lw888**（新户专属 8折）仅适用于“浪网 入门”、“浪网 进阶”、“浪网 高端”、“浪网 商业”四个常规套餐的所有周期。其余如年付标准、一次性流量包以及定制线路均不享受该折扣。目前未确认其他限时活动。
