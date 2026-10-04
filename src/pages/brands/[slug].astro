@@ -83,272 +83,185 @@ const relatedBrands = curatedSlugs
     ]
   })} />
 
-  <section class="pt-32 pb-16 bg-brand-dark border-b border-white/5 relative">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Breadcrumb UI -->
-      <nav class="flex items-center space-x-2 text-xs font-mono tracking-wider text-slate-500 mb-8 uppercase">
-        <a href="/" class="hover:text-brand-neon transition-colors">HOME</a>
-        <span>/</span>
-        <a href="/brands" class="hover:text-brand-neon transition-colors">BRANDS</a>
-        <span>/</span>
-        <span class="text-white">{brand.slug}</span>
-      </nav>
-
-      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
-        <div>
-          <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-6 flex flex-col items-start gap-5">
-            <span>{brand.h1 || brand.name}</span>
-            <span 
-              id="hero-limited-coupon-slot"
-              data-temporary-coupons={JSON.stringify(brand.temporaryCoupons || [])}
-              class="inline-flex flex-col sm:flex-row sm:items-center sm:flex-wrap text-sm md:text-base font-normal tracking-normal bg-brand-navy/30 border border-brand-accent/30 rounded px-4 py-2 text-brand-accent gap-2 md:gap-3 shadow-[0_0_15px_rgba(250,204,21,0.1)] max-w-full"
-            >
-              <span class="bg-brand-accent text-brand-dark px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider whitespace-nowrap shrink-0">限时优惠码</span>
-              <span class="flex items-center flex-wrap gap-2 md:gap-3">
-                <strong id="h1-temp-code" class="font-mono text-brand-neon tracking-wider">-</strong>
-                <button id="h1-temp-copy" class="hidden items-center justify-center bg-white/10 hover:bg-white/20 text-white text-[10px] px-2 py-0.5 rounded cursor-pointer transition-colors" title="复制优惠码">复制</button>
-                <span class="opacity-50">｜</span>
-                <strong id="h1-temp-discount">-</strong>
-                <span id="h1-temp-expiry-sep" class="opacity-50 hidden">｜</span>
-                <span id="h1-temp-expiry" class="text-xs md:text-sm text-slate-300 hidden"></span>
-              </span>
-            </span>
+  <section class="relative pt-32 pb-16 overflow-hidden bg-brand-navy border-b border-white/5">
+    <div class="absolute inset-0 z-0">
+      <div class="absolute inset-0 bg-brand-dark/80 mix-blend-multiply"></div>
+      <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-neon/5 to-transparent"></div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="flex flex-col md:flex-row items-start justify-between gap-8 md:gap-12">
+        
+        <!-- 左侧 58% -->
+        <div class="w-full md:w-[58%] flex flex-col">
+          <!-- Breadcrumb -->
+          <nav class="flex items-center space-x-2 text-xs font-mono tracking-wider text-slate-500 mb-8 uppercase" aria-label="Breadcrumb">
+              <a href="/" class="hover:text-brand-neon transition-colors">Home</a>
+              <span>/</span>
+              <a href="/brands" class="hover:text-brand-neon transition-colors">Brands</a>
+              <span>/</span>
+              <span class="text-brand-accent">{brand.name}</span>
+          </nav>
+          
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 text-white leading-tight max-w-3xl">
+              {brand.h1 || brand.title}
           </h1>
+          
           <div class="flex flex-wrap gap-2 mb-6">
-            {hasIPLC && <span class="text-[0.7rem] font-bold tracking-widest bg-brand-accent text-brand-dark px-3 py-1 rounded-sm uppercase">IPLC 专线</span>}
-            {hasIEPL && <span class="text-[0.7rem] font-bold tracking-widest bg-purple-500 text-white px-3 py-1 rounded-sm uppercase border border-purple-400">IEPL 专线</span>}
-            {hasNetflix && <span class="text-[0.7rem] font-bold tracking-widest bg-white/10 text-white px-3 py-1 rounded-sm uppercase border border-white/20">Streaming</span>}
-            {hasAI && <span class="text-[0.7rem] font-bold tracking-widest bg-white/10 text-white px-3 py-1 rounded-sm uppercase border border-white/20">AI Ready</span>}
+              {brand.lineType && <span class="text-[0.7rem] font-bold tracking-widest bg-brand-accent text-brand-dark px-3 py-1 rounded-sm uppercase">{brand.lineType}</span>}
+              {brand.protocols?.map(p => <span class="text-[0.7rem] font-bold tracking-widest bg-purple-500 text-white px-3 py-1 rounded-sm uppercase border border-purple-400">{p}</span>)}
+              {hasNetflix && <span class="text-[0.7rem] font-bold tracking-widest bg-white/10 text-white px-3 py-1 rounded-sm uppercase border border-white/20">Streaming</span>}
+              {hasAI && <span class="text-[0.7rem] font-bold tracking-widest bg-white/10 text-white px-3 py-1 rounded-sm uppercase border border-white/20">AI Ready</span>}
           </div>
+          
           <p class="text-lg text-slate-400 max-w-2xl leading-relaxed">
-            {brand.heroDescription || "查看该品牌当前收录的线路、套餐与使用资料。"}
+              {brand.heroDescription || "探索更多优质网络服务。"}
           </p>
         </div>
-        
-        <div class="shrink-0 w-full md:w-auto md:max-w-md lg:max-w-lg flex flex-col items-start md:items-end">
-          {(brand.purchase?.url || brand.aff) ? (
-            <a href={brand.purchase?.url || brand.aff} data-departure-link class="inline-flex items-center justify-center px-8 py-4 bg-brand-neon text-brand-dark font-bold text-lg rounded-sm hover:bg-white transition-all uppercase tracking-widest shadow-[0_0_20px_rgba(56,189,248,0.3)] w-full md:w-auto">
-              快速购买
-            </a>
-          ) : (
-            <span class="inline-flex items-center justify-center px-8 py-4 bg-white/10 text-slate-400 font-bold text-lg rounded-sm cursor-not-allowed uppercase tracking-widest w-full md:w-auto">
-              购买入口待补充
-            </span>
-          )}
-          {brand.telegram && (
-            <a
-              href={brand.telegram}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="mt-4 inline-flex items-center justify-center px-6 py-3 bg-sky-500 text-white font-bold rounded-sm hover:bg-sky-400 transition-all w-full md:w-auto"
-            >
-              Telegram 频道
-            </a>
-          )}
-          {(() => {
-            const stdCoupon = brand.coupon;
-            return (
-              <div class="mt-4 flex flex-col items-end justify-center space-y-3 w-full">
+
+        <!-- 右侧 42% -->
+        <div class="w-full md:w-[42%] flex flex-col">
+          <!-- 品牌快速速览卡片 -->
+          <div class="bg-brand-dark/50 border border-white/10 rounded-xl p-6 backdrop-blur-sm shadow-xl w-full">
+            <h3 class="text-sm font-bold text-white mb-4 flex items-center">
+              <svg class="w-5 h-5 text-brand-neon mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              品牌快速速览
+            </h3>
+            
+            <ul class="space-y-3 mb-6">
+              {(() => {
+                const minPrice = brand.pricing && brand.pricing.length > 0 ? Math.min(...brand.pricing.map(p => p.price)) : null;
+                const items = [];
+                if (minPrice !== null && minPrice !== Infinity) items.push({ label: '最低套餐', value: `¥${minPrice}/起` });
+                if (brand.lineType) items.push({ label: '线路类型', value: brand.lineType });
+                if (brand.protocols && brand.protocols.length > 0) items.push({ label: '支持协议', value: brand.protocols.join(', ') });
+                if (brand.nodeCoverage && (brand.nodeCoverage.total || brand.nodeCoverage.regions)) items.push({ label: '节点覆盖', value: brand.nodeCoverage.total || brand.nodeCoverage.regions?.join('/') });
+                if (brand.deviceLimit) items.push({ label: '设备限制', value: String(brand.deviceLimit) });
+                if (brand.speedLimit || brand.maxBandwidth) items.push({ label: '最高带宽', value: brand.maxBandwidth || brand.speedLimit });
                 
-                {/* Detailed Temp Coupon Card (Client-side populated) */}
-                <div id="hero-temp-detailed-card" class="hidden flex-col bg-brand-dark border border-brand-accent px-6 py-4 rounded-md text-sm shadow-[0_0_15px_rgba(250,204,21,0.2)] w-full">
-                  <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
-                    <span class="text-[10px] font-bold tracking-widest bg-brand-accent text-brand-dark px-2 py-0.5 rounded uppercase flex items-center shrink-0">
-                      <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                      LIMITED OFFER
-                    </span>
-                    <span id="card-temp-countdown" class="text-brand-accent font-bold text-[10px] sm:text-xs ml-2 text-right"></span>
-                  </div>
-                  <div id="card-temp-name" class="text-white font-bold mb-3 text-center">-</div>
-                  <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-center gap-3">
-                    <div class="flex items-center">
-                      <span class="text-slate-400 mr-2 text-xs shrink-0">优惠码:</span>
-                      <code id="card-temp-code" class="text-brand-neon font-bold tracking-wider text-base">-</code>
-                    </div>
-                    <div class="flex items-center sm:border-l sm:border-white/20 sm:pl-3">
-                      <span class="text-slate-400 mr-2 text-xs shrink-0">优惠:</span>
-                      <span id="card-temp-discount" class="text-brand-accent font-bold text-base">-</span>
-                    </div>
-                    <div class="flex items-center sm:border-l sm:border-white/20 sm:pl-3">
-                      <span class="text-slate-400 mr-2 text-xs shrink-0">范围:</span>
-                      <span id="card-temp-scope" class="text-white text-xs">-</span>
-                    </div>
-                  </div>
-                </div>
+                return items.slice(0, 5).map(item => (
+                  <li class="flex justify-between items-center border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                    <span class="text-xs text-slate-400 font-mono uppercase">{item.label}</span>
+                    <span class="text-sm text-white font-medium text-right max-w-[60%] line-clamp-1" title={item.value}>{item.value}</span>
+                  </li>
+                ));
+              })()}
+            </ul>
 
-                {/* Standard Coupon */}
-                {stdCoupon && (
-                  <div class="inline-flex flex-col sm:flex-row sm:flex-wrap sm:items-center bg-brand-dark border border-brand-neon/30 px-6 py-3 rounded-md text-sm shadow-[0_0_10px_rgba(56,189,248,0.1)] gap-3 w-full justify-center lg:justify-start">
-                    <div class="w-full text-center sm:hidden mb-1 text-[10px] text-slate-500 uppercase tracking-widest border-b border-white/5 pb-1">常驻优惠</div>
-                    <div class="hidden sm:block text-[10px] font-bold tracking-widest bg-brand-neon/20 text-brand-neon px-2 py-0.5 rounded uppercase mr-2 shrink-0">常驻优惠</div>
-                    
-                    <div class="flex items-center justify-center">
-                      <span class="text-slate-400 mr-2 text-xs shrink-0">优惠码:</span>
-                      <code class="text-brand-neon font-bold tracking-wider">{stdCoupon.code}</code>
-                    </div>
-
-                    {stdCoupon.discount && (
-                      <div class="flex items-center justify-center sm:border-l sm:border-white/20 sm:pl-3">
-                        <span class="text-slate-400 mr-2 text-xs shrink-0">优惠:</span>
-                        <span class="text-brand-accent font-bold">{stdCoupon.discount}</span>
-                      </div>
-                    )}
-
-                    {stdCoupon.scope && (
-                      <div class="flex items-center justify-center sm:border-l sm:border-white/20 sm:pl-3">
-                        <span class="text-slate-400 mr-2 text-xs shrink-0">适用范围:</span>
-                        <span class="text-white text-xs text-center">{stdCoupon.scope}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
+            <!-- 优惠区域 -->
+            <div class="mb-6 p-4 rounded-lg bg-white/5 border border-white/10" id="hero-promo-container">
+              {(() => {
+                const hasTemp = brand.temporaryCoupons && brand.temporaryCoupons.length > 0;
+                const std = brand.coupon;
+                if (!hasTemp && !std) {
+                  return <div class="text-center text-sm text-slate-400 py-2">暂无公开优惠</div>;
+                }
                 
-                <script is:inline>
-                  (function() {
-                    const slot = document.getElementById('hero-limited-coupon-slot');
-                    if (!slot) return;
-                    
-                    const tempsRaw = slot.getAttribute('data-temporary-coupons');
-                    let temps = [];
-                    try { temps = JSON.parse(tempsRaw); } catch(e) {}
-                    
-                    const h1Code = document.getElementById('h1-temp-code');
-                    const h1Discount = document.getElementById('h1-temp-discount');
-                    const h1Expiry = document.getElementById('h1-temp-expiry');
-                    const h1ExpirySep = document.getElementById('h1-temp-expiry-sep');
-                    const h1Copy = document.getElementById('h1-temp-copy');
-                    
-                    const card = document.getElementById('hero-temp-detailed-card');
-                    const cardName = document.getElementById('card-temp-name');
-                    const cardCode = document.getElementById('card-temp-code');
-                    const cardDiscount = document.getElementById('card-temp-discount');
-                    const cardScope = document.getElementById('card-temp-scope');
-                    const cardCountdown = document.getElementById('card-temp-countdown');
-                    
-                    let activeInterval = null;
-                    
-                    function update() {
-                      const now = Date.now();
-                      const activeTemps = temps.filter(c => {
-                        if (c.manualActive === false) return false;
-                        if (c.manualActive === true) {
-                          if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
-                          if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
-                          return true;
-                        }
-                        if (!c.startsAt || !c.expiresAt) return false;
-                        const s = new Date(c.startsAt).getTime();
-                        const e = new Date(c.expiresAt).getTime();
-                        return now >= s && now <= e;
-                      });
-                      
-                      if (activeTemps.length > 0) {
-                        activeTemps.sort((a, b) => (b.priority || 0) - (a.priority || 0));
-                        
-                        // Populate H1
-                        h1Code.textContent = activeTemps.map(c => c.code).join(' / ');
-                        h1Discount.textContent = activeTemps.map(c => c.discount).join(' / ');
-                        
-                        const earliestExpiry = activeTemps.map(c => c.expiresAt).filter(Boolean).sort()[0];
-                        if (earliestExpiry) {
-                          const expDate = new Date(earliestExpiry);
-                          h1Expiry.textContent = (expDate.getMonth() + 1) + '月' + expDate.getDate() + '日截止';
-                        } else {
-                          h1Expiry.textContent = '截止时间以官方公告为准';
-                        }
-                        h1Expiry.classList.remove('hidden');
-                        h1ExpirySep.classList.remove('hidden');
-                        h1Copy.classList.add('hidden'); // disable single copy for multiple
-                        h1Copy.classList.remove('flex');
-                        if(activeTemps.length === 1) {
-                            h1Copy.classList.remove('hidden');
-                            h1Copy.classList.add('flex');
-                            h1Copy.onclick = () => {
-                              navigator.clipboard.writeText(activeTemps[0].code).then(() => {
-                                h1Copy.textContent = '已复制';
-                                setTimeout(() => h1Copy.textContent = '复制', 2000);
-                              });
-                            };
-                        }
-                        
-                        // Populate Card
-                        if (card) {
-                          card.style.display = 'flex';
-                          
-                          if (activeTemps.length === 1) {
-                              const best = activeTemps[0];
-                              cardName.textContent = best.name || '限时优惠';
-                              cardCode.textContent = best.code;
-                              cardDiscount.textContent = best.discount;
-                              cardScope.textContent = best.scope || '-';
-                          } else {
-                              cardName.textContent = '双节限时活动';
-                              // Dynamically construct rows for multiple coupons
-                              const container = cardName.nextElementSibling;
-                              if (container) {
-                                  container.innerHTML = activeTemps.map(c => `
-                                      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-2 mb-2 w-full text-center sm:text-left gap-1 last:border-0 last:pb-0 last:mb-0">
-                                          <div class="flex flex-col">
-                                            <span class="text-white text-xs font-bold">${c.scope || '-'}</span>
-                                            <div class="flex items-center justify-center sm:justify-start gap-2 mt-1">
-                                                <code class="text-brand-neon font-bold tracking-wider text-base">${c.code}</code>
-                                                <span class="text-brand-accent font-bold text-sm">${c.discount}</span>
-                                            </div>
-                                          </div>
-                                          <button class="bg-white/10 hover:bg-white/20 text-white text-[10px] px-3 py-1 rounded cursor-pointer transition-colors shrink-0 self-center" onclick="navigator.clipboard.writeText('${c.code}').then(()=>{this.textContent='已复制';setTimeout(()=>this.textContent='复制',2000)})">复制</button>
-                                      </div>
-                                  `).join('');
-                                  // Update layout class so it stacks nicely
-                                  container.className = "flex flex-col justify-center gap-2 w-full";
-                              }
-                          }
-                          
-                          if (earliestExpiry) {
-                            const expiresAt = new Date(earliestExpiry).getTime();
-                            const diff = expiresAt - now;
-                            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                            cardCountdown.textContent = `剩余 ${d}天 ${h}小时`;
-                          } else {
-                            cardCountdown.textContent = '活动进行中';
-                          }
-                        }
-                        return true;
-                      } else {
-                        // Reset to placeholders
-                        h1Code.textContent = '-';
-                        h1Discount.textContent = '-';
-                        h1Expiry.classList.add('hidden');
-                        h1ExpirySep.classList.add('hidden');
-                        h1Copy.classList.add('hidden');
-                        h1Copy.classList.remove('flex');
-                        
-                        if (card) {
-                          card.style.display = 'none';
-                        }
-                        if (activeInterval) clearInterval(activeInterval);
-                        document.body.classList.remove('has-active-temp-coupon');
-                        document.body.classList.add('no-active-temp-coupon');
-                        return false;
-                      }
-                    }
-                    
-                    if (update()) {
-                      document.body.classList.remove('no-active-temp-coupon');
-                      document.body.classList.add('has-active-temp-coupon');
-                      activeInterval = setInterval(update, 1000 * 60 * 60);
-                    } else {
-                      document.body.classList.remove('has-active-temp-coupon');
-                      document.body.classList.add('no-active-temp-coupon');
-                    }
-                  })();
-                </script>
-              </div>
-            );
-          })()}
+                if (hasTemp) {
+                  return (
+                    <div id="hero-temp-promo" class="hidden flex-col items-center justify-center text-center">
+                      <span class="text-[10px] font-bold bg-brand-accent text-brand-dark px-2 py-0.5 rounded uppercase mb-3 tracking-widest">限时优惠活动</span>
+                      <div class="flex flex-col gap-2 w-full" id="hero-temp-list"></div>
+                      <span id="hero-temp-expiry" class="text-[10px] text-slate-400 mt-3 border-t border-white/10 pt-2 w-full"></span>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div class="flex flex-col items-center justify-center text-center">
+                      <span class="text-[10px] font-bold bg-white/20 text-white px-2 py-0.5 rounded uppercase mb-2 tracking-widest">常驻优惠</span>
+                      <code class="text-brand-neon font-bold text-lg tracking-widest">{std.code}</code>
+                      <span class="text-brand-accent text-sm mt-1">{std.discount}</span>
+                    </div>
+                  );
+                }
+              })()}
+            </div>
+            
+            <!-- 按钮 -->
+            <div class="flex flex-col gap-3">
+              {brand.purchase?.url || brand.aff ? (
+                <a href={brand.purchase?.url || brand.aff} target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center px-6 py-3.5 bg-brand-neon text-brand-dark font-bold rounded-sm hover:bg-white transition-all uppercase tracking-widest shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+                  快速购买
+                </a>
+              ) : (
+                <span class="w-full flex items-center justify-center px-6 py-3.5 bg-white/10 text-slate-400 font-bold rounded-sm cursor-not-allowed uppercase tracking-widest">
+                  购买入口待补充
+                </span>
+              )}
+              
+              {brand.telegram && (
+                <a href={brand.telegram} target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center px-6 py-3 bg-sky-500 text-white font-bold rounded-sm hover:bg-sky-400 transition-all text-sm shadow-[0_0_10px_rgba(14,165,233,0.3)]">
+                  Telegram 频道
+                </a>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    
+    {brand.temporaryCoupons && brand.temporaryCoupons.length > 0 && (
+      <script is:inline define:vars={{ temps: brand.temporaryCoupons, stdCoupon: brand.coupon }}>
+        (function() {
+          const now = Date.now();
+          const activeTemps = temps.filter(c => {
+            if (c.manualActive === false) return false;
+            if (c.manualActive === true) {
+              if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
+              if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
+              return true;
+            }
+            if (!c.startsAt || !c.expiresAt) return false;
+            const s = new Date(c.startsAt).getTime();
+            const e = new Date(c.expiresAt).getTime();
+            return now >= s && now <= e;
+          });
+
+          const container = document.getElementById('hero-temp-promo');
+          const list = document.getElementById('hero-temp-list');
+          const expiry = document.getElementById('hero-temp-expiry');
+          const root = document.getElementById('hero-promo-container');
+          
+          if (activeTemps.length > 0) {
+            activeTemps.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+            
+            if (container && list) {
+              container.style.display = 'flex';
+              list.innerHTML = activeTemps.map(c => `
+                <div class="flex items-center justify-between bg-black/20 p-2 rounded border border-white/5">
+                  <div class="flex flex-col text-left">
+                    <span class="text-[10px] text-slate-400 mb-0.5">${c.scope || '-'}</span>
+                    <div class="flex items-baseline gap-2">
+                      <code class="text-brand-neon font-bold text-sm tracking-widest">${c.code}</code>
+                      <span class="text-brand-accent text-xs font-bold">${c.discount}</span>
+                    </div>
+                  </div>
+                  <button class="bg-brand-navy border border-white/10 hover:border-brand-neon/50 hover:bg-brand-navy/80 text-white text-[10px] px-3 py-1.5 rounded cursor-pointer transition-colors" onclick="navigator.clipboard.writeText('${c.code}').then(()=>{this.textContent='已复制';setTimeout(()=>this.textContent='复制',2000)})">复制</button>
+                </div>
+              `).join('');
+              
+              const earliestExpiry = activeTemps.map(c => c.expiresAt).filter(Boolean).sort()[0];
+              if (earliestExpiry && expiry) {
+                const expDate = new Date(earliestExpiry);
+                expiry.textContent = (expDate.getMonth() + 1) + '月' + expDate.getDate() + '日截止，请抓紧时间！';
+              }
+            }
+          } else {
+            if (stdCoupon) {
+              root.innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center">
+                  <span class="text-[10px] font-bold bg-white/20 text-white px-2 py-0.5 rounded uppercase mb-2 tracking-widest">常驻优惠</span>
+                  <code class="text-brand-neon font-bold text-lg tracking-widest">${stdCoupon.code}</code>
+                  <span class="text-brand-accent text-sm mt-1">${stdCoupon.discount}</span>
+                </div>
+              `;
+            } else {
+              root.innerHTML = `<div class="text-center text-sm text-slate-400 py-2">暂无公开优惠</div>`;
+            }
+          }
+        })();
+      </script>
+    )}
   </section>
 
   <!-- Details Content -->
