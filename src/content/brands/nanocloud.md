@@ -110,6 +110,7 @@ visualData:
       - period: 年付
         months: 12
         price: 240
+telegram: 'https://t.me/+ozCTB7VsmvFkMTNl'
 ---
 根据当前收录的官方品牌资料，**NanoCloud** 以极高的性价比和全面的客户端生态，为不同需求的用户提供了灵活的网络接入方案。
 
@@ -124,4 +125,4 @@ visualData:
   - **射手座** (不限速，10台设备)
 
 **优惠说明**：
-NanoCloud 当前暂无通用的公开优惠码，请加入官方 TG 群组获取最新内部专属优惠及活动信息。
+NanoCloud 当前暂无公开通用优惠码，可加入官方 Telegram 频道获取内部优惠与活动信息。
