@@ -130,9 +130,16 @@ const relatedBrands = curatedSlugs
             
             <ul class="space-y-3 mb-6">
               {(() => {
-                const minPrice = brand.pricing && brand.pricing.length > 0 ? Math.min(...brand.pricing.map(p => p.price)) : null;
+                const minPrice = brand.pricing && brand.pricing.length > 0 ? Math.min(...brand.pricing.map(p => {
+                  if (typeof p.price === 'number') return p.price;
+                  if (typeof p.price === 'string') {
+                    const num = parseFloat(p.price.replace(/[^\d.]/g, ''));
+                    return isNaN(num) ? Infinity : num;
+                  }
+                  return Infinity;
+                })) : null;
                 const items = [];
-                if (minPrice !== null && minPrice !== Infinity) items.push({ label: '最低套餐', value: `¥${minPrice}/起` });
+                if (minPrice !== null && minPrice !== Infinity) items.push({ label: '最低套餐', value: `¥${minPrice}起` });
                 if (brand.lineType) items.push({ label: '线路类型', value: brand.lineType });
                 if (brand.protocols && brand.protocols.length > 0) items.push({ label: '支持协议', value: brand.protocols.join(', ') });
                 if (brand.nodeCoverage && (brand.nodeCoverage.total || brand.nodeCoverage.regions)) items.push({ label: '节点覆盖', value: brand.nodeCoverage.total || brand.nodeCoverage.regions?.join('/') });
@@ -180,7 +187,7 @@ const relatedBrands = curatedSlugs
             <!-- 按钮 -->
             <div class="flex flex-col gap-3">
               {brand.purchase?.url || brand.aff ? (
-                <a href={brand.purchase?.url || brand.aff} target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center px-6 py-3.5 bg-brand-neon text-brand-dark font-bold rounded-sm hover:bg-white transition-all uppercase tracking-widest shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+                <a href={brand.purchase?.url || brand.aff} data-departure-link={brand.purchase?.cloaked !== false ? 'true' : undefined} target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center px-6 py-3.5 bg-brand-neon text-brand-dark font-bold rounded-sm hover:bg-white transition-all uppercase tracking-widest shadow-[0_0_15px_rgba(56,189,248,0.2)]">
                   快速购买
                 </a>
               ) : (
@@ -203,61 +210,75 @@ const relatedBrands = curatedSlugs
     {brand.temporaryCoupons && brand.temporaryCoupons.length > 0 && (
       <script is:inline define:vars={{ temps: brand.temporaryCoupons, stdCoupon: brand.coupon }}>
         (function() {
-          const now = Date.now();
-          const activeTemps = temps.filter(c => {
-            if (c.manualActive === false) return false;
-            if (c.manualActive === true) {
-              if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
-              if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
-              return true;
-            }
-            if (!c.startsAt || !c.expiresAt) return false;
-            const s = new Date(c.startsAt).getTime();
-            const e = new Date(c.expiresAt).getTime();
-            return now >= s && now <= e;
-          });
-
-          const container = document.getElementById('hero-temp-promo');
-          const list = document.getElementById('hero-temp-list');
-          const expiry = document.getElementById('hero-temp-expiry');
-          const root = document.getElementById('hero-promo-container');
-          
-          if (activeTemps.length > 0) {
-            activeTemps.sort((a, b) => (b.priority || 0) - (a.priority || 0));
-            
-            if (container && list) {
-              container.style.display = 'flex';
-              list.innerHTML = activeTemps.map(c => `
-                <div class="flex items-center justify-between bg-black/20 p-2 rounded border border-white/5">
-                  <div class="flex flex-col text-left">
-                    <span class="text-[10px] text-slate-400 mb-0.5">${c.scope || '-'}</span>
-                    <div class="flex items-baseline gap-2">
-                      <code class="text-brand-neon font-bold text-sm tracking-widest">${c.code}</code>
-                      <span class="text-brand-accent text-xs font-bold">${c.discount}</span>
-                    </div>
-                  </div>
-                  <button class="bg-brand-navy border border-white/10 hover:border-brand-neon/50 hover:bg-brand-navy/80 text-white text-[10px] px-3 py-1.5 rounded cursor-pointer transition-colors" onclick="navigator.clipboard.writeText('${c.code}').then(()=>{this.textContent='已复制';setTimeout(()=>this.textContent='复制',2000)})">复制</button>
-                </div>
-              `).join('');
-              
-              const earliestExpiry = activeTemps.map(c => c.expiresAt).filter(Boolean).sort()[0];
-              if (earliestExpiry && expiry) {
-                const expDate = new Date(earliestExpiry);
-                expiry.textContent = (expDate.getMonth() + 1) + '月' + expDate.getDate() + '日截止，请抓紧时间！';
+          let activeInterval = null;
+          function update() {
+            const now = Date.now();
+            const activeTemps = temps.filter(c => {
+              if (c.manualActive === false) return false;
+              if (c.manualActive === true) {
+                if (c.startsAt && now < new Date(c.startsAt).getTime()) return false;
+                if (c.expiresAt && now > new Date(c.expiresAt).getTime()) return false;
+                return true;
               }
-            }
-          } else {
-            if (stdCoupon) {
-              root.innerHTML = `
-                <div class="flex flex-col items-center justify-center text-center">
-                  <span class="text-[10px] font-bold bg-white/20 text-white px-2 py-0.5 rounded uppercase mb-2 tracking-widest">常驻优惠</span>
-                  <code class="text-brand-neon font-bold text-lg tracking-widest">${stdCoupon.code}</code>
-                  <span class="text-brand-accent text-sm mt-1">${stdCoupon.discount}</span>
-                </div>
-              `;
+              if (!c.startsAt || !c.expiresAt) return false;
+              const s = new Date(c.startsAt).getTime();
+              const e = new Date(c.expiresAt).getTime();
+              return now >= s && now <= e;
+            });
+
+            const container = document.getElementById('hero-temp-promo');
+            const list = document.getElementById('hero-temp-list');
+            const expiry = document.getElementById('hero-temp-expiry');
+            const root = document.getElementById('hero-promo-container');
+            
+            if (activeTemps.length > 0) {
+              activeTemps.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+              
+              if (container && list) {
+                container.style.display = 'flex';
+                list.innerHTML = activeTemps.map(c => `
+                  <div class="flex items-center justify-between bg-black/20 p-2 rounded border border-white/5">
+                    <div class="flex flex-col text-left">
+                      <span class="text-[10px] text-slate-400 mb-0.5">${c.scope || '-'}</span>
+                      <div class="flex items-baseline gap-2">
+                        <code class="text-brand-neon font-bold text-sm tracking-widest">${c.code}</code>
+                        <span class="text-brand-accent text-xs font-bold">${c.discount}</span>
+                      </div>
+                    </div>
+                    <button class="bg-brand-navy border border-white/10 hover:border-brand-neon/50 hover:bg-brand-navy/80 text-white text-[10px] px-3 py-1.5 rounded cursor-pointer transition-colors" onclick="navigator.clipboard.writeText('${c.code}').then(()=>{this.textContent='已复制';setTimeout(()=>this.textContent='复制',2000)})">复制</button>
+                  </div>
+                `).join('');
+                
+                const earliestExpiry = activeTemps.map(c => c.expiresAt).filter(Boolean).sort()[0];
+                if (earliestExpiry && expiry) {
+                  const expDate = new Date(earliestExpiry);
+                  expiry.textContent = (expDate.getMonth() + 1) + '月' + expDate.getDate() + '日截止，请抓紧时间！';
+                }
+              }
+              document.body.classList.remove('no-active-temp-coupon');
+              document.body.classList.add('has-active-temp-coupon');
+              return true;
             } else {
-              root.innerHTML = `<div class="text-center text-sm text-slate-400 py-2">暂无公开优惠</div>`;
+              if (stdCoupon) {
+                root.innerHTML = `
+                  <div class="flex flex-col items-center justify-center text-center">
+                    <span class="text-[10px] font-bold bg-white/20 text-white px-2 py-0.5 rounded uppercase mb-2 tracking-widest">常驻优惠</span>
+                    <code class="text-brand-neon font-bold text-lg tracking-widest">${stdCoupon.code}</code>
+                    <span class="text-brand-accent text-sm mt-1">${stdCoupon.discount}</span>
+                  </div>
+                `;
+              } else {
+                root.innerHTML = `<div class="text-center text-sm text-slate-400 py-2">暂无公开优惠</div>`;
+              }
+              document.body.classList.remove('has-active-temp-coupon');
+              document.body.classList.add('no-active-temp-coupon');
+              if (activeInterval) clearInterval(activeInterval);
+              return false;
             }
+          }
+          
+          if (update()) {
+            activeInterval = setInterval(update, 1000 * 60 * 60);
           }
         })();
       </script>
