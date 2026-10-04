@@ -16,6 +16,8 @@ if (brand.maxBandwidth) facts.push({ label: '最大带宽', value: brand.maxBand
 if (brand.ipType) facts.push({ label: 'IP', value: brand.ipType });
 if (brand.paymentMethods) facts.push({ label: '支付', value: Array.isArray(brand.paymentMethods) ? brand.paymentMethods.join(' / ') : brand.paymentMethods });
 if (brand.customerSupport) facts.push({ label: '客服', value: brand.customerSupport });
+if (brand.streamingSupport) facts.push({ label: '流媒体解锁', value: Array.isArray(brand.streamingSupport) ? brand.streamingSupport.join(' / ') : brand.streamingSupport });
+if (brand.aiSupport) facts.push({ label: 'AI 解锁', value: Array.isArray(brand.aiSupport) ? brand.aiSupport.join(' / ') : brand.aiSupport });
 
 if (brand.coupon && brand.coupon.code) {
   const couponLabel = brand.coupon.eligibilityText || '常驻优惠';
