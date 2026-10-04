@@ -2341,6 +2341,75 @@ if (phanFile) {
   if (phErrors === 0) console.log('PHANTOM PRICING: PASS');
 }
 
+// --- YUZHOUYUN Consistency Test ---
+const yzyFile = files.find(f => f.endsWith('yuzhouyun.md'));
+if (yzyFile) {
+  let yzyErrors = 0;
+  const yzyRaw = fs.readFileSync(path.join(brandsDir, yzyFile), 'utf8');
+  const yzyBrand = matter(yzyRaw).data;
+
+  if (yzyBrand.pricing.length !== 29) {
+    console.error('ERROR: YUZHOUYUN pricing length expected 29, got ' + yzyBrand.pricing.length);
+    yzyErrors++; errors++;
+  }
+
+  // YUZHOU553 must match exactly 24 plans
+  const yzyEligible = yzyBrand.pricing.filter(p => p.couponEligible !== false);
+  if (yzyEligible.length !== 24) {
+    console.error('ERROR: YUZHOUYUN YUZHOU553 eligible expected 24, got ' + yzyEligible.length);
+    yzyErrors++; errors++;
+  } else {
+    console.log('YUZHOUYUN YUZHOU553 ELIGIBLE: 24/24');
+  }
+
+  const testYzyCalc = (name, period, original, expected, testDate = '2026-10-05T00:00:00Z') => {
+    const plan = yzyBrand.pricing.find(p => p.name === name && p.period === period);
+    if (!plan) {
+      console.error(`ERROR: YUZHOUYUN plan not found: ${name} ${period}`);
+      return false;
+    }
+    const cp = getBestCouponForPricing(yzyBrand, plan, new Date(testDate));
+    if (expected === null) {
+      if (cp !== null) {
+        console.error(`ERROR: YUZHOUYUN ${name} ${period} expected null coupon, got ${cp.code}`);
+        return false;
+      }
+    } else {
+      if (!cp) {
+        console.error(`ERROR: YUZHOUYUN ${name} ${period} expected coupon YUZHOU553, got null`);
+        return false;
+      }
+      const mult = getDiscountMultiplier(cp);
+      const finalPrice = original * mult;
+      if (Math.abs(finalPrice - expected) > 0.01) {
+        console.error(`ERROR: YUZHOUYUN ${name} ${period} expected ${expected}, got ${finalPrice} (coupon: ${cp.code})`);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  let yzyPricePass = true;
+
+  // YUZHOU553 (8折) on eligible plans
+  if (!testYzyCalc('行星基础版', '月付', 25, 20)) yzyPricePass = false;
+  if (!testYzyCalc('行星基础版', '季付', 70, 56)) yzyPricePass = false;
+  if (!testYzyCalc('恒星标准版', '半年付', 260, 208)) yzyPricePass = false;
+  if (!testYzyCalc('星系专业版', '年付', 980, 784)) yzyPricePass = false;
+  if (!testYzyCalc('寰宇旗舰版', '三年付', 5000, 4000)) yzyPricePass = false;
+
+  // nulls
+  if (!testYzyCalc('星云年付小包', '年付', 96, null)) yzyPricePass = false;
+  if (!testYzyCalc('行星基础版（不限时套餐）', '一次性', 110, null)) yzyPricePass = false;
+  if (!testYzyCalc('恒星标准版（不限时套餐）', '一次性', 220, null)) yzyPricePass = false;
+
+  if (!yzyPricePass) {
+    yzyErrors++; errors++;
+  } else {
+    console.log('YUZHOUYUN COUPON CONSISTENCY: PASS');
+  }
+}
+
 // --- QUANQIUYUN Consistency Test ---
 const qqyFile = files.find(f => f.endsWith('quanqiuyun.md'));
 if (qqyFile) {
