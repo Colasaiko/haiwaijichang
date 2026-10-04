@@ -112,17 +112,24 @@ visualData:
         price: 240
 telegram: 'https://t.me/+ozCTB7VsmvFkMTNl'
 ---
-根据当前收录的官方品牌资料，**NanoCloud** 以极高的性价比和全面的客户端生态，为不同需求的用户提供了灵活的网络接入方案。
 
-### 已知服务特征
-- **IPv4/IPv6 双栈网络**：全面兼容下一代互联网标准，网络接入更加顺畅。
-- **全平台客户端**：官方提供适用于 Android、Windows、macOS、iOS 的专属客户端，配合 Telegram Bot，日常操作与订阅管理极度便捷。
-- **强力解锁能力**：可靠解锁 Netflix、Disney+、YouTube 等国际流媒体，以及 ChatGPT 与 TikTok，满足娱乐与生产力双重需求。
-- **差异化套餐设计**：
-  - **猎户座** (100Mbps，2台设备)
-  - **白羊座** (300Mbps，5台设备)
-  - **双鱼座** (500Mbps，8台设备)
-  - **射手座** (不限速，10台设备)
+## 套餐价格（简览）
+NanoCloud 提供了多款高性价比套餐，包括猎户座、白羊座、双鱼座、射手座等。支持月付及年付，适合不同流量需求的用户。
 
-**优惠说明**：
-NanoCloud 当前暂无公开通用优惠码，可加入官方 Telegram 频道获取内部优惠与活动信息。
+## 客户端与使用方式
+NanoCloud 官方提供全面支持，支持 Android、Windows、macOS 和 iOS 等全平台客户端。此外，还支持便捷的 Telegram Bot 绑定与使用。
+
+## 流媒体与 AI 解锁
+NanoCloud 具备优秀的解锁能力，支持 Netflix、Disney+、YouTube 等主流流媒体平台，并且支持 ChatGPT 以及 TikTok 的流畅访问。
+
+## 常见问题 FAQ
+### NanoCloud 有优惠码吗？
+目前 NanoCloud 暂无公开通用优惠码，您可以关注官方最新动态获取活动信息。
+### NanoCloud 支持哪些平台客户端？
+支持 Windows, macOS, iOS, Android 等主流操作系统，并支持第三方主流订阅软件。
+### NanoCloud 支持哪些流媒体？
+支持 Netflix, Disney+, YouTube 等主流海外流媒体平台。
+### NanoCloud 支持 ChatGPT 吗？
+支持，NanoCloud 能够流畅解锁 ChatGPT。
+### NanoCloud 限制设备数量吗？
+具体设备限制以实际购买的套餐说明为准，常规套餐能满足绝大部分个人用户的多设备需求。

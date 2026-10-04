@@ -46,8 +46,13 @@ const keywords = Array.isArray(brand.keywords)
 const currentUrl = Astro.url.href;
 const siteUrl = Astro.site?.toString() || Astro.url.origin;
 
-// Get a few related brands randomly or sequentially
-const relatedBrands = allBrands.filter(b => b.slug !== brand.slug).slice(0, 3);
+// Fixed curated list of 10 related brands (excluding self)
+const curatedSlugs = ['weifeng', 'feimao', 'firefly', 'wuyou', 'shanyue', 'lingmao', 'kuajie', 'jiuyun', 'baoyun', 'shenxing'];
+const relatedBrands = curatedSlugs
+  .filter(s => s !== brand.slug)
+  .map(s => allBrands.find(b => b.slug === s))
+  .filter(Boolean)
+  .slice(0, 10);
 ---
 
 <Layout title={title} description={description} keywords={keywords}>
