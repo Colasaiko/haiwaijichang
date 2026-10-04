@@ -2341,6 +2341,79 @@ if (phanFile) {
   if (phErrors === 0) console.log('PHANTOM PRICING: PASS');
 }
 
+// --- QUANQIUYUN Consistency Test ---
+const qqyFile = files.find(f => f.endsWith('quanqiuyun.md'));
+if (qqyFile) {
+  let qqyErrors = 0;
+  const qqyRaw = fs.readFileSync(path.join(brandsDir, qqyFile), 'utf8');
+  const qqyBrand = matter(qqyRaw).data;
+
+  if (qqyBrand.pricing.length !== 29) {
+    console.error('ERROR: QUANQIUYUN pricing length expected 29, got ' + qqyBrand.pricing.length);
+    qqyErrors++; errors++;
+  }
+
+  if (qqyBrand.coupon) {
+    console.error('ERROR: QUANQIUYUN must not have any standard coupon (found: ' + qqyBrand.coupon.code + ')');
+    qqyErrors++; errors++;
+  }
+
+  const testQqyCalc = (name, period, original, expected, expectedCode = null, testDate = '2026-10-05T00:00:00Z') => {
+    const plan = qqyBrand.pricing.find(p => p.name === name && p.period === period);
+    if (!plan) {
+      console.error(`ERROR: QUANQIUYUN plan not found: ${name} ${period}`);
+      return false;
+    }
+    const cp = getBestCouponForPricing(qqyBrand, plan, new Date(testDate));
+    if (expected === null) {
+      if (cp !== null) {
+        console.error(`ERROR: QUANQIUYUN ${name} ${period} expected null coupon, got ${cp.code}`);
+        return false;
+      }
+    } else {
+      if (!cp) {
+        console.error(`ERROR: QUANQIUYUN ${name} ${period} expected coupon ${expectedCode}, got null`);
+        return false;
+      }
+      if (expectedCode && cp.code !== expectedCode) {
+        console.error(`ERROR: QUANQIUYUN ${name} ${period} expected code ${expectedCode}, got ${cp.code}`);
+        return false;
+      }
+      const mult = getDiscountMultiplier(cp);
+      const finalPrice = original * mult;
+      if (Math.abs(finalPrice - expected) > 0.01) {
+        console.error(`ERROR: QUANQIUYUN ${name} ${period} expected ${expected}, got ${finalPrice} (coupon: ${cp.code})`);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  let qqyPricePass = true;
+
+  // zq85 (85折, 月付/季付/半年付)
+  if (!testQqyCalc('BGP 智能优化·入门方案', '月付', 20, 17, 'zq85')) qqyPricePass = false;
+  if (!testQqyCalc('BGP 智能优化·进阶方案', '季付', 108, 91.8, 'zq85')) qqyPricePass = false;
+  if (!testQqyCalc('BGP 智能优化·高端方案', '半年付', 510, 433.5, 'zq85')) qqyPricePass = false;
+
+  // zq80 (8折, 年付/二年付/三年付)
+  if (!testQqyCalc('BGP 智能优化·入门方案', '年付', 192, 153.6, 'zq80')) qqyPricePass = false;
+  if (!testQqyCalc('BGP 智能优化·商业方案', '三年付', 3888, 3110.4, 'zq80')) qqyPricePass = false;
+
+  // nulls — must not match any coupon
+  if (!testQqyCalc('轻量版', '年付', 99, null)) qqyPricePass = false;
+  if (!testQqyCalc('独享私人专线', '月付', 680, null)) qqyPricePass = false;
+  if (!testQqyCalc('不限时轻量包', '一次性', 100, null)) qqyPricePass = false;
+  if (!testQqyCalc('不限时标准包', '一次性', 360, null)) qqyPricePass = false;
+  if (!testQqyCalc('不限时大容量包', '一次性', 700, null)) qqyPricePass = false;
+
+  if (!qqyPricePass) {
+    qqyErrors++; errors++;
+  } else {
+    console.log('QUANQIUYUN COUPON CONSISTENCY: PASS');
+  }
+}
+
 if (errors === 0) console.log('COUPON CONSISTENCY: PASS');
 console.log('CONTRADICTIONS: ' + errors);
 if (errors > 0) process.exit(1);
