@@ -28,7 +28,7 @@ features:
   - 灵活的设备限制：支持 2~10 台设备同时在线
 purchase:
   label: 快速购买
-  url: 'https://edge.shimo.men/auth/register?code=P7gzTydW'
+  url: '/go/https://edge.shimo.men/auth/register?code=P7gzTydW'
   cloaked: true
 pricing:
   - name: 猎户座
