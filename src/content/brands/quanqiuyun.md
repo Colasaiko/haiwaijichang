@@ -50,7 +50,7 @@ features:
   - 独享私人专线提供独立节点与独享带宽
 purchase:
   label: 快速购买
-  url: /go/https://sswdh.gcvipaff.com/#/?code=iZl9XAe2
+  url: 'https://sswdh.gcvipaff.com/#/?code=iZl9XAe2'
   cloaked: true
 temporaryCoupons:
   - code: zq80
