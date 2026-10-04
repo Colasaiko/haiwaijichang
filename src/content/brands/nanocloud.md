@@ -17,7 +17,6 @@ streamingSupport:
   - YouTube
 aiSupport:
   - ChatGPT
-  - TikTok
 clientSupport: Android / Windows / macOS / iOS
 features:
   - 支持 IPv4 / IPv6 双栈网络
