@@ -2221,6 +2221,19 @@ if (invFile) {
     return true;
   };
   
+  
+  let yxr888Count = 0;
+  for (const plan of invBrand.pricing) {
+    const cp = getStandardCouponForPricing(invBrand, plan);
+    if (cp && cp.code === 'yxr888') {
+      yxr888Count++;
+    }
+  }
+  if (yxr888Count !== 24) {
+    console.error('ERROR: INVISIBLE yxr888 expected exactly 24 eligible plans, got ' + yxr888Count);
+    invErrors++; errors++;
+  }
+  
   let invPricePass = true;
   
   // yxr888 logic
