@@ -59,24 +59,24 @@ const enhancedBrands = rankingBrands.map((b, index) => {
   
   let reason = '';
   if (b.slug === 'weifeng') {
-    reason = '线路稳定且功能完整度极高，在流媒体解锁与 AI 支持上表现优异，适合作为综合优先选择。';
+    reason = '线路、套餐与功能资料较完整，同时覆盖 AI 与流媒体等使用场景，适合作为综合优先参考。';
   } else if (b.slug === 'feimao') {
-    reason = '综合体验均衡且套餐选择灵活，线路覆盖广泛，适合重视稳定使用体验与多场景需求的用户。';
+    reason = '套餐与线路资料覆盖较完整，并兼顾多种使用场景，适合希望综合比较线路与功能的用户。';
   } else if (b.slug === 'firefly') {
-    reason = '采用 IPLC + VLESS 组合架构，无缝解锁 AI 与流媒体，适合多设备场景日常综合使用。';
+    reason = '提供 IPLC + VLESS，并明确支持 AI、流媒体与多设备使用场景，适合日常综合使用。';
   } else {
     const highlights = [];
-    if (lineTypeStr) highlights.push(`优质 ${lineTypeStr} 网络`);
-    if (hasStreaming) highlights.push('流畅解锁热门流媒体');
-    if (hasAI) highlights.push('支持 AI 访问');
+    if (lineTypeStr) highlights.push(`提供 ${lineTypeStr} 线路`);
+    if (hasStreaming) highlights.push('包含流媒体支持');
+    if (hasAI) highlights.push('支持 AI 工具访问');
     
     const feats = (b.features || []).filter((f: string) => !f.includes('流媒体') && !f.includes('AI') && !f.includes('专线')).slice(0, 2);
-    const extra = feats.length > 0 ? `，${feats.join('，')}` : '';
+    const extra = feats.length > 0 ? `记录了 ${feats.join('，')} 等特征` : '';
     
     if (highlights.length > 0) {
-      reason = `主打${highlights.join('与')}${extra}，在该价位段提供了优良的综合体验，成功入榜。`;
+      reason = `基于现有资料显示，该品牌${highlights.join('，')}${extra ? '，' + extra : ''}，适合关注此类功能的用户参考。`;
     } else {
-      reason = `${extra || '提供稳定的网络加速服务'}，各项配置均衡，具备较高的性价比和可用性。`;
+      reason = `收录了其基础网络服务${extra ? '，' + extra : ''}，可作为相关使用场景的备选参考。`;
     }
   }
 
