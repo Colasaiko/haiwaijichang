@@ -1,45 +1,402 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getEntry, getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
+import { aiSupportReference } from '../data/ai-support';
 
 const page = await getEntry('pages', 'ai');
-const { title, description, h1, subtitle, keyword, fallbackText, sections } = page.data;
+const { title, description, h1 } = page.data;
 
-const brandEntries = await getCollection('brands');
-const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (a.order || 999) - (b.order || 999));
+const allBrands = await getCollection('brands');
 
-const matchedBrands = keyword 
-  ? brands.filter(b => b.features.join(' ').toLowerCase().includes(keyword)) 
-  : brands.slice(0, 6);
+function parsePrice(val) {
+  if (val === undefined || val === null) return null;
+  const str = String(val).replace(/[^0-9.]/g, '');
+  const n = parseFloat(str);
+  return isNaN(n) ? null : n;
+}
+
+function getMinPrice(pricing) {
+  if (!pricing || !Array.isArray(pricing) || pricing.length === 0) return null;
+  let min = Infinity;
+  for (const p of pricing) {
+    let pr = parsePrice(p.discountPrice);
+    if (pr === null) pr = parsePrice(p.price);
+    if (pr === null) pr = parsePrice(p.originalPrice);
+    if (pr !== null && pr < min) {
+      min = pr;
+    }
+  }
+  return min === Infinity ? null : min;
+}
+
+const aiBrands = [];
+
+for (const b of allBrands) {
+  const data = b.data;
+  const aiData = aiSupportReference[data.slug];
+  
+  if (aiData) {
+    const minPrice = getMinPrice(data.pricing);
+    let lineTypeStr = typeof data.lineType === 'string' ? data.lineType : (Array.isArray(data.lineType) ? data.lineType.join(' / ') : '—');
+    let nodesStr = typeof data.nodes === 'string' ? data.nodes : (Array.isArray(data.nodes) ? data.nodes.join(' / ') : '—');
+
+    aiBrands.push({
+      name: data.name,
+      slug: data.slug,
+      order: data.order || 999,
+      chatgpt: aiData.chatgpt,
+      claude: aiData.claude,
+      gemini: aiData.gemini,
+      lineTypeStr,
+      minPrice,
+      nodesStr
+    });
+  }
+}
+
+aiBrands.sort((a, b) => a.order - b.order);
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://haiwaijichang.com/" },
+    { "@type": "ListItem", "position": 2, "name": "机场推荐", "item": "https://haiwaijichang.com/airport-recommendation" },
+    { "@type": "ListItem", "position": 3, "name": "AI 机场", "item": "https://haiwaijichang.com/ai" }
+  ]
+};
+
+const itemListSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "ChatGPT / Claude / Gemini AI 支持品牌列表",
+  "itemListElement": aiBrands.map((b, i) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "name": b.name,
+    "url": `https://haiwaijichang.com/brands/${b.slug}`
+  }))
+};
+
+const faqs = [
+  { q: "什么是 ChatGPT 机场？", a: "通常指节点 IP 和线路质量能稳定访问 ChatGPT，且不被 OpenAI 大规模封禁或拦截的节点服务提供商。" },
+  { q: "支持 ChatGPT 就一定支持 Claude 吗？", a: "不一定。各大 AI 平台的封控策略和支持地区不同。有些节点的 IP 可以访问 ChatGPT，但会被 Claude 拒绝。" },
+  { q: "为什么 Gemini 显示“视节点而定”？", a: "Google 对节点 IP 库的分类非常严格，即使是同一个品牌，有些原生 IP 节点可用，而部分数据中心 IP 节点则可能无法使用 Gemini。" },
+  { q: "同一个机场为什么有些节点能用 AI、有些不能？", a: "因为节点分布在不同的数据中心或拥有不同的出口 IP，而 AI 平台针对每个 IP 的风控和可用性判断是动态变化的。" },
+  { q: "AI 支持状态会变化吗？", a: "会。AI 支持状态代表的是当前的测试结果。随着平台策略收紧或服务商调整节点配置，支持情况随时可能发生变化。" },
+  { q: "原生 IP 就一定能使用 ChatGPT 吗？", a: "不一定。虽然原生 IP 成功率更高，但如果该 IP 段曾经被大量滥用，平台依然可能会对其进行限制或拦截。" },
+  { q: "选择 AI 机场最重要看什么？", a: "要看自己主要使用的 AI 工具是否有明确标注支持，并且在日常使用的地区节点上可用，同时建议先通过短期套餐进行实际测试。" }
+];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(f => ({
+    "@type": "Question",
+    "name": f.q,
+    "acceptedAnswer": { "@type": "Answer", "text": f.a }
+  }))
+};
+
+const renderStatusBadge = (status) => {
+  if (status === '支持') return `<span class="inline-block px-2 py-0.5 rounded text-xs font-bold bg-brand-neon/10 text-brand-neon border border-brand-neon/30">支持</span>`;
+  if (status === '视节点而定') return `<span class="inline-block px-2 py-0.5 rounded text-xs font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/30">视节点而定</span>`;
+  if (status === '不支持') return `<span class="inline-block px-2 py-0.5 rounded text-xs font-bold bg-red-500/10 text-red-500 border border-red-500/30">不支持</span>`;
+  return `<span class="inline-block px-2 py-0.5 rounded text-xs font-bold bg-slate-500/10 text-slate-400 border border-slate-500/30">未明确</span>`;
+};
 ---
 <Layout title={title} description={description}>
-  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5">
-    <div class="max-w-4xl mx-auto px-4 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">{h1}</h1>
-      <p class="text-lg text-slate-400">{subtitle}</p>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5 relative overflow-hidden">
+    <div class="absolute inset-0 z-0 pointer-events-none opacity-30 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-900/40 via-brand-dark/20 to-transparent"></div>
+    <div class="max-w-5xl mx-auto px-4 relative z-10 text-center">
+      <div class="inline-block px-3 py-1 bg-white/5 border border-white/10 rounded-full text-brand-neon text-xs font-bold tracking-widest mb-6">
+        AI CONTROL PANEL
+      </div>
+      <h1 class="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">
+        {h1}
+      </h1>
+      <p class="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed mb-8">
+        AI 工具能否使用，不只取决于“机场支不支持”。同一品牌不同节点的 IP、地区和平台策略都可能影响 ChatGPT、Claude、Gemini 的实际访问情况。
+      </p>
+      
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="#ai-brands" class="px-6 py-2.5 bg-brand-neon text-brand-dark font-bold rounded-full hover:bg-white transition-colors text-sm shadow-[0_0_20px_rgba(0,255,170,0.3)]">查看品牌 AI 支持</a>
+        <a href="#chatgpt" class="px-6 py-2.5 bg-transparent text-brand-neon font-bold rounded-full hover:bg-brand-neon/10 transition-all text-sm border border-brand-neon/30">ChatGPT 怎么选</a>
+        <a href="#gemini" class="px-6 py-2.5 bg-transparent text-cyan-400 font-bold rounded-full hover:bg-cyan-400/10 transition-all text-sm border border-cyan-400/30">Gemini 为什么看节点</a>
+        <a href="/brands" class="px-6 py-2.5 bg-transparent text-slate-300 font-bold rounded-full hover:bg-white/10 transition-all text-sm border border-white/20">全部品牌</a>
+      </div>
     </div>
   </section>
 
-  <section class="py-16 bg-brand-dark min-h-screen">
-    <div class="max-w-4xl mx-auto px-4 prose prose-invert prose-brand">
-      <h2>{sections[0].title}</h2>
-      <p set:html={sections[0].content}></p>
+  <section class="py-12 bg-brand-dark border-b border-white/5">
+    <div class="max-w-5xl mx-auto px-4">
+      <div class="bg-brand-navy p-6 rounded-xl border border-brand-neon/20 mb-8 text-center">
+        <p class="text-sm text-brand-neon font-bold">⚠️ 支持状态不是永久保证，平台政策、节点 IP、地区和服务商配置都可能变化。</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-gradient-to-b from-brand-navy to-black/40 border border-white/5 p-6 rounded-xl">
+          <h3 class="text-lg font-bold text-white mb-4 flex justify-between items-center">
+            <span>支持</span>
+            <span class="w-3 h-3 rounded-full bg-brand-neon shadow-[0_0_8px_rgba(0,255,170,0.8)] animate-pulse"></span>
+          </h3>
+          <p class="text-sm text-slate-400 leading-relaxed">当前参考资料明确标注支持，代表该品牌绝大部分常用节点可以正常访问对应 AI 工具。</p>
+        </div>
+        <div class="bg-gradient-to-b from-brand-navy to-black/40 border border-white/5 p-6 rounded-xl">
+          <h3 class="text-lg font-bold text-white mb-4 flex justify-between items-center">
+            <span>视节点而定</span>
+            <span class="w-3 h-3 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)] animate-pulse"></span>
+          </h3>
+          <p class="text-sm text-slate-400 leading-relaxed">同品牌并非所有节点都能保证相同表现。可能部分原生 IP 可用，而其他数据中心 IP 被拦截。</p>
+        </div>
+        <div class="bg-gradient-to-b from-brand-navy to-black/40 border border-white/5 p-6 rounded-xl">
+          <h3 class="text-lg font-bold text-white mb-4 flex justify-between items-center">
+            <span>未明确</span>
+            <span class="w-3 h-3 rounded-full bg-slate-500 shadow-[0_0_8px_rgba(100,116,139,0.8)] animate-pulse"></span>
+          </h3>
+          <p class="text-sm text-slate-400 leading-relaxed">没有足够明确的最新测评资料，本站不自行推测其解锁能力。建议以短周期测试为准。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="chatgpt" class="py-16 bg-brand-navy border-b border-white/5">
+    <div class="max-w-5xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-6">ChatGPT 机场应该看什么？</h2>
+      <div class="prose prose-invert prose-brand max-w-none">
+        <p>1. <strong>是否有明确支持状态</strong>：在选择前，确认品牌是否明确标示了 ChatGPT 支持。</p>
+        <p>2. <strong>节点 IP 是否能够正常访问</strong>：ChatGPT 对 IP 库有严格的风控体系，部分节点的 IP 可能会随时被拦截或提示 Access Denied。</p>
+        <p>3. <strong>地区是否符合平台当前服务范围</strong>：ChatGPT 并非在所有国家可用，需选择在 ChatGPT 服务范围内的节点地区（如美国、日本、新加坡等）。</p>
+        <p>4. <strong>同一品牌不同节点可能不同</strong>：一个机场的日本节点能用，不代表其香港节点也能用。</p>
+        <p>5. <strong>节点今天可用不代表永久可用</strong>：AI 平台的封控策略在不断更新，没有任何一家服务商能保证“永久解锁”。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-brand-dark border-b border-white/5">
+    <div class="max-w-5xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-cyan-400 mb-6">Claude 支持也要看节点与地区</h2>
+      <div class="bg-cyan-900/20 border border-cyan-400/20 p-6 rounded-xl mb-6">
+        <p class="text-cyan-100 text-sm leading-relaxed">支持 Claude 的品牌，不代表每个节点都具有相同结果。实际情况可能受节点和平台政策变化影响。</p>
+      </div>
+      <p class="text-slate-400 mb-8 max-w-3xl">Claude 的注册和使用风控往往比 ChatGPT 更严格，对原生 IP 和地区纯净度的要求更高。选择时除了看标注状态，还需关注平时常用的地区节点。</p>
+    </div>
+  </section>
+
+  <section id="gemini" class="py-16 bg-brand-navy border-b border-white/5">
+    <div class="max-w-5xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-yellow-500 mb-6">为什么 Gemini 经常是“视节点而定”？</h2>
+      <div class="prose prose-invert prose-brand max-w-none">
+        <p>在当前的品牌测评中，Gemini 的支持状态经常被标注为“视节点而定”。因此不能简单把“品牌支持 Gemini”理解为全部节点都可用。</p>
+        <ul>
+          <li>受节点 IP 影响。</li>
+          <li>受节点地区影响。</li>
+          <li>受平台当前风控策略影响。</li>
+          <li>受服务商自身节点调整影响。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-brand-dark border-b border-white/5">
+    <div class="max-w-5xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-white/50 mb-10">为什么同一个机场，换节点结果会不同？</h2>
       
-      <h2>{sections[1].title}</h2>
-      <p set:html={sections[1].content}></p>
-      
-      <div class="not-prose grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 mb-12">
-        {matchedBrands.length > 0 ? matchedBrands.map(b => (
-          <a href={`/brands/${b.slug}`} class="block bg-brand-navy border border-white/10 p-6 rounded-xl hover:border-brand-neon transition-colors">
-            <h3 class="text-xl font-bold text-white mb-2">{b.name}</h3>
-            <p class="text-sm text-slate-400 line-clamp-2">{b.features[0]}</p>
-            <div class="mt-4 text-xs font-mono text-brand-neon">查看详情 &rarr;</div>
-          </a>
-        )) : <p class="text-slate-500">{fallbackText}</p>}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-black/40 border border-white/5 p-6 rounded-xl">
+          <div class="text-xl font-black text-brand-neon mb-2">01</div>
+          <h3 class="text-lg font-bold text-white mb-2">节点地区不同</h3>
+          <p class="text-sm text-slate-400">AI 平台限制了某些地区访问，若切换到受限地区，即使线路再好也无法使用。</p>
+        </div>
+        <div class="bg-black/40 border border-white/5 p-6 rounded-xl">
+          <div class="text-xl font-black text-brand-neon mb-2">02</div>
+          <h3 class="text-lg font-bold text-white mb-2">出口 IP 不同</h3>
+          <p class="text-sm text-slate-400">不同节点的服务器 IP 来自不同数据中心，部分 IP 段可能处于 AI 平台的黑名单中。</p>
+        </div>
+        <div class="bg-black/40 border border-white/5 p-6 rounded-xl">
+          <div class="text-xl font-black text-brand-neon mb-2">03</div>
+          <h3 class="text-lg font-bold text-white mb-2">平台策略会变化</h3>
+          <p class="text-sm text-slate-400">AI 服务商会定期更新封控规则，曾经可用的节点可能突然失效。</p>
+        </div>
+        <div class="bg-black/40 border border-white/5 p-6 rounded-xl">
+          <div class="text-xl font-black text-brand-neon mb-2">04</div>
+          <h3 class="text-lg font-bold text-white mb-2">服务商会调整节点</h3>
+          <p class="text-sm text-slate-400">机场为了稳定或成本原因会更换服务器供应商，导致节点底层 IP 发生变化。</p>
+        </div>
       </div>
       
-      <h2>{sections[2].title}</h2>
-      <p set:html={sections[2].content}></p>
+      <div class="bg-white/5 p-6 rounded-xl border border-white/10 text-center">
+        <p class="text-slate-300 font-bold">AI 支持应该理解成：“当前节点能力”，而不是：“品牌永久属性”。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-brand-navy border-b border-white/5">
+    <div class="max-w-5xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-10">你主要用哪一种 AI？</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-brand-dark border border-white/10 p-6 rounded-xl">
+          <h3 class="text-lg font-bold text-white mb-2">ChatGPT 日常使用</h3>
+          <p class="text-sm text-slate-400">需要重点检查 ChatGPT 是否明确标注支持。如果日常依赖此工具，建议确认常用节点（如日、美、新）的实际可用性。</p>
+        </div>
+        <div class="bg-brand-dark border border-white/10 p-6 rounded-xl">
+          <h3 class="text-lg font-bold text-white mb-2">Claude 长文本 / 编程</h3>
+          <p class="text-sm text-slate-400">需检查 Claude 支持状态。风控通常更严，需准备备用节点，不应假定单一节点永久可用。</p>
+        </div>
+        <div class="bg-brand-dark border border-white/10 p-6 rounded-xl">
+          <h3 class="text-lg font-bold text-white mb-2">Gemini</h3>
+          <p class="text-sm text-slate-400">因极可能出现“视节点而定”的情况，需在购买后自行测试哪些节点能正常唤起并使用。</p>
+        </div>
+        <div class="bg-brand-dark border border-white/10 p-6 rounded-xl">
+          <h3 class="text-lg font-bold text-white mb-2">多 AI 工具同时使用</h3>
+          <p class="text-sm text-slate-400">建议在 AI 品牌总表中寻找全绿支持的品牌，并结合实际测试确认节点。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-brand-dark border-b border-white/5">
+    <div class="max-w-5xl mx-auto px-4">
+      <h2 class="text-2xl font-bold text-white text-center mb-10">买 AI 机场前，建议检查这 5 项</h2>
+      <div class="max-w-2xl mx-auto space-y-6">
+        <div class="flex items-start">
+          <div class="w-8 h-8 rounded-full bg-brand-neon/20 text-brand-neon font-bold flex items-center justify-center mr-4 shrink-0">1</div>
+          <div>
+            <h4 class="text-white font-bold mb-1">看 ChatGPT / Claude / Gemini 是否分别标注</h4>
+            <p class="text-sm text-slate-400">不要一概而论认为支持其中一个就等于支持全部。</p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <div class="w-8 h-8 rounded-full bg-brand-neon/20 text-brand-neon font-bold flex items-center justify-center mr-4 shrink-0">2</div>
+          <div>
+            <h4 class="text-white font-bold mb-1">不要把“支持 AI”理解成全部 AI 都支持</h4>
+            <p class="text-sm text-slate-400">状态因平台而异，请仔细核对。</p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <div class="w-8 h-8 rounded-full bg-brand-neon/20 text-brand-neon font-bold flex items-center justify-center mr-4 shrink-0">3</div>
+          <div>
+            <h4 class="text-white font-bold mb-1">确认常用地区节点</h4>
+            <p class="text-sm text-slate-400">前往 <a href="/nodes" class="text-brand-neon hover:underline">节点选择</a> 了解地区差异。</p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <div class="w-8 h-8 rounded-full bg-brand-neon/20 text-brand-neon font-bold flex items-center justify-center mr-4 shrink-0">4</div>
+          <div>
+            <h4 class="text-white font-bold mb-1">先用短周期测试</h4>
+            <p class="text-sm text-slate-400">如果只是想尝试，可以选择 <a href="/cheap-airport" class="text-brand-neon hover:underline">便宜机场 / 短期套餐</a> 避免损失。</p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <div class="w-8 h-8 rounded-full bg-brand-neon/20 text-brand-neon font-bold flex items-center justify-center mr-4 shrink-0">5</div>
+          <div>
+            <h4 class="text-white font-bold mb-1">还要看线路与稳定性</h4>
+            <p class="text-sm text-slate-400">AI 解锁了但速度慢也无济于事，参考 <a href="/stable-airport" class="text-brand-neon hover:underline">稳定机场指南</a> 和 <a href="/dedicated-line" class="text-brand-neon hover:underline">IPLC/IEPL 专线</a>。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ai-brands" class="py-16 bg-brand-navy border-b border-white/5 scroll-mt-24">
+    <div class="max-w-5xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-6">当前品牌 AI 支持状态</h2>
+      <p class="text-slate-400 text-sm mb-10 max-w-3xl">AI 支持状态根据当前收录的品牌公开资料与测评数据整理，节点可用情况可能随 IP、地区及平台政策变化。</p>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+        {aiBrands.map(b => (
+          <div class="bg-brand-dark border border-white/10 p-6 rounded-xl flex flex-col hover:border-brand-neon/50 transition-all relative">
+            <h3 class="text-lg font-bold text-white mb-2 pr-12">{b.name}</h3>
+            <p class="text-xs text-slate-500 mb-4 line-clamp-1 h-4">{b.lineTypeStr}</p>
+            
+            <div class="space-y-3 mb-6 bg-black/30 p-4 rounded-lg border border-white/5">
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-slate-400">ChatGPT</span>
+                <span set:html={renderStatusBadge(b.chatgpt)}></span>
+              </div>
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-slate-400">Claude</span>
+                <span set:html={renderStatusBadge(b.claude)}></span>
+              </div>
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-slate-400">Gemini</span>
+                <span set:html={renderStatusBadge(b.gemini)}></span>
+              </div>
+            </div>
+
+            <div class="mt-auto flex items-center justify-between">
+              <div>
+                {b.minPrice !== null ? (
+                  <span class="text-xl font-black text-white">¥{b.minPrice}<span class="text-xs text-slate-500 font-normal ml-1">起</span></span>
+                ) : (
+                  <span class="text-sm text-slate-500">价格未明</span>
+                )}
+              </div>
+              <a href={`/brands/${b.slug}`} class="text-xs font-bold text-brand-neon hover:text-white transition-colors underline underline-offset-4 decoration-brand-neon/30">查看详情</a>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <h2 class="text-2xl font-bold text-white mb-6">ChatGPT / Claude / Gemini 支持快速比较</h2>
+      <div class="w-full overflow-x-auto pb-4">
+        <table class="w-full min-w-[800px] border-collapse bg-brand-dark rounded-xl overflow-hidden border border-white/10 text-sm">
+          <thead>
+            <tr class="bg-white/5 border-b border-white/10">
+              <th class="p-4 text-left font-bold text-slate-300">品牌</th>
+              <th class="p-4 text-center font-bold text-slate-300">ChatGPT</th>
+              <th class="p-4 text-center font-bold text-slate-300">Claude</th>
+              <th class="p-4 text-center font-bold text-slate-300">Gemini</th>
+              <th class="p-4 text-left font-bold text-slate-300">线路</th>
+              <th class="p-4 text-right font-bold text-slate-300">最低价格</th>
+              <th class="p-4 text-center font-bold text-slate-300">详情</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            {aiBrands.map(b => (
+              <tr class="hover:bg-white/5 transition-colors">
+                <td class="p-4 font-bold text-white">{b.name}</td>
+                <td class="p-4 text-center" set:html={renderStatusBadge(b.chatgpt)}></td>
+                <td class="p-4 text-center" set:html={renderStatusBadge(b.claude)}></td>
+                <td class="p-4 text-center" set:html={renderStatusBadge(b.gemini)}></td>
+                <td class="p-4 text-slate-400 text-xs">{b.lineTypeStr}</td>
+                <td class="p-4 text-right text-white font-bold">{b.minPrice !== null ? `¥${b.minPrice} 起` : '—'}</td>
+                <td class="p-4 text-center"><a href={`/brands/${b.slug}`} class="text-brand-neon hover:underline">查看</a></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-brand-dark border-b border-white/5">
+    <div class="max-w-3xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-white mb-10 text-center">常见问题 FAQ</h2>
+      <div class="space-y-6">
+        {faqs.map(faq => (
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+            <h3 class="text-lg font-bold text-white mb-2">{faq.q}</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">{faq.a}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-gradient-to-br from-brand-navy to-slate-900">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <h2 class="text-2xl md:text-3xl font-bold text-white mb-8">AI 支持看清楚了，再继续比较</h2>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="/airport-recommendation" class="px-6 py-3 bg-brand-neon text-brand-dark font-bold rounded-full hover:bg-white transition-colors text-sm">机场推荐总指南</a>
+        <a href="/brands" class="px-6 py-3 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-colors text-sm">全部品牌</a>
+        <a href="/nodes" class="px-6 py-3 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-colors text-sm">节点选择</a>
+        <a href="/stable-airport" class="px-6 py-3 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-colors text-sm">稳定机场</a>
+      </div>
     </div>
   </section>
 </Layout>
