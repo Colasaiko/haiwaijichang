@@ -40,22 +40,31 @@ brandEntries.forEach(e => {
   let hasIPLC = upperLine.includes('IPLC');
   let hasIEPL = upperLine.includes('IEPL');
   
-  // 2. Fallback to features ONLY IF missing from lineType
-  if (!hasIPLC && !hasIEPL) {
-    let featuresStr = Array.isArray(b.features) ? b.features.join(' ') : '';
-    let upperFeat = featuresStr.toUpperCase();
+  // 2. Fallback to features independently
+  let featuresStr = Array.isArray(b.features) ? b.features.join(' ') : '';
+  let upperFeat = featuresStr.toUpperCase();
+
+  if (!hasIPLC) {
     hasIPLC = upperFeat.includes('IPLC');
+  }
+  if (!hasIEPL) {
     hasIEPL = upperFeat.includes('IEPL');
   }
 
   if (hasIPLC || hasIEPL) {
+    const detectedLineTypes = [];
+    if (hasIPLC) detectedLineTypes.push('IPLC');
+    if (hasIEPL) detectedLineTypes.push('IEPL');
+    
+    const displayLineType = detectedLineTypes.join(' / ');
+
     const minPrice = getMinPrice(b.pricing);
     const protocols = Array.isArray(b.protocols) ? b.protocols.join(' / ') : (b.protocols || '—');
     
     const brandData = {
       name: b.name,
       slug: b.slug,
-      lineTypeStr,
+      lineTypeStr: displayLineType,
       protocols,
       minPrice,
       speedLimit: b.speedLimit || '—',
@@ -103,7 +112,7 @@ const faqs = [
   { q: "IPLC 是什么？", a: "IPLC 指国际私有专用线路 (International Private Leased Circuit)，通常用于跨国专线连接，路径和普通公网中转不同。具体实现与网络质量取决于服务商的真实交付。" },
   { q: "IEPL 是什么？", a: "IEPL 指国际以太网专线 (International Ethernet Private Line)，属于端到端以太网连接方案，常用于企业级网络互联。" },
   { q: "IPLC 和 IEPL 哪个更好？", a: "两者在底层技术细节上有所不同，但对于普通用户而言，实际体验更多取决于服务商采购的带宽规模、国内接入质量以及落地节点配置，无需单纯按名称排高低。" },
-  { q: "写着“专线”的机场一定是 IPLC 吗？", a: "不一定。许多服务商出于营销目的会使用“专线”一词，实际上可能仅指国内某段优化或公网中转。本站仅收录明确标注 IPLC/IEPL 字段的品牌。" },
+  { q: "写着“专线”的机场一定是 IPLC 吗？", a: "不一定。部分品牌资料会使用“专线”这一泛化描述，但仅凭这个词无法判断是否属于 IPLC 或 IEPL。本站仅收录明确标注 IPLC/IEPL 字段的品牌。" },
   { q: "IPLC 一定不会晚高峰拥堵吗？", a: "不一定。即便跨境段使用专线，如果服务商的国内接入段带宽不足或用户负载过高，仍可能在晚高峰出现拥堵。实际体验受多段网络链路共同影响。" },
   { q: "怎么确认一个品牌是否真的标注 IPLC？", a: "可以通过查看该品牌提供的线路架构说明、套餐详情和节点特征来确认。本站整理的数据仅代表品牌在公开资料中的明确标注，不代表本站独立验证了其底层运营商合同。" }
 ];
@@ -177,7 +186,7 @@ const faqSchema = {
           <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
             <li>有些品牌明确写 IPLC</li>
             <li>有些明确写 IEPL</li>
-            <li>有些只写“专线”，实际是优化中转</li>
+            <li>有些资料只写“专线”，但未进一步明确属于 IPLC、IEPL 还是其他中转/接入方案。</li>
             <li>有些使用中转 + 落地组合</li>
             <li>营销名称不一定等于标准技术字段</li>
             <li>同品牌不同套餐可能使用不同线路</li>
