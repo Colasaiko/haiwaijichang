@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 
 const brandEntries = await getCollection('brands');
 const allBrandsMap = new Map();
-brandEntries.forEach(e => allBrandsMap.set(e.data.slug, Object.assign({ id: e.id }, e.data)));
+brandEntries.forEach(e => allBrandsMap.set(e.data.slug, e.data));
 
 const getStr = (val) => typeof val === 'string' ? val : (Array.isArray(val) ? val.join(' ') : '');
 const getMinPrice = (pricing) => {
@@ -64,6 +64,7 @@ const itemListSchema = {
   "itemListElement": quickAnswerBrands.map((b, i) => ({
     "@type": "ListItem",
     "position": i + 1,
+    "name": b.name,
     "url": `https://haiwaijichang.com/brands/${b?.slug}`
   }))
 };
@@ -75,19 +76,19 @@ const faqs = [
   },
   {
     "q": "便宜机场一定不好吗？",
-    "a": "并非绝对。便宜机场在基础查阅资料或轻度网页浏览上可能性价比很高，但在晚高峰高并发或重度视频流媒体等场景，专线服务通常表现更稳定。适合预算优先的用户尝试。"
+    "a": "并非绝对。便宜机场在基础查阅资料或轻度网页浏览上可能性价比很高，不同线路在不同网络环境下表现会有差异，专线类服务通常更强调跨境链路质量，但仍应结合自己的地区、运营商与实际测试判断。"
   },
   {
     "q": "IPLC 和普通中转有什么区别？",
-    "a": "普通中转可能会在跨境阶段经过公共互联网，容易受到晚高峰拥堵干扰；而 IPLC 属于国际专线，端到端直接连通，理论上延迟更低、抗干扰能力更强。"
+    "a": "IPLC 属于专线类连接方案，与普通公网中转的网络路径不同，通常用于强调跨境链路质量，但实际体验仍取决于接入方式、运营商和具体服务配置。"
   },
   {
     "q": "机场能不能稳定使用 ChatGPT？",
-    "a": "这取决于节点是否配备了相应的原生解锁策略。榜单或功能明细中如果标明了支持 AI 工具，说明其针对这类需求进行了优化配置。"
+    "a": "是否能使用 ChatGPT 取决于节点 IP、地区和服务商当前支持情况。榜单或功能明细中如果标明了支持 AI 工具，说明其针对这类需求进行了优化配置。"
   },
   {
     "q": "怎么看机场是否支持 Netflix？",
-    "a": "大部分机场会在节点命名或落地线路上配置流媒体解锁。建议在品牌明细中查看 streaming 字段，或者确认是否有明确标注 Netflix、Disney+ 等流媒体服务支持。"
+    "a": "流媒体可用性可能随节点 IP 与平台策略变化。建议在品牌明细中查看 streaming 字段，或者确认是否有明确标注 Netflix、Disney+ 等流媒体服务支持。"
   },
   {
     "q": "新手应该选择月付还是年付？",
@@ -109,7 +110,7 @@ const faqSchema = {
 };
 ---
 
-<Layout title={title} description={description} canonical={canonicalURL}>
+<Layout title={title} description={description}>
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
@@ -285,7 +286,7 @@ const faqSchema = {
             <li><strong>预算不同</strong>：有人仅需低价备用，有人需要旗舰专线。</li>
             <li><strong>地区与运营商差异</strong>：中国不同地区、甚至同地区的不同宽带，连接相同节点可能表现截然不同。</li>
             <li><strong>使用场景不同</strong>：重度下载、视频流媒体、还是纯文本查阅资料？</li>
-            <li><strong>功能需求各异</strong>：是否需要原生解锁 ChatGPT 或特定的 Netflix 区区？</li>
+            <li><strong>功能需求各异</strong>：是否需要访问 ChatGPT，或观看特定地区的 Netflix 内容？</li>
             <li><strong>设备兼容性</strong>：是否需要适配路由器、游戏主机，或者特定的客户端组合？</li>
           </ul>
           <p class="mt-4">因此，排行榜只是编辑根据各项资料综合整理的推荐顺序，不是绝对性能排名。我们建议根据实际使用环境先做小额测试。</p>
@@ -339,6 +340,18 @@ const faqSchema = {
               </p>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* 最终 CTA */}
+      <div class="mb-12 bg-brand-navy border border-brand-neon/20 p-8 rounded-2xl text-center">
+        <h2 class="text-2xl font-bold text-white mb-4">还不知道怎么开始？</h2>
+        <p class="text-slate-400 mb-8 max-w-2xl mx-auto">如果已经选好方向，可以继续查看使用指南与帮助中心；如果还在比较品牌，可以返回排行榜或品牌中心。</p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/guides" class="px-6 py-2.5 bg-brand-neon/10 text-brand-neon rounded-full font-bold hover:bg-brand-neon hover:text-brand-dark transition-all text-sm border border-brand-neon/30">使用指南</a>
+          <a href="/help" class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm border border-white/10">帮助中心</a>
+          <a href="/ranking" class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm border border-white/10">2026 机场排行榜</a>
+          <a href="/brands" class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm border border-white/10">全部品牌</a>
         </div>
       </div>
 
