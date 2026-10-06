@@ -1,0 +1,347 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const brandEntries = await getCollection('brands');
+const allBrandsMap = new Map();
+brandEntries.forEach(e => allBrandsMap.set(e.data.slug, Object.assign({ id: e.id }, e.data)));
+
+const getStr = (val) => typeof val === 'string' ? val : (Array.isArray(val) ? val.join(' ') : '');
+const getMinPrice = (pricing) => {
+  if (!pricing || !Array.isArray(pricing)) return null;
+  let min = 999999;
+  pricing.forEach(p => {
+    const valRaw = p.discountPrice || p.price || p.originalPrice;
+    if (valRaw !== undefined && valRaw !== null) {
+      const numMatch = String(valRaw).match(/[\d.]+/);
+      if (numMatch) {
+        const num = parseFloat(numMatch[0]);
+        if (!isNaN(num) && num < min) min = num;
+      }
+    }
+  });
+  return min === 999999 ? null : min;
+};
+
+const processBrand = (slug) => {
+  const b = allBrandsMap.get(slug);
+  if (!b) return null;
+  
+  const fStreaming = b.streamingSupport || '';
+  const hasStreaming = (typeof fStreaming === 'string' && fStreaming.length > 0) || (Array.isArray(fStreaming) && fStreaming.length > 0) || (b.features && b.features.some((f) => { const up = f.toUpperCase(); return up.includes('NETFLIX') || up.includes('DISNEY') || f.includes('流媒体') || up.includes('STREAMING'); }));
+  
+  const fAi = getStr(b.aiSupport);
+  const hasAI = fAi.toUpperCase().includes('CHATGPT') || (b.features && b.features.some((f) => { const up = f.toUpperCase(); return up.includes('CHATGPT') || up.includes('AI'); }));
+  
+  const lineTypeStr = getStr(b.lineType);
+  const minPrice = getMinPrice(b.pricing);
+  
+  return { ...b, hasStreaming, hasAI, lineTypeStr, minPrice };
+};
+
+const top3Slugs = ['weifeng', 'feimao', 'firefly'];
+const compareSlugs = ['weifeng', 'feimao', 'firefly', 'shanyue', 'wuyou', 'kuajie', 'lingmao'];
+
+const quickAnswerBrands = top3Slugs.map(processBrand).filter(Boolean);
+const compareBrands = compareSlugs.map(processBrand).filter(Boolean);
+
+const title = "2026 机场推荐指南：稳定机场、专线、AI 与流媒体怎么选 | 海外机场";
+const description = "2026 机场推荐与选择指南，按稳定性、价格、IPLC/IEPL 专线、AI、流媒体、Clash 等使用场景整理机场选择方法，并提供品牌排行榜与详细评测入口。";
+const canonicalURL = "https://haiwaijichang.com/airport-recommendation";
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://haiwaijichang.com/" },
+    { "@type": "ListItem", "position": 2, "name": "机场推荐指南", "item": canonicalURL }
+  ]
+};
+
+const itemListSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": quickAnswerBrands.map((b, i) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "url": `https://haiwaijichang.com/brands/${b?.slug}`
+  }))
+};
+
+const faqs = [
+  {
+    "q": "2026 机场推荐应该先看什么？",
+    "a": "在选择前，建议优先评估自身的真实需求，如主要解锁哪类流媒体、是否需要频繁使用 AI 工具、以及晚高峰对网络稳定性的要求，随后再查看具体品牌详情页中的线路与功能配置。"
+  },
+  {
+    "q": "便宜机场一定不好吗？",
+    "a": "并非绝对。便宜机场在基础查阅资料或轻度网页浏览上可能性价比很高，但在晚高峰高并发或重度视频流媒体等场景，专线服务通常表现更稳定。适合预算优先的用户尝试。"
+  },
+  {
+    "q": "IPLC 和普通中转有什么区别？",
+    "a": "普通中转可能会在跨境阶段经过公共互联网，容易受到晚高峰拥堵干扰；而 IPLC 属于国际专线，端到端直接连通，理论上延迟更低、抗干扰能力更强。"
+  },
+  {
+    "q": "机场能不能稳定使用 ChatGPT？",
+    "a": "这取决于节点是否配备了相应的原生解锁策略。榜单或功能明细中如果标明了支持 AI 工具，说明其针对这类需求进行了优化配置。"
+  },
+  {
+    "q": "怎么看机场是否支持 Netflix？",
+    "a": "大部分机场会在节点命名或落地线路上配置流媒体解锁。建议在品牌明细中查看 streaming 字段，或者确认是否有明确标注 Netflix、Disney+ 等流媒体服务支持。"
+  },
+  {
+    "q": "新手应该选择月付还是年付？",
+    "a": "对于首次使用的用户，建议先选择月付套餐，利用一到两个月的时间测试该网络在自己常用设备和真实环境下的表现，满意后再考虑季度或年付套餐。"
+  }
+];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.a
+    }
+  }))
+};
+---
+
+<Layout title={title} description={description} canonical={canonicalURL}>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5 relative overflow-hidden">
+    <div class="absolute inset-0 z-0 flex items-center justify-center opacity-10 pointer-events-none">
+      <div class="w-[800px] h-[800px] border-[40px] border-brand-neon rounded-full blur-[120px]"></div>
+    </div>
+    <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">2026 机场推荐指南：不同需求该怎么选？</h1>
+      <p class="text-lg text-slate-400 mb-10 leading-relaxed">不要只看“哪个机场最好”，真正需要比较的是线路、价格、AI、流媒体、设备与实际使用场景。本页把现有品牌资料整理成一个选择入口，助你快速定位适合自己的服务。</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/ranking" class="w-full sm:w-auto px-8 py-3 bg-brand-neon text-brand-dark font-bold rounded-full hover:brightness-110 transition-all shadow-lg shadow-brand-neon/20">查看 2026 排行榜</a>
+        <a href="/brands" class="w-full sm:w-auto px-8 py-3 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-all border border-white/10">浏览全部品牌</a>
+        <a href="#use-cases" class="w-full sm:w-auto px-8 py-3 bg-transparent text-brand-neon font-bold rounded-full hover:bg-brand-neon/10 transition-all border border-brand-neon/30">按使用场景选择</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-brand-dark">
+    <div class="max-w-5xl mx-auto px-4">
+      
+      {/* 快速答案区域 */}
+      <div class="mb-20">
+        <div class="flex items-center mb-8">
+          <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon">如果你只想快速选</h2>
+        </div>
+        <p class="text-slate-400 mb-6">以下是根据收录资料综合筛选出的当前代表性选择，直接点击可查看详细信息：</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          {quickAnswerBrands.map((b, i) => b && (
+            <div class="bg-brand-navy border border-brand-neon/20 p-6 rounded-2xl hover:border-brand-neon transition-colors relative flex flex-col">
+              <div class="absolute -top-3 -right-3 w-8 h-8 bg-brand-neon text-brand-dark font-black flex items-center justify-center rounded-full shadow-lg shadow-brand-neon/20">{i + 1}</div>
+              <h3 class="text-xl font-bold text-white mb-2 pr-4">{b.name}</h3>
+              <div class="text-2xl font-black text-brand-neon mb-4">{b.minPrice !== null ? `¥${b.minPrice}` : '—'} <span class="text-sm font-normal text-slate-400">起</span></div>
+              <div class="flex flex-wrap gap-2 mb-4">
+                {b.lineTypeStr && <span class="px-2 py-1 bg-white/5 rounded text-xs text-slate-300 border border-white/10">{b.lineTypeStr}</span>}
+                {b.hasAI && <span class="px-2 py-1 bg-white/5 rounded text-xs text-slate-300 border border-white/10">AI</span>}
+                {b.hasStreaming && <span class="px-2 py-1 bg-white/5 rounded text-xs text-slate-300 border border-white/10">流媒体</span>}
+              </div>
+              <ul class="text-sm text-slate-400 space-y-2 mb-6 flex-grow">
+                {b.features && b.features.slice(0, 2).map((f) => (
+                  <li class="flex items-start"><span class="text-brand-neon mr-2 font-bold">✓</span> <span class="leading-relaxed line-clamp-2">{f}</span></li>
+                ))}
+              </ul>
+              <a href={`/brands/${b.slug}`} class="block w-full text-center py-2.5 bg-brand-neon/10 text-brand-neon border border-brand-neon/30 hover:bg-brand-neon hover:text-brand-dark rounded-full font-bold transition-colors text-sm">查看详情</a>
+            </div>
+          ))}
+        </div>
+        <div class="text-center">
+          <p class="text-slate-400">完整 Top 10 请查看 <a href="/ranking" class="text-brand-neon hover:underline decoration-brand-neon/50 underline-offset-4">2026 机场天梯榜</a></p>
+        </div>
+      </div>
+
+      {/* 按需求选机场 */}
+      <div id="use-cases" class="mb-20 scroll-mt-24">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-8">按需求选机场</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <a href="/stable-airport" class="group bg-brand-navy p-6 rounded-xl border border-white/10 hover:border-brand-neon/50 transition-all shadow-lg hover:shadow-brand-neon/10">
+            <h3 class="text-lg font-bold text-white mb-2 group-hover:text-brand-neon transition-colors flex items-center justify-between">
+              追求稳定 <svg class="w-4 h-4 text-brand-neon opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </h3>
+            <p class="text-sm text-slate-400">重点关注线路类型、晚高峰表现相关资料及专线架构。</p>
+          </a>
+          
+          <a href="/cheap-airport" class="group bg-brand-navy p-6 rounded-xl border border-white/10 hover:border-brand-neon/50 transition-all shadow-lg hover:shadow-brand-neon/10">
+            <h3 class="text-lg font-bold text-white mb-2 group-hover:text-brand-neon transition-colors flex items-center justify-between">
+              预算优先 <svg class="w-4 h-4 text-brand-neon opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </h3>
+            <p class="text-sm text-slate-400">适合先比较入门套餐价格，再确认流量与线路。</p>
+          </a>
+          
+          <a href="/dedicated-line" class="group bg-brand-navy p-6 rounded-xl border border-white/10 hover:border-brand-neon/50 transition-all shadow-lg hover:shadow-brand-neon/10">
+            <h3 class="text-lg font-bold text-white mb-2 group-hover:text-brand-neon transition-colors flex items-center justify-between">
+              IPLC / IEPL 专线 <svg class="w-4 h-4 text-brand-neon opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </h3>
+            <p class="text-sm text-slate-400">适合关注专线架构与跨境线路质量的用户。</p>
+          </a>
+          
+          <a href="/ai" class="group bg-brand-navy p-6 rounded-xl border border-white/10 hover:border-brand-neon/50 transition-all shadow-lg hover:shadow-brand-neon/10">
+            <h3 class="text-lg font-bold text-white mb-2 group-hover:text-brand-neon transition-colors flex items-center justify-between">
+              AI 工具 <svg class="w-4 h-4 text-brand-neon opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </h3>
+            <p class="text-sm text-slate-400">适合 ChatGPT、Claude、Gemini 等使用场景。</p>
+          </a>
+          
+          <a href="/streaming" class="group bg-brand-navy p-6 rounded-xl border border-white/10 hover:border-brand-neon/50 transition-all shadow-lg hover:shadow-brand-neon/10">
+            <h3 class="text-lg font-bold text-white mb-2 group-hover:text-brand-neon transition-colors flex items-center justify-between">
+              流媒体 <svg class="w-4 h-4 text-brand-neon opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </h3>
+            <p class="text-sm text-slate-400">适合 Netflix、Disney+ 等内容解锁需求。</p>
+          </a>
+          
+          <a href="/clash-airport" class="group bg-brand-navy p-6 rounded-xl border border-white/10 hover:border-brand-neon/50 transition-all shadow-lg hover:shadow-brand-neon/10">
+            <h3 class="text-lg font-bold text-white mb-2 group-hover:text-brand-neon transition-colors flex items-center justify-between">
+              Clash 用户 <svg class="w-4 h-4 text-brand-neon opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </h3>
+            <p class="text-sm text-slate-400">适合需要 Clash / Mihomo 等客户端兼容信息的用户。</p>
+          </a>
+        </div>
+      </div>
+
+      {/* 机场选择四步法 */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-8">机场怎么选？先看这 4 项</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Step 1</div>
+            <h3 class="text-lg font-bold text-white mb-3">先确定预算</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">不要只看月付价格，也要确认流量、付款周期、一次性套餐或年付套餐的实际成本。</p>
+          </div>
+          
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Step 2</div>
+            <h3 class="text-lg font-bold text-white mb-3">看<a href="/technology" class="text-brand-neon hover:underline">线路</a></h3>
+            <p class="text-sm text-slate-400 leading-relaxed">区分普通中转、IPLC、IEPL、VLESS 等资料。不要声称某一种一定最好，应结合当地网络判断。</p>
+          </div>
+          
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Step 3</div>
+            <h3 class="text-lg font-bold text-white mb-3">看你的功能需求</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">确认 AI 访问、Netflix/Disney+ 流媒体解锁、多设备并发及 Clash 等客户端兼容性需求。</p>
+          </div>
+          
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Step 4</div>
+            <h3 class="text-lg font-bold text-white mb-3">先看资料，再做选择</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">结合<a href="/brands" class="text-brand-neon hover:underline">品牌详情页</a>、<a href="/ranking" class="text-brand-neon hover:underline">排行榜</a>、使用场景与自己的实际网络环境客观判断。</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 品牌快速比较 */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-8">2026 推荐品牌快速比较</h2>
+        <div class="overflow-x-auto bg-brand-navy border border-white/10 rounded-xl">
+          <table class="w-full text-left min-w-[700px] border-collapse">
+            <thead>
+              <tr class="bg-white/5 text-slate-400 text-sm uppercase tracking-wider">
+                <th class="p-4 font-medium border-b border-white/10">品牌</th>
+                <th class="p-4 font-medium border-b border-white/10">最低价格</th>
+                <th class="p-4 font-medium border-b border-white/10">线路</th>
+                <th class="p-4 font-medium border-b border-white/10 text-center">AI</th>
+                <th class="p-4 font-medium border-b border-white/10 text-center">流媒体</th>
+                <th class="p-4 font-medium border-b border-white/10 text-right">详情</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-300 text-sm divide-y divide-white/5">
+              {compareBrands.map(b => b && (
+                <tr class="hover:bg-white/5 transition-colors">
+                  <td class="p-4 font-bold text-white">{b.name}</td>
+                  <td class="p-4 font-mono">{b.minPrice !== null ? `¥${b.minPrice} 起` : '—'}</td>
+                  <td class="p-4 font-mono text-xs">{b.lineTypeStr || '—'}</td>
+                  <td class="p-4 text-center">{b.hasAI ? <span class="text-brand-neon font-bold">✓</span> : <span class="text-slate-500">—</span>}</td>
+                  <td class="p-4 text-center">{b.hasStreaming ? <span class="text-brand-neon font-bold">✓</span> : <span class="text-slate-500">—</span>}</td>
+                  <td class="p-4 text-right">
+                    <a href={`/brands/${b.slug}`} class="text-brand-neon hover:text-white underline underline-offset-4 decoration-brand-neon/30 hover:decoration-white transition-colors">查看</a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 机场推荐 ≠ 一个品牌适合所有人 */}
+      <div class="mb-20 bg-gradient-to-r from-brand-navy to-brand-dark border border-white/10 p-8 rounded-2xl relative overflow-hidden">
+        <div class="absolute right-0 top-0 w-64 h-64 bg-brand-neon/5 rounded-bl-full pointer-events-none"></div>
+        <h2 class="text-2xl font-bold text-white mb-6 relative z-10">为什么没有“所有人都适合的第一名”？</h2>
+        <div class="prose prose-invert prose-brand max-w-none mb-8 relative z-10">
+          <p>在寻找机场时，很多用户希望直接获得一个“全网最好”的答案。但实际上，并不存在完美适配所有场景的单一选项，因为：</p>
+          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+            <li><strong>预算不同</strong>：有人仅需低价备用，有人需要旗舰专线。</li>
+            <li><strong>地区与运营商差异</strong>：中国不同地区、甚至同地区的不同宽带，连接相同节点可能表现截然不同。</li>
+            <li><strong>使用场景不同</strong>：重度下载、视频流媒体、还是纯文本查阅资料？</li>
+            <li><strong>功能需求各异</strong>：是否需要原生解锁 ChatGPT 或特定的 Netflix 区区？</li>
+            <li><strong>设备兼容性</strong>：是否需要适配路由器、游戏主机，或者特定的客户端组合？</li>
+          </ul>
+          <p class="mt-4">因此，排行榜只是编辑根据各项资料综合整理的推荐顺序，不是绝对性能排名。我们建议根据实际使用环境先做小额测试。</p>
+        </div>
+        <div class="flex gap-4 relative z-10">
+          <a href="/ranking" class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm">查看排行榜</a>
+          <a href="/brands" class="px-6 py-2.5 bg-brand-neon/10 text-brand-neon rounded-full font-bold hover:bg-brand-neon hover:text-brand-dark transition-all text-sm">查看全部品牌</a>
+        </div>
+      </div>
+
+      {/* 新手避坑 */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-8">第一次选机场，建议避开这些误区</h2>
+        <div class="space-y-4">
+          <div class="bg-brand-navy border-l-4 border-orange-500/50 p-5 rounded-r-xl">
+            <h3 class="text-base font-bold text-white mb-1">1. 只看最低价格</h3>
+            <p class="text-sm text-slate-400">最低价往往流量极少或线路为普通级别，无法代表该品牌的真实质量。</p>
+          </div>
+          <div class="bg-brand-navy border-l-4 border-orange-500/50 p-5 rounded-r-xl">
+            <h3 class="text-base font-bold text-white mb-1">2. 看到“专线”就默认是 IPLC</h3>
+            <p class="text-sm text-slate-400">许多商家宣传的专线可能是质量参差不齐的隧道中转，建议仔细查看品牌资料与协议说明。</p>
+          </div>
+          <div class="bg-brand-navy border-l-4 border-orange-500/50 p-5 rounded-r-xl">
+            <h3 class="text-base font-bold text-white mb-1">3. 把支持流媒体理解为所有节点永久可用</h3>
+            <p class="text-sm text-slate-400">受制于流媒体官方的持续封锁，大部分机场只能保障特定节点（如新、港、日）的解锁状态，并需要经常变动 IP。</p>
+          </div>
+          <div class="bg-brand-navy border-l-4 border-orange-500/50 p-5 rounded-r-xl">
+            <h3 class="text-base font-bold text-white mb-1">4. 只看网络测速图，不看套餐说明</h3>
+            <p class="text-sm text-slate-400">测速仅代表某一瞬间、某一网络环境下的极值，不能作为晚高峰稳定性的唯一参考，且限速策略可能因套餐而异。</p>
+          </div>
+          <div class="bg-brand-navy border-l-4 border-orange-500/50 p-5 rounded-r-xl">
+            <h3 class="text-base font-bold text-white mb-1">5. 购买前不确认客户端与设备兼容性</h3>
+            <p class="text-sm text-slate-400">先确认你需要在使用<a href="/help" class="text-brand-neon hover:underline">哪些平台设备</a>，再选择提供对应文档支持的服务商。</p>
+          </div>
+        </div>
+      </div>
+
+      {/* FAQ */}
+      <div class="mb-12">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-8">常见问题 (FAQ)</h2>
+        <div class="space-y-6">
+          {faqs.map(faq => (
+            <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+              <h3 class="text-lg font-bold text-white mb-3 flex items-start">
+                <span class="text-brand-neon mr-3">Q.</span>
+                {faq.q}
+              </h3>
+              <p class="text-sm text-slate-400 leading-relaxed flex items-start">
+                <span class="text-slate-600 font-bold mr-3">A.</span>
+                <span class="flex-1">{faq.a}</span>
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  </section>
+</Layout>
