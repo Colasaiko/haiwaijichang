@@ -1,47 +1,327 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getEntry } from 'astro:content';
-
 import { getCollection } from 'astro:content';
+
 const brandEntries = await getCollection('brands');
-const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (a.order || 999) - (b.order || 999));
+const allBrandsMap = new Map();
+brandEntries.forEach(e => {
+  const data = e.data;
+  data.id = e.id;
+  allBrandsMap.set(e.data.slug, data);
+});
 
-// Filter brands relevant to this topic
-const matchedBrands = '' 
-  ? brands.filter(b => b.features.join(' ').toLowerCase().includes('')) 
-  : brands.slice(0, 6);
+const getStr = (val) => typeof val === 'string' ? val : (Array.isArray(val) ? val.join(' ') : '');
+const getMinPrice = (pricing) => {
+  if (!pricing || !Array.isArray(pricing)) return null;
+  let min = 999999;
+  pricing.forEach(p => {
+    const valRaw = p.discountPrice || p.price || p.originalPrice;
+    if (valRaw !== undefined && valRaw !== null) {
+      const numMatch = String(valRaw).match(/[\d.]+/);
+      if (numMatch) {
+        const num = parseFloat(numMatch[0]);
+        if (!isNaN(num) && num < min) min = num;
+      }
+    }
+  });
+  return min === 999999 ? null : min;
+};
 
-const page = await getEntry('pages', 'stable-airport');
-const { title, description, h1, heroText, sections, emptyText } = page.data;
+const processBrand = (slug) => {
+  const b = allBrandsMap.get(slug);
+  if (!b) return null;
+  
+  const lineTypeStr = getStr(b.lineType);
+  const minPrice = getMinPrice(b.pricing);
+  
+  return { ...b, lineTypeStr, minPrice };
+};
+
+const stableSlugs = ['weifeng', 'feimao', 'firefly', 'shanyue', 'wuyou', 'kuajie'];
+const stableBrands = stableSlugs.map(processBrand).filter(Boolean);
+
+const title = "2026 稳定机场推荐：IPLC 专线、晚高峰与线路怎么判断 | 海外机场";
+const description = "2026 稳定机场选择指南，从 IPLC/IEPL 专线、线路架构、节点、套餐与晚高峰使用场景出发，整理稳定性判断方法与可参考品牌，并提供专线、排行榜和品牌详情入口。";
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://haiwaijichang.com/" },
+    { "@type": "ListItem", "position": 2, "name": "机场推荐", "item": "https://haiwaijichang.com/airport-recommendation" },
+    { "@type": "ListItem", "position": 3, "name": "稳定机场", "item": "https://haiwaijichang.com/stable-airport" }
+  ]
+};
+
+const itemListSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": stableBrands.map((b, i) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "name": b.name,
+    "url": `https://haiwaijichang.com/brands/${b?.slug}`
+  }))
+};
+
+const faqs = [
+  {
+    "q": "什么叫稳定机场？",
+    "a": "稳定通常指在日常使用和晚高峰期间，节点延迟波动较小、可用性较高，且不易受阻断影响。这不仅取决于线路类型，也与服务商的负载控制、冗余节点配置相关。"
+  },
+  {
+    "q": "IPLC 一定比普通中转稳定吗？",
+    "a": "IPLC 属于专线类网络方案，不经过公共国际互联网，通常拥有更稳定的跨境传输质量。但实际表现也受国内接入端带宽和当地运营商限制，并非绝对完美。"
+  },
+  {
+    "q": "为什么晚高峰容易变慢？",
+    "a": "晚高峰时段，整体国际出口带宽拥堵，公共中转节点容易受到较大干扰。即使是专线服务，如果商家超售导致国内接入点拥堵，也可能出现速度下降现象。"
+  },
+  {
+    "q": "怎么判断机场适不适合自己的网络？",
+    "a": "最好的方法是通过月付或低成本套餐进行真实环境测试。在不同时间段、不同设备上访问自己常用的网站或服务，观察实际表现是否符合预期。"
+  },
+  {
+    "q": "新手应该先月付还是年付？",
+    "a": "对于初次使用的品牌，强烈建议先选择月付。在确认其线路在您的地区、宽带环境下表现稳定后，再考虑更长期限的套餐，以降低试错成本。"
+  }
+];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.a
+    }
+  }))
+};
 ---
+
 <Layout title={title} description={description}>
-  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5">
-    <div class="max-w-4xl mx-auto px-4 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">{h1}</h1>
-      <p class="text-lg text-slate-400">{heroText}</p>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  {/* Hero */}
+  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5 relative overflow-hidden">
+    <div class="absolute inset-0 z-0 flex items-center justify-center opacity-10 pointer-events-none">
+      <div class="w-[600px] h-[600px] border-[20px] border-cyan-500 rounded-full blur-[100px]"></div>
+    </div>
+    <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">2026 稳定机场推荐：稳定性到底怎么看？</h1>
+      <p class="text-lg text-slate-400 mb-10 leading-relaxed max-w-3xl mx-auto">“稳定”不能只看一张测速图。线路类型、跨境路径、节点质量、套餐限制，以及你所在地区和运营商，都会影响实际体验。</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="#stable-brands" class="w-full sm:w-auto px-8 py-3 bg-brand-neon text-brand-dark font-bold rounded-full hover:brightness-110 transition-all shadow-lg shadow-brand-neon/20">稳定机场参考品牌</a>
+        <a href="/dedicated-line" class="w-full sm:w-auto px-8 py-3 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-all border border-white/10">查看专线指南</a>
+        <a href="/ranking" class="w-full sm:w-auto px-8 py-3 bg-transparent text-brand-neon font-bold rounded-full hover:bg-brand-neon/10 transition-all border border-brand-neon/30">查看完整排行榜</a>
+      </div>
     </div>
   </section>
 
-  <section class="py-16 bg-brand-dark min-h-screen">
-    <div class="max-w-4xl mx-auto px-4 prose prose-invert prose-brand">
-      <h2>{sections[0].title}</h2>
-      <p>{sections[0].content}</p>
+  <section class="py-16 bg-brand-dark">
+    <div class="max-w-5xl mx-auto px-4">
       
-      <h2>{sections[1].title}</h2>
-      <p>{sections[1].content}</p>
-      
-      <div class="not-prose grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 mb-12">
-        {matchedBrands.length > 0 ? matchedBrands.map(b => (
-          <a href={`/brands/${b.slug}`} class="block bg-brand-navy border border-white/10 p-6 rounded-xl hover:border-brand-neon transition-colors">
-            <h3 class="text-xl font-bold text-white mb-2">{b.name}</h3>
-            <p class="text-sm text-slate-400 line-clamp-2">{b.features[0]}</p>
-            <div class="mt-4 text-xs font-mono text-brand-neon">查看详情 &rarr;</div>
-          </a>
-        )) : <p class="text-slate-500">{emptyText}</p>}
+      {/* 稳定 ≠ 单纯速度快 */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-cyan-500 mb-8">稳定机场，真正要看什么？</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl relative overflow-hidden group hover:border-cyan-500/50 transition-colors">
+            <h3 class="text-lg font-bold text-white mb-3 relative z-10">1. 线路架构</h3>
+            <p class="text-sm text-slate-400 leading-relaxed relative z-10">IPLC、IEPL、普通中转、协议与接入方式不同，跨境路径也不同。<br/><br/><a href="/technology" class="text-brand-neon hover:underline">了解线路技术 &rarr;</a></p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl relative overflow-hidden group hover:border-cyan-500/50 transition-colors">
+            <h3 class="text-lg font-bold text-white mb-3 relative z-10">2. 晚高峰表现</h3>
+            <p class="text-sm text-slate-400 leading-relaxed relative z-10">晚高峰体验不能只靠商家截图判断，建议在自己常用地区与运营商实际测试。</p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl relative overflow-hidden group hover:border-cyan-500/50 transition-colors">
+            <h3 class="text-lg font-bold text-white mb-3 relative z-10">3. 节点与备用线路</h3>
+            <p class="text-sm text-slate-400 leading-relaxed relative z-10">节点覆盖越符合你的常用地区，切换与备用空间通常越大。<br/><br/><a href="/nodes" class="text-brand-neon hover:underline">节点选择指南 &rarr;</a></p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl relative overflow-hidden group hover:border-cyan-500/50 transition-colors">
+            <h3 class="text-lg font-bold text-white mb-3 relative z-10">4. 套餐限制</h3>
+            <p class="text-sm text-slate-400 leading-relaxed relative z-10">限速、倍率、设备数量、流量和付款周期都会影响真实使用体验。</p>
+          </div>
+        </div>
       </div>
-      
-      <h2>{sections[2].title}</h2>
-      <p set:html={sections[2].content}></p>
+
+      {/* 稳定机场参考品牌 */}
+      <div id="stable-brands" class="mb-20 scroll-mt-24">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div>
+            <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-cyan-500 mb-4">稳定需求可优先查看这些品牌资料</h2>
+            <p class="text-slate-400 max-w-3xl">以下品牌的现有资料中均有较明确的 IPLC / 专线、节点或线路信息，因此适合作为稳定性需求用户的进一步比较对象。实际体验仍需结合所在地、运营商与使用时间判断。</p>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {stableBrands.map((b) => b && (
+            <div class="bg-brand-navy border border-white/10 p-6 rounded-2xl flex flex-col hover:border-brand-neon/50 transition-all">
+              <h3 class="text-xl font-bold text-white mb-2">{b.name}</h3>
+              <div class="text-2xl font-black text-brand-neon mb-4">
+                {b.minPrice !== null ? `¥${b.minPrice}` : '—'} <span class="text-sm font-normal text-slate-400">起</span>
+              </div>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="px-2 py-1 bg-white/5 rounded text-xs text-slate-300 border border-white/10">{b.lineTypeStr || '—'}</span>
+                {b.speedLimit && <span class="px-2 py-1 bg-white/5 rounded text-xs text-slate-300 border border-white/10">限速: {b.speedLimit}</span>}
+                {b.deviceLimit && <span class="px-2 py-1 bg-white/5 rounded text-xs text-slate-300 border border-white/10">设备: {b.deviceLimit}</span>}
+              </div>
+              <ul class="text-sm text-slate-400 space-y-2 mb-6 flex-grow">
+                {b.features && b.features.slice(0, 2).map((f) => (
+                  <li class="flex items-start"><span class="text-brand-neon mr-2 font-bold">•</span> <span class="leading-relaxed line-clamp-2">{f}</span></li>
+                ))}
+              </ul>
+              <a href={`/brands/${b.slug}`} class="block w-full text-center py-2.5 bg-white/5 text-white border border-white/10 hover:bg-brand-neon hover:text-brand-dark hover:border-brand-neon rounded-full font-bold transition-colors text-sm">查看详情</a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 快速比较表 */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-cyan-500 mb-8">稳定机场参考品牌快速比较</h2>
+        <div class="overflow-x-auto bg-brand-navy border border-white/10 rounded-xl">
+          <table class="w-full text-left min-w-[800px] border-collapse">
+            <thead>
+              <tr class="bg-white/5 text-slate-400 text-sm uppercase tracking-wider">
+                <th class="p-4 font-medium border-b border-white/10">品牌</th>
+                <th class="p-4 font-medium border-b border-white/10">线路</th>
+                <th class="p-4 font-medium border-b border-white/10">最低价格</th>
+                <th class="p-4 font-medium border-b border-white/10 text-center">速度限制</th>
+                <th class="p-4 font-medium border-b border-white/10 text-center">节点倍率</th>
+                <th class="p-4 font-medium border-b border-white/10 text-center">设备限制</th>
+                <th class="p-4 font-medium border-b border-white/10 text-right">详情</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-300 text-sm divide-y divide-white/5">
+              {stableBrands.map(b => b && (
+                <tr class="hover:bg-white/5 transition-colors">
+                  <td class="p-4 font-bold text-white">{b.name}</td>
+                  <td class="p-4 font-mono text-xs">{b.lineTypeStr || '—'}</td>
+                  <td class="p-4 font-mono">{b.minPrice !== null ? `¥${b.minPrice} 起` : '—'}</td>
+                  <td class="p-4 text-center">{b.speedLimit || '—'}</td>
+                  <td class="p-4 text-center">{b.nodeMultiplier || '—'}</td>
+                  <td class="p-4 text-center">{b.deviceLimit || '—'}</td>
+                  <td class="p-4 text-right">
+                    <a href={`/brands/${b.slug}`} class="text-brand-neon hover:text-white underline underline-offset-4 decoration-brand-neon/30 hover:decoration-white transition-colors">查看</a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 为什么不能直接说谁最稳定 */}
+      <div class="mb-20 bg-gradient-to-br from-brand-navy to-slate-900 border border-white/10 p-8 rounded-2xl relative overflow-hidden">
+        <h2 class="text-2xl font-bold text-white mb-6 relative z-10">为什么本站不做“绝对稳定第一名”？</h2>
+        <div class="prose prose-invert prose-brand max-w-none mb-8 relative z-10">
+          <p>许多用户希望直接得到“最稳定”的单一推荐，但真实网络环境下，并不存在绝对统一的标准。这主要是因为：</p>
+          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+            <li><strong>中国地区不同</strong>：南北方、沿海与内陆的国际出口路由存在差异。</li>
+            <li><strong>运营商不同</strong>：电信、联通、移动的跨境链路质量表现不同。</li>
+            <li><strong>网络环境不同</strong>：家庭宽带和移动数据网络（4G/5G）的连通性可能截然不同。</li>
+            <li><strong>晚高峰情况不同</strong>：拥堵时段的表现取决于接入端的冗余情况。</li>
+            <li><strong>节点与套餐不同</strong>：同一品牌内，不同价位的套餐、不同地区的节点稳定性也可能有差异。</li>
+            <li><strong>线路随时更新</strong>：服务商可能因为政策或成本原因调整上游线路。</li>
+          </ul>
+          <p class="mt-4">结论：本站可以根据已知品牌资料整理线路与功能信息，但不能替用户所在网络环境做绝对稳定性保证。</p>
+        </div>
+        <div class="flex gap-4 relative z-10">
+          <a href="/airport-recommendation" class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm">场景推荐</a>
+          <a href="/ranking" class="px-6 py-2.5 bg-cyan-500/10 text-cyan-400 rounded-full font-bold hover:bg-cyan-500 hover:text-brand-dark transition-all text-sm">查看排行榜</a>
+        </div>
+      </div>
+
+      {/* 自己怎么测稳定 */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-cyan-500 mb-8">购买前后，建议这样判断稳定性</h2>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div class="bg-brand-navy border-t-2 border-cyan-500/30 p-5 rounded-b-xl hover:border-cyan-500 transition-colors">
+            <div class="text-sm font-black text-cyan-500 mb-2">Step 1</div>
+            <h3 class="font-bold text-white mb-2">先用月付测试</h3>
+            <p class="text-xs text-slate-400">不要一开始直接买多年套餐。利用小额成本排雷最安全。</p>
+          </div>
+          <div class="bg-brand-navy border-t-2 border-cyan-500/30 p-5 rounded-b-xl hover:border-cyan-500 transition-colors">
+            <div class="text-sm font-black text-cyan-500 mb-2">Step 2</div>
+            <h3 class="font-bold text-white mb-2">早晚高峰对比</h3>
+            <p class="text-xs text-slate-400">分别测试白天和晚高峰。不要只测试一个时间段的表现。</p>
+          </div>
+          <div class="bg-brand-navy border-t-2 border-cyan-500/30 p-5 rounded-b-xl hover:border-cyan-500 transition-colors">
+            <div class="text-sm font-black text-cyan-500 mb-2">Step 3</div>
+            <h3 class="font-bold text-white mb-2">测试真实场景</h3>
+            <p class="text-xs text-slate-400">网页、AI、流媒体、下载或远程办公，根据你真正会用的场景测试。</p>
+          </div>
+          <div class="bg-brand-navy border-t-2 border-cyan-500/30 p-5 rounded-b-xl hover:border-cyan-500 transition-colors">
+            <div class="text-sm font-black text-cyan-500 mb-2">Step 4</div>
+            <h3 class="font-bold text-white mb-2">切换多个节点</h3>
+            <p class="text-xs text-slate-400">不要只看单一节点。尝试不同国家或区域节点的可用性。</p>
+          </div>
+          <div class="bg-brand-navy border-t-2 border-cyan-500/30 p-5 rounded-b-xl hover:border-cyan-500 transition-colors">
+            <div class="text-sm font-black text-cyan-500 mb-2">Step 5</div>
+            <h3 class="font-bold text-white mb-2">连续观察几天</h3>
+            <p class="text-xs text-slate-400">一次测速不能代表长期表现，需要几天的连续使用感受。</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 常见误区 */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-cyan-500 mb-8">常见误区</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl border-l-4 border-l-orange-500">
+            <h3 class="text-lg font-bold text-white mb-2">1. “速度快 = 一定稳定”</h3>
+            <p class="text-sm text-slate-400">峰值速度和持续可用性不是同一件事。测速再高，如果晚高峰频繁断线，依然不适合稳定性需求。</p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl border-l-4 border-l-orange-500">
+            <h3 class="text-lg font-bold text-white mb-2">2. “写着专线 = 一定是 IPLC”</h3>
+            <p class="text-sm text-slate-400">应该看品牌资料是否明确标注 IPLC / IEPL。部分商家会将优质中转隧道也称为专线。</p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl border-l-4 border-l-orange-500">
+            <h3 class="text-lg font-bold text-white mb-2">3. “一次测速就能判断全部”</h3>
+            <p class="text-sm text-slate-400">不同时间、节点、运营商结果可能不同，单次测速极值无法反馈全天的网络质量。</p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl border-l-4 border-l-orange-500">
+            <h3 class="text-lg font-bold text-white mb-2">4. “年付一定更划算”</h3>
+            <p class="text-sm text-slate-400">价格可能更低，但新用户应先确认实际适配情况。买错套餐的沉没成本远高于月付溢价。</p>
+          </div>
+        </div>
+      </div>
+
+      {/* FAQ */}
+      <div class="mb-16">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-cyan-500 mb-8">常见问题 (FAQ)</h2>
+        <div class="space-y-6">
+          {faqs.map(faq => (
+            <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+              <h3 class="text-lg font-bold text-white mb-3 flex items-start">
+                <span class="text-cyan-500 mr-3 font-black">Q.</span>
+                {faq.q}
+              </h3>
+              <p class="text-sm text-slate-400 leading-relaxed flex items-start">
+                <span class="text-slate-600 font-bold mr-3">A.</span>
+                <span class="flex-1">{faq.a}</span>
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 最终 CTA */}
+      <div class="mb-12 bg-brand-navy border border-cyan-500/20 p-8 rounded-2xl text-center">
+        <h2 class="text-2xl font-bold text-white mb-4">还想继续比较？</h2>
+        <p class="text-slate-400 mb-8 max-w-2xl mx-auto">如果还有其他功能与场景需求，您可以继续浏览我们的推荐指南和具体品牌信息，进一步了解各类线路的详细配置。</p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/airport-recommendation" class="px-6 py-2.5 bg-cyan-500/10 text-cyan-400 rounded-full font-bold hover:bg-cyan-500 hover:text-brand-dark transition-all text-sm border border-cyan-500/30">机场推荐总指南</a>
+          <a href="/dedicated-line" class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm border border-white/10">专线机场指南</a>
+          <a href="/brands" class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm border border-white/10">全部品牌</a>
+          <a href="/ranking" class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm border border-white/10">排行榜</a>
+        </div>
+      </div>
+
     </div>
   </section>
 </Layout>
