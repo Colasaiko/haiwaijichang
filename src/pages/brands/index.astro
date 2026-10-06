@@ -58,22 +58,37 @@ const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (
       
       <!-- Brand Filters -->
       <div class="flex flex-wrap gap-4 mb-12 justify-center">
-        <span class="px-4 py-2 bg-brand-neon/20 text-brand-neon border border-brand-neon rounded-full text-sm font-bold uppercase tracking-wider">全部品牌</span>
-        <span class="px-4 py-2 bg-white/5 text-slate-400 border border-white/10 hover:border-brand-neon hover:text-white rounded-full text-sm font-medium transition-colors cursor-pointer">IPLC 专线</span>
-        <span class="px-4 py-2 bg-white/5 text-slate-400 border border-white/10 hover:border-brand-neon hover:text-white rounded-full text-sm font-medium transition-colors cursor-pointer">流媒体解锁</span>
-        <span class="px-4 py-2 bg-white/5 text-slate-400 border border-white/10 hover:border-brand-neon hover:text-white rounded-full text-sm font-medium transition-colors cursor-pointer">支持 ChatGPT</span>
-        <span class="px-4 py-2 bg-white/5 text-slate-400 border border-white/10 hover:border-brand-neon hover:text-white rounded-full text-sm font-medium transition-colors cursor-pointer">Clash 支持</span>
+        <button data-filter="all" class="brand-filter-btn px-4 py-2 bg-brand-neon/20 text-brand-neon border border-brand-neon rounded-full text-sm font-bold uppercase tracking-wider transition-colors">全部品牌</button>
+        <button data-filter="iplc" class="brand-filter-btn px-4 py-2 bg-white/5 text-slate-400 border border-white/10 hover:border-brand-neon hover:text-white rounded-full text-sm font-medium transition-colors cursor-pointer">IPLC 专线</button>
+        <button data-filter="streaming" class="brand-filter-btn px-4 py-2 bg-white/5 text-slate-400 border border-white/10 hover:border-brand-neon hover:text-white rounded-full text-sm font-medium transition-colors cursor-pointer">流媒体解锁</button>
+        <button data-filter="ai" class="brand-filter-btn px-4 py-2 bg-white/5 text-slate-400 border border-white/10 hover:border-brand-neon hover:text-white rounded-full text-sm font-medium transition-colors cursor-pointer">支持 ChatGPT</button>
+        <button data-filter="clash" class="brand-filter-btn px-4 py-2 bg-white/5 text-slate-400 border border-white/10 hover:border-brand-neon hover:text-white rounded-full text-sm font-medium transition-colors cursor-pointer">Clash 支持</button>
       </div>
 
       <!-- Brand Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div id="no-results-msg" class="hidden text-center py-12 text-slate-400 text-lg">没有找到符合该条件的品牌</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="brand-grid">
         {brands.map((brand) => {
           const hasIPLC = brand.features.some(f => f.toLowerCase().includes('iplc') || f.includes('专线'));
           const hasNetflix = brand.features.some(f => f.toLowerCase().includes('netflix') || f.includes('流媒体'));
           const hasAI = brand.features.some(f => f.toLowerCase().includes('chatgpt') || f.toLowerCase().includes('ai'));
           
+          const getStr = (val) => typeof val === 'string' ? val : (Array.isArray(val) ? val.join(' ') : '');
+          const fLineType = getStr(brand.lineType);
+          const filterIplc = fLineType.toUpperCase().includes('IPLC') || brand.features.some(f => f.toUpperCase().includes('IPLC'));
+          
+          const fStreaming = brand.streamingSupport || '';
+          const filterStreaming = (typeof fStreaming === 'string' && fStreaming.length > 0) || (Array.isArray(fStreaming) && fStreaming.length > 0) || brand.features.some(f => { const up = f.toUpperCase(); return up.includes('NETFLIX') || up.includes('DISNEY') || f.includes('流媒体') || up.includes('STREAMING'); });
+          
+          const fAi = brand.aiSupport || '';
+          const filterAi = (typeof fAi === 'string' && fAi.toUpperCase().includes('CHATGPT')) || brand.features.some(f => { const up = f.toUpperCase(); return up.includes('CHATGPT') || up.includes('AI'); });
+          
+          const combinedClashCheck = [getStr(brand.features), getStr(brand.clientSupport), getStr(brand.clients), getStr(brand.platforms), getStr(brand.apps)].join(' ').toUpperCase();
+          const filterClash = combinedClashCheck.includes('CLASH');
+          
+          
           return (
-            <a href={`/brands/${brand.slug}`} class="group bg-brand-navy border border-white/10 rounded-xl p-6 hover:border-brand-neon/50 hover:bg-brand-navy/80 transition-all relative overflow-hidden flex flex-col">
+            <a href={`/brands/${brand.slug}`} class="brand-card-item group bg-brand-navy border border-white/10 rounded-xl p-6 hover:border-brand-neon/50 hover:bg-brand-navy/80 transition-all relative overflow-hidden flex flex-col" data-iplc={filterIplc.toString()} data-streaming={filterStreaming.toString()} data-ai={filterAi.toString()} data-clash={filterClash.toString()}>
               <div class="absolute top-0 right-0 w-32 h-32 bg-brand-neon/5 rounded-bl-full -mr-16 -mt-16 group-hover:bg-brand-neon/20 transition-colors"></div>
               
               <div class="flex items-start justify-between mb-4 relative z-10">
@@ -109,4 +124,55 @@ const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (
       </div>
     </div>
   </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const btns = document.querySelectorAll('.brand-filter-btn');
+      const cards = document.querySelectorAll('.brand-card-item');
+      const noResults = document.getElementById('no-results-msg');
+
+      btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Update button styles
+          btns.forEach(b => {
+            b.classList.remove('bg-brand-neon/20', 'text-brand-neon', 'border-brand-neon', 'font-bold');
+            b.classList.add('bg-white/5', 'text-slate-400', 'border-white/10', 'font-medium');
+          });
+          btn.classList.remove('bg-white/5', 'text-slate-400', 'border-white/10', 'font-medium');
+          btn.classList.add('bg-brand-neon/20', 'text-brand-neon', 'border-brand-neon', 'font-bold');
+
+          const filter = btn.getAttribute('data-filter');
+          let visibleCount = 0;
+
+          cards.forEach(card => {
+            let show = false;
+            if (filter === 'all') {
+              show = true;
+            } else if (filter === 'iplc') {
+              show = card.getAttribute('data-iplc') === 'true';
+            } else if (filter === 'streaming') {
+              show = card.getAttribute('data-streaming') === 'true';
+            } else if (filter === 'ai') {
+              show = card.getAttribute('data-ai') === 'true';
+            } else if (filter === 'clash') {
+              show = card.getAttribute('data-clash') === 'true';
+            }
+
+            if (show) {
+              card.style.display = '';
+              visibleCount++;
+            } else {
+              card.style.display = 'none';
+            }
+          });
+
+          if (visibleCount === 0) {
+            noResults.classList.remove('hidden');
+          } else {
+            noResults.classList.add('hidden');
+          }
+        });
+      });
+    });
+  </script>
 </Layout>
