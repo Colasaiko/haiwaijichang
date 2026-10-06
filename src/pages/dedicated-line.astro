@@ -1,47 +1,443 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCollection, getEntry } from 'astro:content';
 
-import { getEntry, getCollection } from 'astro:content';
+// ── SEO from Content Collection ─────────────────────────────────────────────
 const page = await getEntry('pages', 'dedicated-line');
-const { title, description, h1, heroText, sections, gridText } = page.data;
+const { title, description, h1 } = page.data;
 
+// ── Brand data & Parsing ─────────────────────────────────────────────────────
 const brandEntries = await getCollection('brands');
-const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (a.order || 999) - (b.order || 999));
 
-// Filter brands relevant to this topic
-const matchedBrands = 'iplc' 
-  ? brands.filter(b => b.features.join(' ').toLowerCase().includes('iplc')) 
-  : brands.slice(0, 6);
+function parsePrice(val) {
+  if (val === undefined || val === null) return null;
+  const n = parseFloat(String(val).replace(/[^\d.]/g, ''));
+  return isNaN(n) ? null : n;
+}
 
+function getMinPrice(pricing) {
+  if (!pricing || !Array.isArray(pricing) || pricing.length === 0) return null;
+  let min = Infinity;
+  for (const p of pricing) {
+    const price = parsePrice(p.discountPrice) ?? parsePrice(p.price) ?? parsePrice(p.originalPrice);
+    if (price !== null && price < min) {
+      min = price;
+    }
+  }
+  return min === Infinity ? null : min;
+}
+
+const iplcBrands = [];
+const ieplBrands = [];
+const allDedicatedBrandsMap = new Map();
+
+brandEntries.forEach(e => {
+  const b = e.data;
+  
+  // 1. Check lineType
+  let lineTypeStr = typeof b.lineType === 'string' ? b.lineType : (Array.isArray(b.lineType) ? b.lineType.join(' ') : '');
+  let upperLine = lineTypeStr.toUpperCase();
+  let hasIPLC = upperLine.includes('IPLC');
+  let hasIEPL = upperLine.includes('IEPL');
+  
+  // 2. Fallback to features ONLY IF missing from lineType
+  if (!hasIPLC && !hasIEPL) {
+    let featuresStr = Array.isArray(b.features) ? b.features.join(' ') : '';
+    let upperFeat = featuresStr.toUpperCase();
+    hasIPLC = upperFeat.includes('IPLC');
+    hasIEPL = upperFeat.includes('IEPL');
+  }
+
+  if (hasIPLC || hasIEPL) {
+    const minPrice = getMinPrice(b.pricing);
+    const protocols = Array.isArray(b.protocols) ? b.protocols.join(' / ') : (b.protocols || '—');
+    
+    const brandData = {
+      name: b.name,
+      slug: b.slug,
+      lineTypeStr,
+      protocols,
+      minPrice,
+      speedLimit: b.speedLimit || '—',
+      nodeMultiplier: b.nodeMultiplier || '—',
+      deviceLimit: b.deviceLimit || '—',
+      features: Array.isArray(b.features) ? b.features : [],
+      order: b.order || 999
+    };
+
+    allDedicatedBrandsMap.set(b.slug, brandData);
+    if (hasIPLC) iplcBrands.push(brandData);
+    if (hasIEPL) ieplBrands.push(brandData);
+  }
+});
+
+iplcBrands.sort((a, b) => a.order - b.order);
+ieplBrands.sort((a, b) => a.order - b.order);
+
+const allDedicatedBrands = Array.from(allDedicatedBrandsMap.values()).sort((a, b) => a.order - b.order);
+
+// ── Schema ───────────────────────────────────────────────────────────────────
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页",     "item": "https://haiwaijichang.com/" },
+    { "@type": "ListItem", "position": 2, "name": "机场推荐", "item": "https://haiwaijichang.com/airport-recommendation" },
+    { "@type": "ListItem", "position": 3, "name": "专线机场", "item": "https://haiwaijichang.com/dedicated-line" }
+  ]
+};
+
+const itemListSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "明确标注 IPLC / IEPL 的机场品牌",
+  "itemListElement": allDedicatedBrands.map((b, i) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "name": b.name,
+    "url": `https://haiwaijichang.com/brands/${b.slug}`
+  }))
+};
+
+const faqs = [
+  { q: "IPLC 是什么？", a: "IPLC 指国际私有专用线路 (International Private Leased Circuit)，通常用于跨国专线连接，路径和普通公网中转不同。具体实现与网络质量取决于服务商的真实交付。" },
+  { q: "IEPL 是什么？", a: "IEPL 指国际以太网专线 (International Ethernet Private Line)，属于端到端以太网连接方案，常用于企业级网络互联。" },
+  { q: "IPLC 和 IEPL 哪个更好？", a: "两者在底层技术细节上有所不同，但对于普通用户而言，实际体验更多取决于服务商采购的带宽规模、国内接入质量以及落地节点配置，无需单纯按名称排高低。" },
+  { q: "写着“专线”的机场一定是 IPLC 吗？", a: "不一定。许多服务商出于营销目的会使用“专线”一词，实际上可能仅指国内某段优化或公网中转。本站仅收录明确标注 IPLC/IEPL 字段的品牌。" },
+  { q: "IPLC 一定不会晚高峰拥堵吗？", a: "不一定。即便跨境段使用专线，如果服务商的国内接入段带宽不足或用户负载过高，仍可能在晚高峰出现拥堵。实际体验受多段网络链路共同影响。" },
+  { q: "怎么确认一个品牌是否真的标注 IPLC？", a: "可以通过查看该品牌提供的线路架构说明、套餐详情和节点特征来确认。本站整理的数据仅代表品牌在公开资料中的明确标注，不代表本站独立验证了其底层运营商合同。" }
+];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(f => ({
+    "@type": "Question",
+    "name": f.q,
+    "acceptedAnswer": { "@type": "Answer", "text": f.a }
+  }))
+};
 ---
+
 <Layout title={title} description={description}>
-  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5">
-    <div class="max-w-4xl mx-auto px-4 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">{h1}</h1>
-      <p class="text-lg text-slate-400">{heroText}</p>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  {/* ── Hero ── */}
+  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5 relative overflow-hidden">
+    <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30">
+      <div class="absolute top-1/4 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-brand-neon to-transparent"></div>
+      <div class="absolute top-2/4 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent border-dashed border-b border-cyan-400"></div>
+      <div class="absolute top-3/4 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-brand-neon to-transparent"></div>
+    </div>
+    <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+      <div class="inline-block px-4 py-1.5 bg-brand-neon/10 border border-brand-neon/30 rounded-full text-xs font-bold text-brand-neon uppercase tracking-widest mb-6">NETWORK ROUTE / LINE MAP</div>
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">{h1}</h1>
+      <p class="text-lg text-slate-400 mb-10 leading-relaxed max-w-3xl mx-auto">专线不能只看“专线”两个字。IPLC、IEPL、普通中转与不同接入方式的网络路径并不相同，本页只整理当前资料中明确标注的线路类型。</p>
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <a href="#iplc-brands" class="px-6 py-2.5 bg-brand-neon text-brand-dark font-bold rounded-full hover:brightness-110 transition-all text-sm shadow-lg shadow-brand-neon/20">查看明确 IPLC 品牌 →</a>
+        <a href="#iepl"        class="px-6 py-2.5 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-all text-sm border border-white/10">查看 IEPL 资料 →</a>
+        <a href="/stable-airport" class="px-6 py-2.5 bg-transparent text-brand-neon font-bold rounded-full hover:bg-brand-neon/10 transition-all text-sm border border-brand-neon/30">稳定机场指南</a>
+        <a href="/airport-recommendation" class="px-6 py-2.5 bg-transparent text-brand-neon font-bold rounded-full hover:bg-brand-neon/10 transition-all text-sm border border-brand-neon/30">推荐总指南</a>
+      </div>
     </div>
   </section>
 
-  <section class="py-16 bg-brand-dark min-h-screen">
-    <div class="max-w-4xl mx-auto px-4 prose prose-invert prose-brand">
-      <h2>{sections[0].h2}</h2>
-      <p>{sections[0].p}</p>
-      
-      <h2>{sections[1].h2}</h2>
-      <p>{sections[1].p}</p>
-      
-      <div class="not-prose grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 mb-12">
-        {matchedBrands.length > 0 ? matchedBrands.map(b => (
-          <a href={`/brands/${b.slug}`} class="block bg-brand-navy border border-white/10 p-6 rounded-xl hover:border-brand-neon transition-colors">
-            <h3 class="text-xl font-bold text-white mb-2">{b.name}</h3>
-            <p class="text-sm text-slate-400 line-clamp-2">{b.features[0]}</p>
-            <div class="mt-4 text-xs font-mono text-brand-neon" set:html={gridText.viewDetails}></div>
-          </a>
-        )) : <p class="text-slate-500">{gridText.noData}</p>}
+  <section class="py-16 bg-brand-dark">
+    <div class="max-w-5xl mx-auto px-4">
+
+      {/* ── 知识区域 ── */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-8">IPLC、IEPL、普通中转有什么区别？</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl hover:border-brand-neon/40 transition-colors">
+            <div class="text-xs font-bold text-brand-neon uppercase tracking-widest mb-2 border border-brand-neon/30 px-2 py-1 rounded inline-block bg-brand-neon/10">IPLC</div>
+            <h3 class="text-lg font-bold text-white mb-2">国际专用线路</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">IPLC 通常指国际专线类连接方案，路径和普通公网中转不同。品牌是否真正采用何种具体运营商线路，仍应以服务商公开资料与实际交付为准。</p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl hover:border-cyan-400/40 transition-colors">
+            <div class="text-xs font-bold text-cyan-400 uppercase tracking-widest mb-2 border border-cyan-400/30 px-2 py-1 rounded inline-block bg-cyan-400/10">IEPL</div>
+            <h3 class="text-lg font-bold text-white mb-2">国际以太网专线</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">IEPL 属于以太网专线类连接方式，常用于企业或跨区域网络互联。实际服务中的接入、落地和链路组合仍可能因服务商不同而不同。</p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl hover:border-white/20 transition-colors">
+            <div class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-2 border border-white/20 px-2 py-1 rounded inline-block bg-white/5">TRANSIT</div>
+            <h3 class="text-lg font-bold text-white mb-2">普通中转网络</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">中转通常通过中间服务器优化路径，与专线类方案的网络结构不同，但最终体验仍受到地区、运营商、服务器和负载影响。可参考 <a href="/technology" class="text-brand-neon hover:underline">线路说明</a>。</p>
+          </div>
+        </div>
       </div>
-      
-      <h2>{sections[2].h2}</h2>
-      <p set:html={sections[2].p}></p>
+
+      {/* ── 为什么不能只看专线两个字 ── */}
+      <div class="mb-20 bg-gradient-to-br from-brand-navy to-slate-900 border border-white/10 p-8 rounded-2xl">
+        <h2 class="text-2xl font-bold text-white mb-6">“专线”两个字为什么不够？</h2>
+        <div class="prose prose-invert prose-brand max-w-none mb-8">
+          <p>许多服务商为了营销，会在套餐名称中加入“高端专线”、“精品专线”等字眼。但网络底层架构千差万别：</p>
+          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
+            <li>有些品牌明确写 IPLC</li>
+            <li>有些明确写 IEPL</li>
+            <li>有些只写“专线”，实际是优化中转</li>
+            <li>有些使用中转 + 落地组合</li>
+            <li>营销名称不一定等于标准技术字段</li>
+            <li>同品牌不同套餐可能使用不同线路</li>
+          </ul>
+          <p class="mt-4">结论：本站只根据现有明确资料分类，不把泛化宣传词强行映射成 IPLC / IEPL。查看更多资料可前往 <a href="/brands" class="text-brand-neon hover:underline">品牌中心</a> 或 <a href="/technology" class="text-brand-neon hover:underline">了解线路技术</a>。</p>
+        </div>
+      </div>
+
+      {/* ── IPLC 品牌 ── */}
+      <div id="iplc-brands" class="mb-20 scroll-mt-24">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-4">当前资料中明确标注 IPLC 的品牌</h2>
+        <p class="text-slate-400 mb-8 max-w-3xl">以下品牌根据本站当前收录资料中的 lineType 或明确 IPLC 字段整理。此列表表示资料标注，不等于本站独立验证了运营商合同或线路物理属性。</p>
+        
+        {iplcBrands.length > 0 ? (
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {iplcBrands.map(b => (
+              <div class="bg-brand-navy border border-white/10 p-6 rounded-xl flex flex-col hover:border-brand-neon/50 transition-all relative">
+                <div class="absolute top-4 right-4 bg-brand-neon text-brand-dark text-[10px] font-black px-2 py-1 rounded shadow-lg shadow-brand-neon/20">IPLC</div>
+                <h3 class="text-lg font-bold text-white mb-1 pr-12">{b.name}</h3>
+                <p class="text-xs text-slate-500 mb-4 line-clamp-1 h-4">{b.lineTypeStr}</p>
+                
+                <div class="mb-4 bg-black/20 rounded-lg p-3 border border-white/5 text-xs text-slate-400 space-y-2">
+                  <div class="flex justify-between"><span>协议</span> <span class="text-white">{b.protocols}</span></div>
+                  <div class="flex justify-between"><span>限速</span> <span class="text-white">{b.speedLimit}</span></div>
+                  <div class="flex justify-between"><span>倍率</span> <span class="text-white">{b.nodeMultiplier}</span></div>
+                  <div class="flex justify-between"><span>设备数</span> <span class="text-white">{b.deviceLimit}</span></div>
+                </div>
+
+                <div class="mb-6 space-y-1">
+                  {b.features.slice(0, 2).map(f => (
+                    <div class="text-xs text-slate-400 flex items-start">
+                      <span class="text-brand-neon mr-1.5 opacity-50">✓</span> {f}
+                    </div>
+                  ))}
+                </div>
+
+                <div class="mt-auto flex items-center justify-between">
+                  <div>
+                    {b.minPrice !== null ? (
+                      <span class="text-xl font-black text-white">¥{b.minPrice}<span class="text-xs text-slate-500 font-normal ml-1">起</span></span>
+                    ) : (
+                      <span class="text-sm text-slate-500">价格未明</span>
+                    )}
+                  </div>
+                  <a href={`/brands/${b.slug}`} class="text-xs font-bold text-brand-neon hover:text-white transition-colors underline underline-offset-4 decoration-brand-neon/30">查看详情</a>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div class="bg-brand-navy border border-white/10 p-8 rounded-xl text-center text-slate-500">
+            暂无明确标注 IPLC 的品牌数据。
+          </div>
+        )}
+      </div>
+
+      {/* ── IEPL 品牌 ── */}
+      <div id="iepl" class="mb-20 scroll-mt-24">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-cyan-400 mb-4">当前资料中明确标注 IEPL 的品牌</h2>
+        
+        {ieplBrands.length > 0 ? (
+          <>
+            <p class="text-slate-400 mb-8 max-w-3xl">以下品牌根据本站当前收录资料明确标注了 IEPL 相关技术字段。此列表表示资料标注，非物理验证结果。</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {ieplBrands.map(b => (
+                <div class="bg-brand-navy border border-white/10 p-6 rounded-xl flex flex-col hover:border-cyan-400/50 transition-all relative">
+                  <div class="absolute top-4 right-4 bg-cyan-400 text-brand-dark text-[10px] font-black px-2 py-1 rounded shadow-lg shadow-cyan-400/20">IEPL</div>
+                  <h3 class="text-lg font-bold text-white mb-1 pr-12">{b.name}</h3>
+                  <p class="text-xs text-slate-500 mb-4 line-clamp-1 h-4">{b.lineTypeStr}</p>
+                  
+                  <div class="mb-4 bg-black/20 rounded-lg p-3 border border-white/5 text-xs text-slate-400 space-y-2">
+                    <div class="flex justify-between"><span>协议</span> <span class="text-white">{b.protocols}</span></div>
+                    <div class="flex justify-between"><span>限速</span> <span class="text-white">{b.speedLimit}</span></div>
+                    <div class="flex justify-between"><span>倍率</span> <span class="text-white">{b.nodeMultiplier}</span></div>
+                    <div class="flex justify-between"><span>设备数</span> <span class="text-white">{b.deviceLimit}</span></div>
+                  </div>
+
+                  <div class="mb-6 space-y-1">
+                    {b.features.slice(0, 2).map(f => (
+                      <div class="text-xs text-slate-400 flex items-start">
+                        <span class="text-cyan-400 mr-1.5 opacity-50">✓</span> {f}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div class="mt-auto flex items-center justify-between">
+                    <div>
+                      {b.minPrice !== null ? (
+                        <span class="text-xl font-black text-white">¥{b.minPrice}<span class="text-xs text-slate-500 font-normal ml-1">起</span></span>
+                      ) : (
+                        <span class="text-sm text-slate-500">价格未明</span>
+                      )}
+                    </div>
+                    <a href={`/brands/${b.slug}`} class="text-xs font-bold text-cyan-400 hover:text-white transition-colors underline underline-offset-4 decoration-cyan-400/30">查看详情</a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div class="bg-brand-navy border border-white/10 p-12 rounded-2xl text-center">
+            <div class="text-4xl mb-4">🔍</div>
+            <p class="text-slate-400 mb-6 max-w-2xl mx-auto leading-relaxed">
+              当前收录品牌资料中，暂未发现明确以 lineType 或品牌结构化字段标注 IEPL 的品牌。本站不会因为出现‘专线’宣传词就自动归类为 IEPL。
+            </p>
+            <div class="flex justify-center gap-4">
+              <a href="/brands" class="text-brand-neon hover:underline text-sm font-bold">查看全部品牌 &rarr;</a>
+              <a href="/technology" class="text-brand-neon hover:underline text-sm font-bold">了解线路技术 &rarr;</a>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── 快速比较表 ── */}
+      {allDedicatedBrands.length > 0 && (
+        <div class="mb-20">
+          <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-4">专线机场品牌快速比较</h2>
+          <p class="text-slate-400 mb-6 max-w-3xl">包含上述所有明确标注 IPLC 或 IEPL 的品牌核心参数横向对比。</p>
+          <div class="overflow-x-auto bg-brand-navy border border-white/10 rounded-xl">
+            <table class="w-full text-left min-w-[900px] border-collapse">
+              <thead>
+                <tr class="bg-white/5 text-slate-400 text-xs uppercase tracking-wider">
+                  <th class="p-4 font-medium border-b border-white/10">品牌</th>
+                  <th class="p-4 font-medium border-b border-white/10">线路类型</th>
+                  <th class="p-4 font-medium border-b border-white/10">最低价格</th>
+                  <th class="p-4 font-medium border-b border-white/10">协议</th>
+                  <th class="p-4 font-medium border-b border-white/10">速度限制</th>
+                  <th class="p-4 font-medium border-b border-white/10">节点倍率</th>
+                  <th class="p-4 font-medium border-b border-white/10">设备限制</th>
+                  <th class="p-4 font-medium border-b border-white/10 text-right">详情</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-300 text-sm divide-y divide-white/5">
+                {allDedicatedBrands.map(b => (
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-4 font-bold text-white">{b.name}</td>
+                    <td class="p-4 text-xs text-slate-400">{b.lineTypeStr || '—'}</td>
+                    <td class="p-4 font-mono text-brand-neon">{b.minPrice !== null ? `¥${b.minPrice} 起` : '—'}</td>
+                    <td class="p-4 text-xs text-slate-400">{b.protocols}</td>
+                    <td class="p-4 font-mono text-xs text-slate-400">{b.speedLimit}</td>
+                    <td class="p-4 font-mono text-xs text-slate-400">{b.nodeMultiplier}</td>
+                    <td class="p-4 font-mono text-xs text-slate-400">{b.deviceLimit}</td>
+                    <td class="p-4 text-right">
+                      <a href={`/brands/${b.slug}`} class="text-brand-neon hover:text-white underline underline-offset-4 decoration-brand-neon/30 text-xs">查看</a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── 专线 ≠ 所有人体验都一样 ── */}
+      <div class="mb-20">
+        <h2 class="text-2xl font-bold text-white mb-6 border-l-4 border-brand-neon px-3">专线 ≠ 所有人体验都一样</h2>
+        <div class="bg-brand-navy border border-white/5 p-8 rounded-2xl">
+          <p class="text-slate-400 leading-relaxed mb-6">
+            即使品牌明确写 IPLC / IEPL，实际体验仍可能受到以下多个因素的共同影响：
+          </p>
+          <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <li class="flex flex-col"><span class="text-brand-neon font-bold mb-1">用户所在地</span> <span class="text-xs text-slate-500">不同地区的跨省传输质量不同</span></li>
+            <li class="flex flex-col"><span class="text-brand-neon font-bold mb-1">运营商</span> <span class="text-xs text-slate-500">电信 / 联通 / 移动的接入差异</span></li>
+            <li class="flex flex-col"><span class="text-brand-neon font-bold mb-1">国内接入段</span> <span class="text-xs text-slate-500">BGP、单线或普通公网接入的稳定性</span></li>
+            <li class="flex flex-col"><span class="text-brand-neon font-bold mb-1">节点负载</span> <span class="text-xs text-slate-500">同一时间该线路上的用户使用量</span></li>
+            <li class="flex flex-col"><span class="text-brand-neon font-bold mb-1">服务商配置</span> <span class="text-xs text-slate-500">采购的真实带宽规模与冗余设计</span></li>
+            <li class="flex flex-col"><span class="text-brand-neon font-bold mb-1">套餐限制</span> <span class="text-xs text-slate-500">某些低价套餐可能包含速度或节点限制</span></li>
+          </ul>
+          <div class="mt-8 pt-6 border-t border-white/10">
+            <p class="text-sm text-slate-400">更详细的稳定性评判标准，请参考 <a href="/stable-airport" class="text-brand-neon hover:underline font-bold">稳定机场指南</a>。</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── 如何自己检查品牌资料 ── */}
+      <div class="mb-20">
+        <h2 class="text-2xl font-bold text-white mb-8 border-l-4 border-brand-neon px-3">看到“专线机场”，先检查这 5 项</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div class="bg-brand-navy p-5 rounded-xl border border-white/5 relative pt-8">
+            <div class="absolute top-0 left-0 bg-brand-neon text-brand-dark font-black px-2 py-1 rounded-br-lg text-xs">Step 1</div>
+            <h3 class="font-bold text-white text-sm mb-2">看 lineType 是否明确</h3>
+            <p class="text-xs text-slate-400">例如是否明确标注为 IPLC、IEPL，还是只用了含糊的“高端专线”。</p>
+          </div>
+          <div class="bg-brand-navy p-5 rounded-xl border border-white/5 relative pt-8">
+            <div class="absolute top-0 left-0 bg-brand-neon text-brand-dark font-black px-2 py-1 rounded-br-lg text-xs">Step 2</div>
+            <h3 class="font-bold text-white text-sm mb-2">看协议</h3>
+            <p class="text-xs text-slate-400">例如 VLESS, Shadowsocks, Trojan 等。协议并不直接决定线路质量，但决定了客户端兼容性。</p>
+          </div>
+          <div class="bg-brand-navy p-5 rounded-xl border border-white/5 relative pt-8">
+            <div class="absolute top-0 left-0 bg-brand-neon text-brand-dark font-black px-2 py-1 rounded-br-lg text-xs">Step 3</div>
+            <h3 class="font-bold text-white text-sm mb-2">看倍率</h3>
+            <p class="text-xs text-slate-400">注意 nodeMultiplier，有些专线节点可能会有 2.0x 或更高的流量扣费倍率。</p>
+          </div>
+          <div class="bg-brand-navy p-5 rounded-xl border border-white/5 relative pt-8">
+            <div class="absolute top-0 left-0 bg-brand-neon text-brand-dark font-black px-2 py-1 rounded-br-lg text-xs">Step 4</div>
+            <h3 class="font-bold text-white text-sm mb-2">看限速与设备数</h3>
+            <p class="text-xs text-slate-400">关注 speedLimit 与 deviceLimit，确认是否满足多设备和高带宽需求。</p>
+          </div>
+          <div class="bg-brand-navy p-5 rounded-xl border border-white/5 relative pt-8">
+            <div class="absolute top-0 left-0 bg-brand-neon text-brand-dark font-black px-2 py-1 rounded-br-lg text-xs">Step 5</div>
+            <h3 class="font-bold text-white text-sm mb-2">看套餐周期</h3>
+            <p class="text-xs text-slate-400">价格低并不等于月付低。参考 <a href="/cheap-airport" class="text-brand-neon hover:underline">便宜机场比较方法</a>，分清月付与年付。</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── 常见误区 ── */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-8">常见误区</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="bg-brand-navy p-6 rounded-xl border-l-4 border-l-orange-500">
+            <h3 class="text-base font-bold text-white mb-2">1. "写专线 = IPLC"</h3>
+            <p class="text-sm text-slate-400">错误。必须有明确资料。许多服务商仅仅将国内优化中转包装为“专线”进行宣传。</p>
+          </div>
+          <div class="bg-brand-navy p-6 rounded-xl border-l-4 border-l-orange-500">
+            <h3 class="text-base font-bold text-white mb-2">2. "IPLC = 永远不会拥堵"</h3>
+            <p class="text-sm text-slate-400">错误。国内接入段的质量和服务商的带宽负载水平，仍会在晚高峰影响最终体验。</p>
+          </div>
+          <div class="bg-brand-navy p-6 rounded-xl border-l-4 border-l-orange-500">
+            <h3 class="text-base font-bold text-white mb-2">3. "IEPL 一定比 IPLC 更高级"</h3>
+            <p class="text-sm text-slate-400">错误。它们代表不同的网络架构和连接方案，适合不同的场景，不能简单地仅凭名称排高低。</p>
+          </div>
+          <div class="bg-brand-navy p-6 rounded-xl border-l-4 border-l-orange-500">
+            <h3 class="text-base font-bold text-white mb-2">4. "价格越高线路越好"</h3>
+            <p class="text-sm text-slate-400">错误。定价策略受多种因素影响，仍需要具体查看实际线路资料与套餐包含的内容限制。</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── FAQ ── */}
+      <div class="mb-16">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-8">常见问题 (FAQ)</h2>
+        <div class="space-y-6">
+          {faqs.map(faq => (
+            <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+              <h3 class="text-base font-bold text-white mb-3 flex items-start">
+                <span class="text-brand-neon mr-3 font-black shrink-0">Q.</span>
+                {faq.q}
+              </h3>
+              <p class="text-sm text-slate-400 leading-relaxed flex items-start">
+                <span class="text-slate-600 font-bold mr-3 shrink-0">A.</span>
+                <span class="flex-1">{faq.a}</span>
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Final CTA ── */}
+      <div class="mb-12 bg-brand-navy border border-brand-neon/20 p-8 rounded-2xl text-center">
+        <h2 class="text-2xl font-bold text-white mb-4">线路看懂了，再继续比较</h2>
+        <p class="text-slate-400 mb-8 max-w-2xl mx-auto">了解不同线路类型的差异后，您可以结合自身对稳定性与价格的侧重，浏览更多分类指南或全部品牌数据。</p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/stable-airport"         class="px-6 py-2.5 bg-brand-neon/10 text-brand-neon rounded-full font-bold hover:bg-brand-neon hover:text-brand-dark transition-all text-sm border border-brand-neon/30">稳定机场指南</a>
+          <a href="/cheap-airport"          class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm border border-white/10">便宜机场指南</a>
+          <a href="/airport-recommendation" class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm border border-white/10">机场推荐总指南</a>
+          <a href="/brands"                 class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm border border-white/10">全部品牌</a>
+        </div>
+      </div>
+
     </div>
   </section>
 </Layout>
