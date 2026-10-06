@@ -27,6 +27,40 @@ const page = await getEntry('pages', 'ranking');
 const { title, description, h1, heroText } = page.data;
 
 const getStr = (val: any) => typeof val === 'string' ? val : (Array.isArray(val) ? val.join(' ') : '');
+
+const getMinPrice = (pricing: any) => {
+  if (!pricing || !Array.isArray(pricing)) return null;
+  let min = 999999;
+  pricing.forEach(p => {
+    const valRaw = p.discountPrice || p.price || p.originalPrice;
+    if (valRaw !== undefined && valRaw !== null) {
+      const numMatch = String(valRaw).match(/[\d.]+/);
+      if (numMatch) {
+        const num = parseFloat(numMatch[0]);
+        if (!isNaN(num) && num < min) min = num;
+      }
+    }
+  });
+  return min === 999999 ? null : min;
+};
+
+// Compute enhanced brand properties ahead of time
+const enhancedBrands = rankingBrands.map((b, index) => {
+  const isPartner = ['jiuyun', 'baoyun', 'shenxing'].includes(b.slug);
+  
+  const fStreaming = b.streamingSupport || '';
+  const hasStreaming = (typeof fStreaming === 'string' && fStreaming.length > 0) || (Array.isArray(fStreaming) && fStreaming.length > 0) || (b.features && b.features.some((f: string) => { const up = f.toUpperCase(); return up.includes('NETFLIX') || up.includes('DISNEY') || f.includes('流媒体') || up.includes('STREAMING'); }));
+  
+  const fAi = getStr(b.aiSupport);
+  const hasAI = fAi.toUpperCase().includes('CHATGPT') || (b.features && b.features.some((f: string) => { const up = f.toUpperCase(); return up.includes('CHATGPT') || up.includes('AI'); }));
+  
+  const lineTypeStr = getStr(b.lineType);
+  const minPrice = getMinPrice(b.pricing);
+  
+  return { ...b, originalIndex: index, isPartner, hasStreaming, hasAI, lineTypeStr, minPrice };
+});
+
+const top3 = enhancedBrands.slice(0, 3);
 ---
 
 <Layout title={title} description={description}>
@@ -41,26 +75,66 @@ const getStr = (val: any) => typeof val === 'string' ? val : (Array.isArray(val)
   </section>
 
   <section class="py-16 bg-brand-dark min-h-screen">
-    <div class="max-w-4xl mx-auto px-4">
+    <div class="max-w-5xl mx-auto px-4">
       
-      <div class="bg-brand-navy border border-white/10 rounded-xl p-6 mb-12 text-slate-400 text-sm leading-relaxed relative overflow-hidden">
+      <div class="bg-brand-navy border border-white/10 rounded-xl p-6 mb-16 text-slate-400 text-sm leading-relaxed relative overflow-hidden">
         <div class="absolute left-0 top-0 w-1 h-full bg-brand-neon"></div>
         <p>本榜单为海外机场编辑推荐顺序，综合当前收录的线路、套餐、功能、使用场景及资料完整度整理，并非实时测速榜。部分品牌与本站存在合作关系，已在对应项目中标注。</p>
       </div>
       
-      <div class="space-y-6">
-        {rankingBrands.map((b, index) => {
-          const isTop3 = index < 3;
-          const isPartner = ['jiuyun', 'baoyun', 'shenxing'].includes(b.slug);
-          
-          const fStreaming = b.streamingSupport || '';
-          const hasStreaming = (typeof fStreaming === 'string' && fStreaming.length > 0) || (Array.isArray(fStreaming) && fStreaming.length > 0) || (b.features && b.features.some((f: string) => { const up = f.toUpperCase(); return up.includes('NETFLIX') || up.includes('DISNEY') || f.includes('流媒体') || up.includes('STREAMING'); }));
-          
-          const fAi = getStr(b.aiSupport);
-          const hasAI = fAi.toUpperCase().includes('CHATGPT') || (b.features && b.features.some((f: string) => { const up = f.toUpperCase(); return up.includes('CHATGPT') || up.includes('AI'); }));
-          
-          const lineTypeStr = getStr(b.lineType);
+      {/* 领奖台 Podium */}
+      {top3.length === 3 && (
+        <div class="flex flex-col md:flex-row gap-6 justify-center md:items-end mb-24">
+          {/* #2 */}
+          <div class="w-full md:w-1/3 order-2 md:order-1 bg-brand-navy border border-slate-400/30 rounded-2xl p-6 md:h-[380px] flex flex-col relative overflow-hidden group hover:border-slate-300 transition-colors">
+            <div class="absolute top-0 right-0 bg-gradient-to-br from-slate-300 to-slate-400 text-slate-900 font-black text-xl px-4 py-2 rounded-bl-xl shadow-lg">#2</div>
+            <h2 class="text-2xl font-bold text-white mb-2 pr-12">{top3[1].name}</h2>
+            <p class="text-xs text-slate-400 mb-4 font-mono">{top3[1].features[0] || '优质网络加速服务'}</p>
+            <div class="text-3xl font-black text-white mb-4">{top3[1].minPrice !== null ? `¥${top3[1].minPrice}` : '—'} <span class="text-sm font-normal text-slate-500">起/月</span></div>
+            <div class="flex flex-wrap gap-2 mb-auto">
+              {top3[1].lineTypeStr && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">{top3[1].lineTypeStr}</span>}
+              {top3[1].hasAI && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">AI 解锁</span>}
+              {top3[1].hasStreaming && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">流媒体</span>}
+            </div>
+            <a href={`/brands/${top3[1].slug}`} class="block w-full text-center mt-6 px-4 py-3 bg-white/10 text-white rounded-lg font-bold hover:bg-white hover:text-brand-dark transition-colors text-sm">查看详情</a>
+          </div>
 
+          {/* #1 */}
+          <div class="w-full md:w-1/3 order-1 md:order-2 bg-brand-navy border border-yellow-500/50 rounded-2xl p-8 shadow-[0_0_30px_rgba(234,179,8,0.15)] md:h-[420px] flex flex-col relative overflow-hidden group hover:border-yellow-400 transition-all scale-100 md:scale-105 z-10">
+            <div class="absolute top-0 right-0 bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-950 font-black text-2xl px-5 py-2 rounded-bl-xl shadow-lg">#1</div>
+            <h2 class="text-3xl font-bold text-white mb-2 pr-12">{top3[0].name}</h2>
+            <p class="text-xs text-yellow-500/80 mb-4 font-mono">{top3[0].features[0] || '全网顶级网络专线'}</p>
+            <div class="text-4xl font-black text-yellow-500 mb-4">{top3[0].minPrice !== null ? `¥${top3[0].minPrice}` : '—'} <span class="text-sm font-normal text-yellow-500/60">起/月</span></div>
+            <div class="flex flex-wrap gap-2 mb-auto">
+              {top3[0].lineTypeStr && <span class="px-2 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-500/90 font-mono">{top3[0].lineTypeStr}</span>}
+              {top3[0].hasAI && <span class="px-2 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-500/90 font-mono">AI 解锁</span>}
+              {top3[0].hasStreaming && <span class="px-2 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-500/90 font-mono">流媒体</span>}
+            </div>
+            <a href={`/brands/${top3[0].slug}`} class="block w-full text-center mt-6 px-4 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-yellow-950 rounded-lg font-bold hover:brightness-110 transition-all text-sm shadow-lg">查看详情</a>
+          </div>
+
+          {/* #3 */}
+          <div class="w-full md:w-1/3 order-3 md:order-3 bg-brand-navy border border-orange-400/30 rounded-2xl p-6 md:h-[380px] flex flex-col relative overflow-hidden group hover:border-orange-400 transition-colors">
+            <div class="absolute top-0 right-0 bg-gradient-to-br from-orange-400 to-orange-600 text-orange-950 font-black text-xl px-4 py-2 rounded-bl-xl shadow-lg">#3</div>
+            <h2 class="text-2xl font-bold text-white mb-2 pr-12">{top3[2].name}</h2>
+            <p class="text-xs text-slate-400 mb-4 font-mono">{top3[2].features[0] || '高性价比稳定服务'}</p>
+            <div class="text-3xl font-black text-white mb-4">{top3[2].minPrice !== null ? `¥${top3[2].minPrice}` : '—'} <span class="text-sm font-normal text-slate-500">起/月</span></div>
+            <div class="flex flex-wrap gap-2 mb-auto">
+              {top3[2].lineTypeStr && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">{top3[2].lineTypeStr}</span>}
+              {top3[2].hasAI && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">AI 解锁</span>}
+              {top3[2].hasStreaming && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">流媒体</span>}
+            </div>
+            <a href={`/brands/${top3[2].slug}`} class="block w-full text-center mt-6 px-4 py-3 bg-white/10 text-white rounded-lg font-bold hover:bg-white hover:text-brand-dark transition-colors text-sm">查看详情</a>
+          </div>
+        </div>
+      )}
+
+      {/* 完整排名列表 */}
+      <h2 class="text-2xl font-bold text-white mb-8 px-2 border-l-4 border-brand-neon">完整排名列表</h2>
+      <div class="space-y-6 mb-24 max-w-4xl mx-auto">
+        {enhancedBrands.map((b) => {
+          const index = b.originalIndex;
+          const isTop3 = index < 3;
           return (
             <div class={`flex flex-col md:flex-row bg-brand-navy border rounded-2xl overflow-hidden transition-all ${isTop3 ? 'border-brand-neon/30 shadow-[0_0_20px_rgba(56,189,248,0.1)] scale-[1.01]' : 'border-white/5 hover:border-brand-neon/30'}`}>
               <div class={`flex flex-col justify-center items-center p-6 md:w-32 border-b md:border-b-0 md:border-r border-white/5 ${index === 0 ? 'bg-gradient-to-br from-yellow-500/20 to-yellow-600/5 text-yellow-500' : index === 1 ? 'bg-gradient-to-br from-slate-300/20 to-slate-400/5 text-slate-300' : index === 2 ? 'bg-gradient-to-br from-orange-400/20 to-orange-500/5 text-orange-400' : 'bg-white/5 text-slate-500'}`}>
@@ -72,16 +146,16 @@ const getStr = (val: any) => typeof val === 'string' ? val : (Array.isArray(val)
                 <div class="flex items-center justify-between mb-4">
                   <div class="flex flex-wrap items-center gap-3">
                     <h2 class="text-2xl font-bold text-white">{b.name}</h2>
-                    {isPartner && (
+                    {b.isPartner && (
                       <span class="px-2 py-0.5 bg-brand-accent/20 text-brand-accent text-[0.65rem] font-bold rounded uppercase tracking-wider border border-brand-accent/30 whitespace-nowrap">合作品牌</span>
                     )}
                   </div>
                 </div>
                 
                 <div class="flex flex-wrap gap-2 mb-5">
-                   {lineTypeStr && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">{lineTypeStr}</span>}
-                   {hasStreaming && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">流媒体解锁</span>}
-                   {hasAI && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">AI 解锁</span>}
+                   {b.lineTypeStr && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">{b.lineTypeStr}</span>}
+                   {b.hasStreaming && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">流媒体解锁</span>}
+                   {b.hasAI && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">AI 解锁</span>}
                 </div>
                 
                 <ul class="space-y-2 mb-6 text-sm text-slate-400">
@@ -99,6 +173,79 @@ const getStr = (val: any) => typeof val === 'string' ? val : (Array.isArray(val)
             </div>
           );
         })}
+      </div>
+
+      {/* Top 10 快速对比 */}
+      <h2 class="text-2xl font-bold text-white mb-8 px-2 border-l-4 border-brand-neon">Top 10 快速对比</h2>
+      <div class="mb-24 overflow-x-auto bg-brand-navy border border-white/10 rounded-xl">
+        <table class="w-full text-left min-w-[800px] border-collapse">
+          <thead>
+            <tr class="bg-white/5 text-slate-400 text-sm uppercase tracking-wider">
+              <th class="p-4 font-medium border-b border-white/10">排名</th>
+              <th class="p-4 font-medium border-b border-white/10">品牌</th>
+              <th class="p-4 font-medium border-b border-white/10">最低价格</th>
+              <th class="p-4 font-medium border-b border-white/10">线路</th>
+              <th class="p-4 font-medium border-b border-white/10 text-center">AI</th>
+              <th class="p-4 font-medium border-b border-white/10 text-center">流媒体</th>
+              <th class="p-4 font-medium border-b border-white/10 text-center">合作关系</th>
+              <th class="p-4 font-medium border-b border-white/10 text-right">详情</th>
+            </tr>
+          </thead>
+          <tbody class="text-slate-300 text-sm divide-y divide-white/5">
+            {enhancedBrands.map(b => (
+              <tr class="hover:bg-white/5 transition-colors">
+                <td class="p-4 font-bold font-mono text-brand-neon">#{b.originalIndex + 1}</td>
+                <td class="p-4 font-bold text-white">{b.name}</td>
+                <td class="p-4 font-mono">{b.minPrice !== null ? `¥${b.minPrice} 起` : '—'}</td>
+                <td class="p-4 font-mono text-xs">{b.lineTypeStr || '—'}</td>
+                <td class="p-4 text-center">{b.hasAI ? <span class="text-brand-neon font-bold">✓</span> : <span class="text-slate-500">—</span>}</td>
+                <td class="p-4 text-center">{b.hasStreaming ? <span class="text-brand-neon font-bold">✓</span> : <span class="text-slate-500">—</span>}</td>
+                <td class="p-4 text-center">
+                  {b.isPartner ? <span class="px-2 py-0.5 bg-brand-accent/20 text-brand-accent text-[0.65rem] font-bold rounded uppercase tracking-wider">合作品牌</span> : <span class="text-slate-500">—</span>}
+                </td>
+                <td class="p-4 text-right">
+                  <a href={`/brands/${b.slug}`} class="text-brand-neon hover:text-white underline underline-offset-4 decoration-brand-neon/30 hover:decoration-white transition-colors">查看</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 如何看这个榜单 */}
+      <h2 class="text-2xl font-bold text-white mb-8 px-2 border-l-4 border-brand-neon">如何看这个榜单</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+        <div class="bg-brand-navy border border-white/5 p-6 rounded-xl hover:border-brand-neon/30 transition-colors">
+          <div class="flex items-center mb-3">
+            <svg class="w-6 h-6 text-brand-neon mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <h3 class="text-lg font-bold text-white">线路类型</h3>
+          </div>
+          <p class="text-sm text-slate-400 leading-relaxed">IPLC / IEPL 专线或高质量中转等线路架构会直接影响晚高峰期的体验。建议根据预算优先选择专线服务，以获得更稳定的低延迟表现。</p>
+        </div>
+        
+        <div class="bg-brand-navy border border-white/5 p-6 rounded-xl hover:border-brand-neon/30 transition-colors">
+          <div class="flex items-center mb-3">
+            <svg class="w-6 h-6 text-brand-neon mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <h3 class="text-lg font-bold text-white">价格与门槛</h3>
+          </div>
+          <p class="text-sm text-slate-400 leading-relaxed">表格中标注的最低价仅代表入门门槛，不能单独用来决定服务质量的优劣。高阶套餐通常包含更优质的节点与更高的速度上限。</p>
+        </div>
+        
+        <div class="bg-brand-navy border border-white/5 p-6 rounded-xl hover:border-brand-neon/30 transition-colors">
+          <div class="flex items-center mb-3">
+            <svg class="w-6 h-6 text-brand-neon mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <h3 class="text-lg font-bold text-white">AI 与流媒体</h3>
+          </div>
+          <p class="text-sm text-slate-400 leading-relaxed">Netflix、Disney+ 流媒体解锁和 ChatGPT 等 AI 工具的访问权限非常适合重度需求用户。勾选功能表示该品牌承诺或主要节点支持对应的原生解锁。</p>
+        </div>
+        
+        <div class="bg-brand-navy border border-white/5 p-6 rounded-xl hover:border-brand-neon/30 transition-colors">
+          <div class="flex items-center mb-3">
+            <svg class="w-6 h-6 text-brand-neon mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+            <h3 class="text-lg font-bold text-white">排名性质</h3>
+          </div>
+          <p class="text-sm text-slate-400 leading-relaxed">本榜单纯属本站编辑的推荐顺序，并非实时测速榜，也不代表绝对的性能排行。大家在选择时需结合自身网络环境与实际使用需求做出判断。</p>
+        </div>
       </div>
 
     </div>
