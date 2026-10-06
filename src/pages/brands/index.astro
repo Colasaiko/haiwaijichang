@@ -69,19 +69,20 @@ const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (
       <div id="no-results-msg" class="hidden text-center py-12 text-slate-400 text-lg">没有找到符合该条件的品牌</div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="brand-grid">
         {brands.map((brand) => {
-          const hasIPLC = brand.features.some(f => f.toLowerCase().includes('iplc') || f.includes('专线'));
-          const hasNetflix = brand.features.some(f => f.toLowerCase().includes('netflix') || f.includes('流媒体'));
-          const hasAI = brand.features.some(f => f.toLowerCase().includes('chatgpt') || f.toLowerCase().includes('ai'));
-          
           const getStr = (val) => typeof val === 'string' ? val : (Array.isArray(val) ? val.join(' ') : '');
+          
           const fLineType = getStr(brand.lineType);
           const filterIplc = fLineType.toUpperCase().includes('IPLC') || brand.features.some(f => f.toUpperCase().includes('IPLC'));
+          const hasIPLC = filterIplc;
+
+          const hasNetflix = brand.features.some(f => f.toLowerCase().includes('netflix') || f.includes('流媒体'));
+          const hasAI = brand.features.some(f => f.toLowerCase().includes('chatgpt') || f.toLowerCase().includes('ai'));
           
           const fStreaming = brand.streamingSupport || '';
           const filterStreaming = (typeof fStreaming === 'string' && fStreaming.length > 0) || (Array.isArray(fStreaming) && fStreaming.length > 0) || brand.features.some(f => { const up = f.toUpperCase(); return up.includes('NETFLIX') || up.includes('DISNEY') || f.includes('流媒体') || up.includes('STREAMING'); });
           
-          const fAi = brand.aiSupport || '';
-          const filterAi = (typeof fAi === 'string' && fAi.toUpperCase().includes('CHATGPT')) || brand.features.some(f => { const up = f.toUpperCase(); return up.includes('CHATGPT') || up.includes('AI'); });
+          const fAi = getStr(brand.aiSupport);
+          const filterAi = fAi.toUpperCase().includes('CHATGPT') || brand.features.some(f => { const up = f.toUpperCase(); return up.includes('CHATGPT') || up.includes('AI'); });
           
           const combinedClashCheck = [getStr(brand.features), getStr(brand.clientSupport), getStr(brand.clients), getStr(brand.platforms), getStr(brand.apps)].join(' ').toUpperCase();
           const filterClash = combinedClashCheck.includes('CLASH');
