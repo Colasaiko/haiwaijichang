@@ -57,7 +57,30 @@ const enhancedBrands = rankingBrands.map((b, index) => {
   const lineTypeStr = getStr(b.lineType);
   const minPrice = getMinPrice(b.pricing);
   
-  return { ...b, originalIndex: index, isPartner, hasStreaming, hasAI, lineTypeStr, minPrice };
+  let reason = '';
+  if (b.slug === 'weifeng') {
+    reason = '线路稳定且功能完整度极高，在流媒体解锁与 AI 支持上表现优异，适合作为综合优先选择。';
+  } else if (b.slug === 'feimao') {
+    reason = '综合体验均衡且套餐选择灵活，线路覆盖广泛，适合重视稳定使用体验与多场景需求的用户。';
+  } else if (b.slug === 'firefly') {
+    reason = '采用 IPLC + VLESS 组合架构，无缝解锁 AI 与流媒体，适合多设备场景日常综合使用。';
+  } else {
+    const highlights = [];
+    if (lineTypeStr) highlights.push(`优质 ${lineTypeStr} 网络`);
+    if (hasStreaming) highlights.push('流畅解锁热门流媒体');
+    if (hasAI) highlights.push('支持 AI 访问');
+    
+    const feats = (b.features || []).filter((f: string) => !f.includes('流媒体') && !f.includes('AI') && !f.includes('专线')).slice(0, 2);
+    const extra = feats.length > 0 ? `，${feats.join('，')}` : '';
+    
+    if (highlights.length > 0) {
+      reason = `主打${highlights.join('与')}${extra}，在该价位段提供了优良的综合体验，成功入榜。`;
+    } else {
+      reason = `${extra || '提供稳定的网络加速服务'}，各项配置均衡，具备较高的性价比和可用性。`;
+    }
+  }
+
+  return { ...b, originalIndex: index, isPartner, hasStreaming, hasAI, lineTypeStr, minPrice, reason };
 });
 
 const top3 = enhancedBrands.slice(0, 3);
@@ -90,7 +113,7 @@ const top3 = enhancedBrands.slice(0, 3);
             <div class="absolute top-0 right-0 bg-gradient-to-br from-slate-300 to-slate-400 text-slate-900 font-black text-xl px-4 py-2 rounded-bl-xl shadow-lg">#2</div>
             <h2 class="text-2xl font-bold text-white mb-2 pr-12">{top3[1].name}</h2>
             <p class="text-xs text-slate-400 mb-4 font-mono">{top3[1].features[0] || '优质网络加速服务'}</p>
-            <div class="text-3xl font-black text-white mb-4">{top3[1].minPrice !== null ? `¥${top3[1].minPrice}` : '—'} <span class="text-sm font-normal text-slate-500">起/月</span></div>
+            <div class="text-3xl font-black text-white mb-4">{top3[1].minPrice !== null ? `¥${top3[1].minPrice}` : '—'} <span class="text-sm font-normal text-slate-500">起</span></div>
             <div class="flex flex-wrap gap-2 mb-auto">
               {top3[1].lineTypeStr && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">{top3[1].lineTypeStr}</span>}
               {top3[1].hasAI && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">AI 解锁</span>}
@@ -104,7 +127,7 @@ const top3 = enhancedBrands.slice(0, 3);
             <div class="absolute top-0 right-0 bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-950 font-black text-2xl px-5 py-2 rounded-bl-xl shadow-lg">#1</div>
             <h2 class="text-3xl font-bold text-white mb-2 pr-12">{top3[0].name}</h2>
             <p class="text-xs text-yellow-500/80 mb-4 font-mono">{top3[0].features[0] || '全网顶级网络专线'}</p>
-            <div class="text-4xl font-black text-yellow-500 mb-4">{top3[0].minPrice !== null ? `¥${top3[0].minPrice}` : '—'} <span class="text-sm font-normal text-yellow-500/60">起/月</span></div>
+            <div class="text-4xl font-black text-yellow-500 mb-4">{top3[0].minPrice !== null ? `¥${top3[0].minPrice}` : '—'} <span class="text-sm font-normal text-yellow-500/60">起</span></div>
             <div class="flex flex-wrap gap-2 mb-auto">
               {top3[0].lineTypeStr && <span class="px-2 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-500/90 font-mono">{top3[0].lineTypeStr}</span>}
               {top3[0].hasAI && <span class="px-2 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded text-xs text-yellow-500/90 font-mono">AI 解锁</span>}
@@ -118,7 +141,7 @@ const top3 = enhancedBrands.slice(0, 3);
             <div class="absolute top-0 right-0 bg-gradient-to-br from-orange-400 to-orange-600 text-orange-950 font-black text-xl px-4 py-2 rounded-bl-xl shadow-lg">#3</div>
             <h2 class="text-2xl font-bold text-white mb-2 pr-12">{top3[2].name}</h2>
             <p class="text-xs text-slate-400 mb-4 font-mono">{top3[2].features[0] || '高性价比稳定服务'}</p>
-            <div class="text-3xl font-black text-white mb-4">{top3[2].minPrice !== null ? `¥${top3[2].minPrice}` : '—'} <span class="text-sm font-normal text-slate-500">起/月</span></div>
+            <div class="text-3xl font-black text-white mb-4">{top3[2].minPrice !== null ? `¥${top3[2].minPrice}` : '—'} <span class="text-sm font-normal text-slate-500">起</span></div>
             <div class="flex flex-wrap gap-2 mb-auto">
               {top3[2].lineTypeStr && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">{top3[2].lineTypeStr}</span>}
               {top3[2].hasAI && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">AI 解锁</span>}
@@ -163,6 +186,14 @@ const top3 = enhancedBrands.slice(0, 3);
                      <li class="flex items-start"><svg class="w-4 h-4 text-brand-neon mr-2 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span class="leading-relaxed line-clamp-2">{f}</span></li>
                   ))}
                 </ul>
+                
+                <div class="bg-brand-neon/5 border border-brand-neon/10 p-3 rounded-lg mb-6">
+                  <div class="text-xs font-bold text-brand-neon mb-1 flex items-center">
+                    <svg class="w-3.5 h-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    推荐理由
+                  </div>
+                  <p class="text-sm text-slate-300 leading-relaxed">{b.reason}</p>
+                </div>
                 
                 <div>
                   <a href={`/brands/${b.slug}`} class="inline-flex items-center px-6 py-2.5 bg-brand-neon/10 text-brand-neon border border-brand-neon/30 hover:bg-brand-neon hover:text-brand-dark rounded-full font-bold transition-all text-sm">
