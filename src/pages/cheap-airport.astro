@@ -1,45 +1,437 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getEntry, getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 
+// ── SEO from Content Collection ─────────────────────────────────────────────
 const page = await getEntry('pages', 'cheap-airport');
-const { title, description, h1, subtitle, keyword, fallbackText, sections } = page.data;
+const { title, description, h1 } = page.data;
 
+// ── Brand data ───────────────────────────────────────────────────────────────
 const brandEntries = await getCollection('brands');
-const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (a.order || 999) - (b.order || 999));
+const allBrandsMap = new Map();
+brandEntries.forEach(e => allBrandsMap.set(e.data.slug, e.data));
 
-const matchedBrands = keyword 
-  ? brands.filter(b => b.features.join(' ').toLowerCase().includes(keyword)) 
-  : brands.slice(0, 6);
+// ── Price parser ─────────────────────────────────────────────────────────────
+function parsePrice(val) {
+  if (val === undefined || val === null) return null;
+  const n = parseFloat(String(val).replace(/[^\d.]/g, ''));
+  return isNaN(n) ? null : n;
+}
+function bestPrice(p) {
+  return parsePrice(p.discountPrice) ?? parsePrice(p.price) ?? parsePrice(p.originalPrice);
+}
+
+// ── Period classifiers ───────────────────────────────────────────────────────
+const MONTHLY  = ['月付', '月付起'];
+const TERM     = ['年付', '半年付', '季付', '两年付', '二年付', '三年付'];
+const ONETIME  = ['一次性', '不限时', '永久', '总量'];
+
+function classifyPeriod(period, planName) {
+  const haystack = period + ' ' + planName;
+  if (MONTHLY.some(k  => period.includes(k)))                    return 'monthly';
+  if (ONETIME.some(k  => haystack.includes(k)))                  return 'onetime';
+  if (TERM.some(k     => period.includes(k)))                    return 'term';
+  return null;
+}
+
+// ── Build per-brand plan buckets ─────────────────────────────────────────────
+const monthlyBrands = [];   // cheapest monthly plan per brand, sorted asc
+const termBrands    = [];   // cheapest term plan per brand
+const oneTimeBrands = [];   // cheapest one-time plan per brand
+
+brandEntries.forEach(e => {
+  const b = e.data;
+  if (!b.pricing || !Array.isArray(b.pricing)) return;
+
+  const monthly = [], term = [], onetime = [];
+
+  b.pricing.forEach(p => {
+    const price = bestPrice(p);
+    if (price === null) return;
+    const type = classifyPeriod(p.period || '', p.name || '');
+    const plan = { price, name: p.name || '', period: p.period || '', traffic: p.traffic || '' };
+    if (type === 'monthly') monthly.push(plan);
+    else if (type === 'term') term.push(plan);
+    else if (type === 'onetime') onetime.push(plan);
+  });
+
+  const lineTypeStr = typeof b.lineType === 'string' ? b.lineType
+    : Array.isArray(b.lineType) ? b.lineType.join(' ') : '';
+
+  if (monthly.length)  { monthly.sort((a,b)  => a.price - b.price);  monthlyBrands.push({ slug: b.slug, name: b.name, lineTypeStr, best: monthly[0]  }); }
+  if (term.length)     { term.sort((a,b)      => a.price - b.price);  termBrands.push(   { slug: b.slug, name: b.name, lineTypeStr, best: term[0]     }); }
+  if (onetime.length)  { onetime.sort((a,b)   => a.price - b.price);  oneTimeBrands.push({ slug: b.slug, name: b.name, lineTypeStr, best: onetime[0]  }); }
+});
+
+monthlyBrands.sort((a,b)   => a.best.price - b.best.price);
+termBrands.sort((a,b)      => a.best.price - b.best.price);
+oneTimeBrands.sort((a,b)   => a.best.price - b.best.price);
+
+const top8Monthly  = monthlyBrands.slice(0, 8);
+const top8Term     = termBrands.slice(0, 8);
+const top6OneTime  = oneTimeBrands.slice(0, 6);
+
+// ── Price comparison table: every brand that has ANY plan ───────────────────
+const allSlugs = new Set([
+  ...monthlyBrands.map(b => b.slug),
+  ...termBrands.map(b => b.slug),
+  ...oneTimeBrands.map(b => b.slug),
+]);
+// Build a unified map for the comparison table
+const monthlyMap  = new Map(monthlyBrands.map(b  => [b.slug, b]));
+const termMap     = new Map(termBrands.map(b     => [b.slug, b]));
+const oneTimeMap  = new Map(oneTimeBrands.map(b  => [b.slug, b]));
+
+// Show table for brands that have at least monthly OR term
+const tableRows = monthlyBrands.slice(0, 10).map(mb => ({
+  slug: mb.slug,
+  name: mb.name,
+  lineTypeStr: mb.lineTypeStr,
+  monthly:  monthlyMap.get(mb.slug)?.best  ?? null,
+  term:     termMap.get(mb.slug)?.best     ?? null,
+  onetime:  oneTimeMap.get(mb.slug)?.best  ?? null,
+}));
+
+// ── Schema ───────────────────────────────────────────────────────────────────
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页",     "item": "https://haiwaijichang.com/" },
+    { "@type": "ListItem", "position": 2, "name": "机场推荐", "item": "https://haiwaijichang.com/airport-recommendation" },
+    { "@type": "ListItem", "position": 3, "name": "便宜机场", "item": "https://haiwaijichang.com/cheap-airport" }
+  ]
+};
+
+const itemListSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "低价月付机场入门价格列表",
+  "itemListElement": top8Monthly.map((b, i) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "name": b.name,
+    "url": `https://haiwaijichang.com/brands/${b.slug}`
+  }))
+};
+
+const faqs = [
+  { q: "什么价格算便宜机场？",
+    a: "这没有统一标准。月付套餐从几元到几十元不等；年付总价通常比月付更低，但付款周期更长。不同服务商定价差异较大，建议结合流量、线路和套餐限制综合比较，而不只看单一数字。" },
+  { q: "月付和年付应该怎么比较？",
+    a: "月付和年付不能直接放在同一个价格列下对比，因为它们代表完全不同的付款周期。月付适合初次试用或短期需求；年付总支出虽通常较低，但一次性锁定更长时间，试错成本更高。" },
+  { q: "年付套餐可以直接除以 12 吗？",
+    a: "本站不建议自动将年付总价除以 12 来换算「月均价」，因为不同套餐的流量配额、使用周期和优惠结构各不相同，简单换算容易产生误导性比较。" },
+  { q: "不限时流量包是什么意思？",
+    a: "不限时流量包通常是指一次性购买固定总流量，不设月度刷新，用完即止。适合使用频率不固定、不需要每月持续流量的用户，但一旦流量用完需要再次购买，与月付套餐的计费逻辑完全不同。" },
+  { q: "优惠码价格是否一定长期有效？",
+    a: "不一定。部分优惠可能有适用套餐的限制（如排除年付或特定计划），也可能设有有效期。购买前建议仔细确认优惠码的使用范围和截止时间。" },
+  { q: "低价机场一定不稳定吗？",
+    a: "不能直接画等号。价格高低不等于线路质量高低，但低价套餐通常在流量、节点数量或线路类型上有限制。建议先看品牌资料中的线路与节点信息，结合自身需求判断是否匹配。" },
+];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(f => ({
+    "@type": "Question",
+    "name": f.q,
+    "acceptedAnswer": { "@type": "Answer", "text": f.a }
+  }))
+};
 ---
+
 <Layout title={title} description={description}>
-  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5">
-    <div class="max-w-4xl mx-auto px-4 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">{h1}</h1>
-      <p class="text-lg text-slate-400">{subtitle}</p>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  {/* ── Hero ── */}
+  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5 relative overflow-hidden">
+    <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+      <div class="absolute top-10 left-1/4 w-[400px] h-[2px] bg-gradient-to-r from-transparent via-brand-neon/30 to-transparent"></div>
+      <div class="absolute top-20 left-1/3 w-[300px] h-[1px] bg-gradient-to-r from-transparent via-brand-neon/20 to-transparent"></div>
+      <div class="absolute bottom-10 right-1/4 w-[350px] h-[2px] bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent"></div>
+    </div>
+    <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+      <div class="inline-block px-4 py-1.5 bg-brand-neon/10 border border-brand-neon/30 rounded-full text-xs font-bold text-brand-neon uppercase tracking-widest mb-6">FARE BOARD / 价格看板</div>
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">{h1}</h1>
+      <p class="text-lg text-slate-400 mb-10 leading-relaxed max-w-3xl mx-auto">"便宜"不能只看一个最低数字。¥19 月付、¥79 年付和 ¥100 一次性流量包代表的是完全不同的购买方式，应该分开比较。</p>
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <a href="#monthly"  class="px-6 py-2.5 bg-brand-neon text-brand-dark font-bold rounded-full hover:brightness-110 transition-all text-sm shadow-lg shadow-brand-neon/20">低价月付 →</a>
+        <a href="#annual"   class="px-6 py-2.5 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-all text-sm border border-white/10">年付套餐 →</a>
+        <a href="#one-time" class="px-6 py-2.5 bg-white/10 text-white font-bold rounded-full hover:bg-white/20 transition-all text-sm border border-white/10">不限时套餐 →</a>
+        <a href="/airport-recommendation" class="px-6 py-2.5 bg-transparent text-brand-neon font-bold rounded-full hover:bg-brand-neon/10 transition-all text-sm border border-brand-neon/30">推荐总指南</a>
+      </div>
     </div>
   </section>
 
-  <section class="py-16 bg-brand-dark min-h-screen">
-    <div class="max-w-4xl mx-auto px-4 prose prose-invert prose-brand">
-      <h2>{sections[0].title}</h2>
-      <p set:html={sections[0].content}></p>
-      
-      <h2>{sections[1].title}</h2>
-      <p set:html={sections[1].content}></p>
-      
-      <div class="not-prose grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 mb-12">
-        {matchedBrands.length > 0 ? matchedBrands.map(b => (
-          <a href={`/brands/${b.slug}`} class="block bg-brand-navy border border-white/10 p-6 rounded-xl hover:border-brand-neon transition-colors">
-            <h3 class="text-xl font-bold text-white mb-2">{b.name}</h3>
-            <p class="text-sm text-slate-400 line-clamp-2">{b.features[0]}</p>
-            <div class="mt-4 text-xs font-mono text-brand-neon">查看详情 &rarr;</div>
-          </a>
-        )) : <p class="text-slate-500">{fallbackText}</p>}
+  <section class="py-16 bg-brand-dark">
+    <div class="max-w-5xl mx-auto px-4">
+
+      {/* ── 预算不只看价格 4 cards ── */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-8">低价套餐，还要看这 4 件事</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl hover:border-brand-neon/40 transition-colors">
+            <div class="text-2xl mb-3">📦</div>
+            <h3 class="text-lg font-bold text-white mb-2">1. 流量</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">¥10 和 ¥20 不能脱离 GB 数量直接比较，单价只有结合流量规模才有意义。</p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl hover:border-brand-neon/40 transition-colors">
+            <div class="text-2xl mb-3">📅</div>
+            <h3 class="text-lg font-bold text-white mb-2">2. 付款周期</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">月付试错成本低，年付总价可能更优惠，但不能混在一起看。</p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl hover:border-brand-neon/40 transition-colors">
+            <div class="text-2xl mb-3">🔌</div>
+            <h3 class="text-lg font-bold text-white mb-2">3. 线路</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">低价不代表线路差，高价也不代表一定更好。可参考 <a href="/technology" class="text-brand-neon hover:underline">线路说明</a> 与 <a href="/stable-airport" class="text-brand-neon hover:underline">稳定指南</a>。</p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl hover:border-brand-neon/40 transition-colors">
+            <div class="text-2xl mb-3">⚙️</div>
+            <h3 class="text-lg font-bold text-white mb-2">4. 倍率与限制</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">注意套餐中的节点倍率、速度限制与设备数量等字段，这些都影响实际体验。</p>
+          </div>
+        </div>
       </div>
-      
-      <h2>{sections[2].title}</h2>
-      <p set:html={sections[2].content}></p>
+
+      {/* ── Monthly section ── */}
+      <div id="monthly" class="mb-20 scroll-mt-24">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-4">低预算用户先看月付门槛</h2>
+        <p class="text-slate-400 mb-8 max-w-3xl">以下仅按本站当前收录资料中的最低月付金额排序，不代表线路质量、稳定性或综合排名。共识别到 <strong class="text-white">{monthlyBrands.length} 个</strong>含月付套餐的品牌，展示最低 8 个。</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {top8Monthly.map((b, i) => (
+            <div class="bg-brand-navy border border-white/10 p-5 rounded-xl flex flex-col hover:border-brand-neon/50 transition-all">
+              <div class="flex items-start justify-between mb-3">
+                <span class="text-xs font-black text-slate-500 font-mono">#{i + 1}</span>
+                {b.lineTypeStr && <span class="text-xs px-2 py-0.5 bg-white/5 border border-white/10 rounded text-slate-400">{b.lineTypeStr.substring(0, 12)}</span>}
+              </div>
+              <h3 class="text-base font-bold text-white mb-1 leading-tight">{b.name}</h3>
+              <p class="text-xs text-slate-500 mb-3 line-clamp-1">{b.best.name}</p>
+              <div class="mt-auto">
+                <div class="flex items-baseline gap-1 mb-1">
+                  <span class="text-2xl font-black text-brand-neon">¥{b.best.price}</span>
+                  <span class="text-xs text-slate-400">/ 月付</span>
+                </div>
+                {b.best.traffic && <p class="text-xs text-slate-400 mb-3">{b.best.traffic}</p>}
+                <a href={`/brands/${b.slug}`} class="block text-center py-2 text-xs font-bold text-brand-neon border border-brand-neon/30 rounded-full hover:bg-brand-neon hover:text-brand-dark transition-colors">查看详情</a>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p class="text-xs text-slate-500 italic">* 排序基于收录资料，不代表稳定性或综合质量排名。价格如有优惠码可能与页面不同，请以品牌官网为准。</p>
+      </div>
+
+      {/* ── Annual / term section ── */}
+      <div id="annual" class="mb-20 scroll-mt-24">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-4">年付和长周期套餐要怎么看？</h2>
+        <p class="text-slate-400 mb-2 max-w-3xl">年付总价低，不代表月付价格低；付款周期越长，试错成本通常越高。以下展示各品牌"总支付金额最低"的长周期套餐，包含季付、半年付、年付及以上。</p>
+        <p class="text-slate-500 text-sm mb-8 max-w-3xl">共识别到 <strong class="text-slate-300">{termBrands.length} 个</strong>含长周期套餐的品牌，展示前 8 个。</p>
+
+        <div class="overflow-x-auto bg-brand-navy border border-white/10 rounded-xl mb-4">
+          <table class="w-full text-left min-w-[680px] border-collapse">
+            <thead>
+              <tr class="bg-white/5 text-slate-400 text-xs uppercase tracking-wider">
+                <th class="p-4 font-medium border-b border-white/10">品牌</th>
+                <th class="p-4 font-medium border-b border-white/10">套餐</th>
+                <th class="p-4 font-medium border-b border-white/10">付款周期</th>
+                <th class="p-4 font-medium border-b border-white/10">总价</th>
+                <th class="p-4 font-medium border-b border-white/10">流量</th>
+                <th class="p-4 font-medium border-b border-white/10 text-right">详情</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-300 text-sm divide-y divide-white/5">
+              {top8Term.map(b => (
+                <tr class="hover:bg-white/5 transition-colors">
+                  <td class="p-4 font-bold text-white">{b.name}</td>
+                  <td class="p-4 text-slate-400 text-xs">{b.best.name}</td>
+                  <td class="p-4">
+                    <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs">{b.best.period}</span>
+                  </td>
+                  <td class="p-4 font-black text-brand-neon font-mono">¥{b.best.price}</td>
+                  <td class="p-4 text-slate-400 text-xs">{b.best.traffic || '—'}</td>
+                  <td class="p-4 text-right">
+                    <a href={`/brands/${b.slug}`} class="text-brand-neon hover:text-white underline underline-offset-4 decoration-brand-neon/30 text-xs">查看</a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-slate-500 italic">* 总价为该周期套餐的支付金额，不是月均价格，请勿换算为月付对比。</p>
+      </div>
+
+      {/* ── One-time section ── */}
+      <div id="one-time" class="mb-20 scroll-mt-24">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-4">不限时 / 一次性流量包适合谁？</h2>
+        <p class="text-slate-400 mb-8 max-w-3xl">一次性流量包是购买固定总流量，不按月刷新，用完即止。适合使用频率不固定的用户。共识别到 <strong class="text-white">{oneTimeBrands.length} 个</strong>品牌含此类套餐，展示前 6 个。</p>
+
+        {oneTimeBrands.length > 0 ? (
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+            {top6OneTime.map(b => (
+              <div class="bg-brand-navy border border-white/10 p-5 rounded-xl flex flex-col hover:border-brand-neon/50 transition-all">
+                <h3 class="text-base font-bold text-white mb-1">{b.name}</h3>
+                <p class="text-xs text-slate-500 mb-3 line-clamp-1">{b.best.name}</p>
+                <div class="flex items-baseline gap-2 mb-1">
+                  <span class="text-2xl font-black text-brand-neon">¥{b.best.price}</span>
+                </div>
+                <p class="text-xs text-slate-400 mb-1">{b.best.traffic || '—'}</p>
+                <span class="inline-block px-2 py-0.5 bg-white/5 border border-white/10 rounded text-xs text-slate-400 mb-4">一次性</span>
+                <a href={`/brands/${b.slug}`} class="mt-auto block text-center py-2 text-xs font-bold text-brand-neon border border-brand-neon/30 rounded-full hover:bg-brand-neon hover:text-brand-dark transition-colors">查看详情</a>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div class="bg-brand-navy border border-white/10 p-8 rounded-xl text-center text-slate-500">
+            当前收录资料中的不限时套餐数量有限，可前往 <a href="/brands" class="text-brand-neon hover:underline">全部品牌</a> 继续查看。
+          </div>
+        )}
+        <p class="text-xs text-slate-500 italic mt-2">* 一次性套餐总流量用完即止，与月付套餐的月度刷新逻辑完全不同。</p>
+      </div>
+
+      {/* ── Price comparison table ── */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-4">低预算品牌价格快速比较</h2>
+        <p class="text-slate-400 mb-6 max-w-3xl">以月付入门价格为基准，同时列出该品牌的最低年付总价和最低一次性总价，方便横向对比不同付款方式。"—"表示暂无对应类型套餐。</p>
+        <div class="overflow-x-auto bg-brand-navy border border-white/10 rounded-xl">
+          <table class="w-full text-left min-w-[780px] border-collapse">
+            <thead>
+              <tr class="bg-white/5 text-slate-400 text-xs uppercase tracking-wider">
+                <th class="p-4 font-medium border-b border-white/10">品牌</th>
+                <th class="p-4 font-medium border-b border-white/10">最低月付</th>
+                <th class="p-4 font-medium border-b border-white/10">最低年付总价</th>
+                <th class="p-4 font-medium border-b border-white/10">一次性/不限时</th>
+                <th class="p-4 font-medium border-b border-white/10">线路</th>
+                <th class="p-4 font-medium border-b border-white/10 text-right">详情</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-300 text-sm divide-y divide-white/5">
+              {tableRows.map(row => (
+                <tr class="hover:bg-white/5 transition-colors">
+                  <td class="p-4 font-bold text-white">{row.name}</td>
+                  <td class="p-4 font-mono text-brand-neon">{row.monthly ? `¥${row.monthly.price} / 月付` : '—'}</td>
+                  <td class="p-4 font-mono">{row.term    ? `¥${row.term.price} ${row.term.period}` : '—'}</td>
+                  <td class="p-4 font-mono text-xs">{row.onetime ? `¥${row.onetime.price} / ${row.onetime.traffic || '一次性'}` : '—'}</td>
+                  <td class="p-4 text-xs text-slate-400">{row.lineTypeStr || '—'}</td>
+                  <td class="p-4 text-right">
+                    <a href={`/brands/${row.slug}`} class="text-brand-neon hover:text-white underline underline-offset-4 decoration-brand-neon/30 text-xs">查看</a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-slate-500 italic mt-2">* 年付总价是全年一次性支付，与月付不可直接比较。一次性为流量包总价，不按月刷新。</p>
+      </div>
+
+      {/* ── Why not a single price ranking ── */}
+      <div class="mb-20 bg-gradient-to-br from-brand-navy to-slate-900 border border-white/10 p-8 rounded-2xl">
+        <h2 class="text-2xl font-bold text-white mb-6">为什么不能只按一个价格数字排名？</h2>
+        <div class="prose prose-invert prose-brand max-w-none mb-8">
+          <p>如果把月付、年付和不限时套餐的价格混在一起排序，就会出现"¥12 年付比 ¥15 月付便宜"这样的误导性结论——但 ¥12 是季付总价，而 ¥15 是每月付款，两者的使用周期根本不同。以下是不能做单一排名的几个原因：</p>
+          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
+            <li>月付和年付是不同的付款周期，不是同一种成本</li>
+            <li>年付总价虽通常更低，但使用周期更长、试错成本更高</li>
+            <li>一次性套餐是总流量，不按月刷新</li>
+            <li>不同套餐的流量配额不同，低价可能配低流量</li>
+            <li>优惠码可能有适用范围限制</li>
+            <li>线路和设备限制不同，影响实际可用性</li>
+          </ul>
+          <p class="mt-4">结论：本站将不同付款类型分开展示，不把所有价格强行混成一个榜单。</p>
+        </div>
+        <div class="flex flex-wrap gap-4">
+          <a href="/airport-recommendation" class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm">场景推荐总指南</a>
+          <a href="/ranking" class="px-6 py-2.5 bg-brand-neon/10 text-brand-neon rounded-full font-bold hover:bg-brand-neon hover:text-brand-dark transition-all text-sm">综合排行榜</a>
+        </div>
+      </div>
+
+      {/* ── Newbie budget guide ── */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-8">预算有限，可以这样选</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">场景 A</div>
+            <h3 class="text-lg font-bold text-white mb-3">轻度备用</h3>
+            <p class="text-sm text-slate-400 leading-relaxed mb-3">不需要高稳定性，只要能偶尔查阅资料或访问境外网站。</p>
+            <p class="text-xs text-brand-neon">重点看：低流量 / 短周期 / 不限时包 → <a href="#one-time" class="underline underline-offset-2">不限时套餐区域</a></p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">场景 B</div>
+            <h3 class="text-lg font-bold text-white mb-3">日常网页与 AI 工具</h3>
+            <p class="text-sm text-slate-400 leading-relaxed mb-3">需要稳定访问 ChatGPT、Claude 等 AI 工具或日常网页。</p>
+            <p class="text-xs text-brand-neon">重点看：月付流量 + <a href="/ai" class="underline underline-offset-2">AI 支持说明</a></p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">场景 C</div>
+            <h3 class="text-lg font-bold text-white mb-3">流媒体</h3>
+            <p class="text-sm text-slate-400 leading-relaxed mb-3">需要访问 Netflix、Disney+ 等流媒体平台。</p>
+            <p class="text-xs text-brand-neon">重点看：流量规模 + <a href="/streaming" class="underline underline-offset-2">流媒体支持</a></p>
+          </div>
+          <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">场景 D</div>
+            <h3 class="text-lg font-bold text-white mb-3">长期使用</h3>
+            <p class="text-sm text-slate-400 leading-relaxed mb-3">确定长期使用，考虑年付等更低总价选项。</p>
+            <p class="text-xs text-brand-neon">重点看：先短周期测试 → 满意再考虑 <a href="#annual" class="underline underline-offset-2">年付</a>，可参考 <a href="/stable-airport" class="underline underline-offset-2">稳定指南</a></p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Common misconceptions ── */}
+      <div class="mb-20">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-8">常见误区</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="bg-brand-navy p-6 rounded-xl border-l-4 border-l-orange-500">
+            <h3 class="text-base font-bold text-white mb-2">1. "年付 ¥96 = 每月 ¥96"</h3>
+            <p class="text-sm text-slate-400">这是全年的总支付金额，不是每月费用。¥96 年付意味着一次性支付 ¥96 使用一整年，等效月均约 ¥8，但这并不代表月付价格是 ¥8。</p>
+          </div>
+          <div class="bg-brand-navy p-6 rounded-xl border-l-4 border-l-orange-500">
+            <h3 class="text-base font-bold text-white mb-2">2. "最低价格就是最划算"</h3>
+            <p class="text-sm text-slate-400">还需要比较流量和线路。¥10 的 10GB 月付和 ¥20 的 200GB 月付，后者的单价明显更低。</p>
+          </div>
+          <div class="bg-brand-navy p-6 rounded-xl border-l-4 border-l-orange-500">
+            <h3 class="text-base font-bold text-white mb-2">3. "有优惠码就所有套餐都能打折"</h3>
+            <p class="text-sm text-slate-400">部分优惠可能排除年付、定制或特殊套餐，适用范围因品牌政策而不同，购买前应仔细确认。</p>
+          </div>
+          <div class="bg-brand-navy p-6 rounded-xl border-l-4 border-l-orange-500">
+            <h3 class="text-base font-bold text-white mb-2">4. "第一次买就直接三年付"</h3>
+            <p class="text-sm text-slate-400">新品牌更适合先确认实际使用体验。即使总价诱人，锁定数年的试错成本远高于多付一个月的溢价。</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── FAQ ── */}
+      <div class="mb-16">
+        <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-8">常见问题 (FAQ)</h2>
+        <div class="space-y-6">
+          {faqs.map(faq => (
+            <div class="bg-brand-navy border border-white/5 p-6 rounded-xl">
+              <h3 class="text-base font-bold text-white mb-3 flex items-start">
+                <span class="text-brand-neon mr-3 font-black shrink-0">Q.</span>
+                {faq.q}
+              </h3>
+              <p class="text-sm text-slate-400 leading-relaxed flex items-start">
+                <span class="text-slate-600 font-bold mr-3 shrink-0">A.</span>
+                <span class="flex-1">{faq.a}</span>
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Final CTA ── */}
+      <div class="mb-12 bg-brand-navy border border-brand-neon/20 p-8 rounded-2xl text-center">
+        <h2 class="text-2xl font-bold text-white mb-4">价格看清楚了，再继续比较</h2>
+        <p class="text-slate-400 mb-8 max-w-2xl mx-auto">确定付款方式后，可以进一步了解线路、稳定性与使用场景，或直接浏览全部品牌详情。</p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/airport-recommendation" class="px-6 py-2.5 bg-brand-neon/10 text-brand-neon rounded-full font-bold hover:bg-brand-neon hover:text-brand-dark transition-all text-sm border border-brand-neon/30">机场推荐总指南</a>
+          <a href="/stable-airport"         class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm border border-white/10">稳定机场指南</a>
+          <a href="/brands"                 class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm border border-white/10">全部品牌</a>
+          <a href="/ranking"                class="px-6 py-2.5 bg-white/10 text-white rounded-full font-bold hover:bg-white/20 transition-all text-sm border border-white/10">排行榜</a>
+        </div>
+      </div>
+
     </div>
   </section>
 </Layout>
