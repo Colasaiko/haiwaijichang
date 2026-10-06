@@ -75,14 +75,13 @@ const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (
           const filterIplc = fLineType.toUpperCase().includes('IPLC') || brand.features.some(f => f.toUpperCase().includes('IPLC'));
           const hasIPLC = filterIplc;
 
-          const hasNetflix = brand.features.some(f => f.toLowerCase().includes('netflix') || f.includes('流媒体'));
-          const hasAI = brand.features.some(f => f.toLowerCase().includes('chatgpt') || f.toLowerCase().includes('ai'));
-          
           const fStreaming = brand.streamingSupport || '';
           const filterStreaming = (typeof fStreaming === 'string' && fStreaming.length > 0) || (Array.isArray(fStreaming) && fStreaming.length > 0) || brand.features.some(f => { const up = f.toUpperCase(); return up.includes('NETFLIX') || up.includes('DISNEY') || f.includes('流媒体') || up.includes('STREAMING'); });
+          const hasNetflix = filterStreaming;
           
           const fAi = getStr(brand.aiSupport);
           const filterAi = fAi.toUpperCase().includes('CHATGPT') || brand.features.some(f => { const up = f.toUpperCase(); return up.includes('CHATGPT') || up.includes('AI'); });
+          const hasAI = filterAi;
           
           const combinedClashCheck = [getStr(brand.features), getStr(brand.clientSupport), getStr(brand.clients), getStr(brand.platforms), getStr(brand.apps)].join(' ').toUpperCase();
           const filterClash = combinedClashCheck.includes('CLASH');
