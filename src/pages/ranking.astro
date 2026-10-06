@@ -1,47 +1,106 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { getEntry } from 'astro:content';
-
 import { getCollection } from 'astro:content';
-const brandEntries = await getCollection('brands');
-const brands = brandEntries.map(e => ({ id: e.id, ...e.data })).sort((a, b) => (a.order || 999) - (b.order || 999));
 
-// Filter brands relevant to this topic
-const matchedBrands = '' 
-  ? brands.filter(b => b.features.join(' ').toLowerCase().includes('')) 
-  : brands.slice(0, 6);
+const brandEntries = await getCollection('brands');
+const allBrandsMap = new Map(brandEntries.map(e => [e.data.slug, { id: e.id, ...e.data }]));
+
+const targetSlugs = [
+  'weifeng', 
+  'feimao', 
+  'firefly', 
+  'shanyue', 
+  'wuyou', 
+  'kuajie', 
+  'lingmao', 
+  'jiuyun', 
+  'baoyun', 
+  'shenxing'
+];
+
+const rankingBrands = targetSlugs
+  .map(slug => allBrandsMap.get(slug))
+  .filter(Boolean);
 
 const page = await getEntry('pages', 'ranking');
-const { title, description, h1, heroText, sections, emptyText } = page.data;
+const { title, description, h1, heroText } = page.data;
+
+const getStr = (val: any) => typeof val === 'string' ? val : (Array.isArray(val) ? val.join(' ') : '');
 ---
+
 <Layout title={title} description={description}>
-  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5">
-    <div class="max-w-4xl mx-auto px-4 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">{h1}</h1>
+  <section class="pt-32 pb-16 bg-brand-navy border-b border-white/5 relative overflow-hidden">
+    <div class="absolute inset-0 z-0 flex items-center justify-center opacity-10 pointer-events-none">
+      <div class="w-[600px] h-[600px] border-[40px] border-brand-neon rounded-full blur-[100px]"></div>
+    </div>
+    <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 uppercase tracking-tight">{h1}</h1>
       <p class="text-lg text-slate-400">{heroText}</p>
     </div>
   </section>
 
   <section class="py-16 bg-brand-dark min-h-screen">
-    <div class="max-w-4xl mx-auto px-4 prose prose-invert prose-brand">
-      <h2>{sections[0].title}</h2>
-      <p>{sections[0].content}</p>
+    <div class="max-w-4xl mx-auto px-4">
       
-      <h2>{sections[1].title}</h2>
-      <p>{sections[1].content}</p>
-      
-      <div class="not-prose grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 mb-12">
-        {matchedBrands.length > 0 ? matchedBrands.map(b => (
-          <a href={`/brands/${b.slug}`} class="block bg-brand-navy border border-white/10 p-6 rounded-xl hover:border-brand-neon transition-colors">
-            <h3 class="text-xl font-bold text-white mb-2">{b.name}</h3>
-            <p class="text-sm text-slate-400 line-clamp-2">{b.features[0]}</p>
-            <div class="mt-4 text-xs font-mono text-brand-neon">查看详情 &rarr;</div>
-          </a>
-        )) : <p class="text-slate-500">{emptyText}</p>}
+      <div class="bg-brand-navy border border-white/10 rounded-xl p-6 mb-12 text-slate-400 text-sm leading-relaxed relative overflow-hidden">
+        <div class="absolute left-0 top-0 w-1 h-full bg-brand-neon"></div>
+        <p>本榜单为海外机场编辑推荐顺序，综合当前收录的线路、套餐、功能、使用场景及资料完整度整理，并非实时测速榜。部分品牌与本站存在合作关系，已在对应项目中标注。</p>
       </div>
       
-      <h2>{sections[2].title}</h2>
-      <p set:html={sections[2].content}></p>
+      <div class="space-y-6">
+        {rankingBrands.map((b, index) => {
+          const isTop3 = index < 3;
+          const isPartner = ['jiuyun', 'baoyun', 'shenxing'].includes(b.slug);
+          
+          const fStreaming = b.streamingSupport || '';
+          const hasStreaming = (typeof fStreaming === 'string' && fStreaming.length > 0) || (Array.isArray(fStreaming) && fStreaming.length > 0) || (b.features && b.features.some((f: string) => { const up = f.toUpperCase(); return up.includes('NETFLIX') || up.includes('DISNEY') || f.includes('流媒体') || up.includes('STREAMING'); }));
+          
+          const fAi = getStr(b.aiSupport);
+          const hasAI = fAi.toUpperCase().includes('CHATGPT') || (b.features && b.features.some((f: string) => { const up = f.toUpperCase(); return up.includes('CHATGPT') || up.includes('AI'); }));
+          
+          const lineTypeStr = getStr(b.lineType);
+
+          return (
+            <div class={`flex flex-col md:flex-row bg-brand-navy border rounded-2xl overflow-hidden transition-all ${isTop3 ? 'border-brand-neon/30 shadow-[0_0_20px_rgba(56,189,248,0.1)] scale-[1.01]' : 'border-white/5 hover:border-brand-neon/30'}`}>
+              <div class={`flex flex-col justify-center items-center p-6 md:w-32 border-b md:border-b-0 md:border-r border-white/5 ${index === 0 ? 'bg-gradient-to-br from-yellow-500/20 to-yellow-600/5 text-yellow-500' : index === 1 ? 'bg-gradient-to-br from-slate-300/20 to-slate-400/5 text-slate-300' : index === 2 ? 'bg-gradient-to-br from-orange-400/20 to-orange-500/5 text-orange-400' : 'bg-white/5 text-slate-500'}`}>
+                <span class="text-sm font-bold tracking-widest uppercase mb-1 opacity-70">Rank</span>
+                <span class="text-4xl md:text-5xl font-black">#{index + 1}</span>
+              </div>
+              
+              <div class="p-6 md:p-8 flex-grow flex flex-col justify-center">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex flex-wrap items-center gap-3">
+                    <h2 class="text-2xl font-bold text-white">{b.name}</h2>
+                    {isPartner && (
+                      <span class="px-2 py-0.5 bg-brand-accent/20 text-brand-accent text-[0.65rem] font-bold rounded uppercase tracking-wider border border-brand-accent/30 whitespace-nowrap">合作品牌</span>
+                    )}
+                  </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-2 mb-5">
+                   {lineTypeStr && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">{lineTypeStr}</span>}
+                   {hasStreaming && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">流媒体解锁</span>}
+                   {hasAI && <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-slate-300 font-mono">AI 解锁</span>}
+                </div>
+                
+                <ul class="space-y-2 mb-6 text-sm text-slate-400">
+                  {b.features && b.features.slice(0, 3).map((f: string) => (
+                     <li class="flex items-start"><svg class="w-4 h-4 text-brand-neon mr-2 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span class="leading-relaxed line-clamp-2">{f}</span></li>
+                  ))}
+                </ul>
+                
+                <div>
+                  <a href={`/brands/${b.slug}`} class="inline-flex items-center px-6 py-2.5 bg-brand-neon/10 text-brand-neon border border-brand-neon/30 hover:bg-brand-neon hover:text-brand-dark rounded-full font-bold transition-all text-sm">
+                    查看详情 <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
     </div>
   </section>
 </Layout>
