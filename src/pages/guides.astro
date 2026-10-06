@@ -35,6 +35,7 @@ const allGuides = await getCollection('guides');
           </svg>
         </div>
         <input 
+          id="guideSearchInput"
           type="text" 
           placeholder={searchPlaceholder}
           class="block w-full pl-12 pr-4 py-4 bg-brand-dark/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-neon/50 focus:border-brand-neon/50 transition-all shadow-[0_0_15px_rgba(56,189,248,0.1)] group-hover:shadow-[0_0_20px_rgba(56,189,248,0.2)]"
@@ -49,18 +50,19 @@ const allGuides = await getCollection('guides');
   <!-- Content -->
   <section class="py-16 bg-brand-dark min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <div id="guideNoResults" class="hidden text-center py-12 text-slate-400 text-lg">没有找到相关教程</div>
       {categories.map((category) => {
         const categoryGuides = allGuides.filter(g => g.data.category === category.id); 
         if(categoryGuides.length === 0) return null; // DO NOT RENDER EMPTY CATEGORIES
         return (
-        <div>
+        <div class="guide-category">
           <div class="flex items-end justify-between mb-8 pb-4 border-b border-white/5">
             <div class="flex items-center">
               <div class="w-10 h-10 rounded-lg bg-brand-navy border border-brand-neon/20 flex items-center justify-center mr-4">
                 <svg class="w-5 h-5 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={category.icon} /></svg>
               </div>
               <div>
-                <h2 class="text-2xl font-bold text-white">{category.name}</h2>
+                <h2 class="cat-title text-2xl font-bold text-white">{category.name}</h2>
                 <p class="text-sm text-slate-400 mt-1">{category.desc}</p>
               </div>
             </div>
@@ -68,7 +70,7 @@ const allGuides = await getCollection('guides');
           
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {categoryGuides.map((guide) => (
-              <a href={"/guides/" + guide.slug} class="group bg-brand-navy border border-white/5 rounded-xl p-6 hover:border-brand-neon/30 transition-all hover:-translate-y-1 block">
+              <a href={"/guides/" + guide.slug} class="guide-card group bg-brand-navy border border-white/5 rounded-xl p-6 hover:border-brand-neon/30 transition-all hover:-translate-y-1 block">
                 <h3 class="text-base font-bold text-slate-300 group-hover:text-brand-neon transition-colors mb-2 line-clamp-2">{guide.data.title}</h3>
                 <p class="text-sm text-slate-500 line-clamp-2">{guide.data.description}</p>
                 <div class="mt-4 flex items-center text-xs font-mono text-brand-neon/70 group-hover:text-brand-neon">
@@ -85,7 +87,7 @@ const allGuides = await getCollection('guides');
 
   <!-- CTA -->
   <section class="py-16 bg-brand-navy relative overflow-hidden border-t border-white/5">
-    <div class="absolute inset-0 bg-[url('/noise.png')] opacity-5 mix-blend-overlay"></div>
+    <div class="absolute inset-0  opacity-5 mix-blend-overlay"></div>
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
       <h2 class="text-2xl font-bold text-white mb-4">{bottomCta.title}</h2>
       <p class="text-slate-400 mb-8">{bottomCta.desc}</p>
@@ -94,4 +96,60 @@ const allGuides = await getCollection('guides');
       </a>
     </div>
   </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('guideSearchInput');
+      const noResults = document.getElementById('guideNoResults');
+      const categories = document.querySelectorAll('.guide-category');
+
+      if (!input) return;
+
+      function doSearch() {
+        const q = input.value.trim().toLowerCase();
+        let hasAnyMatch = false;
+
+        categories.forEach(cat => {
+          const titleEl = cat.querySelector('.cat-title');
+          const catTitle = titleEl ? titleEl.textContent.toLowerCase() : '';
+          const catMatch = catTitle.includes(q);
+          
+          let hasCardMatch = false;
+          
+          cat.querySelectorAll('.guide-card').forEach(card => {
+            if (q === '' || catMatch || card.textContent.toLowerCase().includes(q)) {
+              card.style.display = '';
+              hasCardMatch = true;
+              hasAnyMatch = true;
+            } else {
+              card.style.display = 'none';
+            }
+          });
+
+          if (q === '' || catMatch || hasCardMatch) {
+            cat.style.display = '';
+            hasAnyMatch = true;
+          } else {
+            cat.style.display = 'none';
+          }
+        });
+
+        if (noResults) {
+          if (hasAnyMatch) {
+            noResults.classList.add('hidden');
+          } else {
+            noResults.classList.remove('hidden');
+          }
+        }
+      }
+
+      input.addEventListener('input', doSearch);
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          doSearch();
+        }
+      });
+    });
+  </script>
 </Layout>

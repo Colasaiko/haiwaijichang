@@ -227,7 +227,10 @@ const { title, description, keywords, faqSchema, hero, seoSection, fastPick, fea
             }
             
             if (filter === '稳定' && tags.includes('专线')) { card.style.display = 'flex'; visibleCount++; return; }
-            if (filter === '价格') { card.style.display = 'none'; return; /* Prices not easily filtered by tag */ }
+            if (filter === '价格') { 
+              // sorting handled outside the loop 
+              return; 
+            }
             if (filter === '专线' && tags.includes('专线')) { card.style.display = 'flex'; visibleCount++; return; }
             if (filter === 'AI' && tags.includes('AI')) { card.style.display = 'flex'; visibleCount++; return; }
             if (filter === 'Streaming' && tags.includes('Streaming')) { card.style.display = 'flex'; visibleCount++; return; }
@@ -236,10 +239,30 @@ const { title, description, keywords, faqSchema, hero, seoSection, fastPick, fea
             card.style.display = 'none';
           });
           
-          if (filter === '价格' || visibleCount === 0) {
-            if(noResults) noResults.style.display = 'block';
-            if(filter === '价格' && noResults) noResults.innerHTML = '<p class="text-slate-400 text-lg">暂无完整价格资料结构进行筛选，请进入品牌中心查看详情。</p>';
-            else if (noResults) noResults.innerHTML = '<p class="text-slate-400 text-lg">{moreBrands.noResults}</p>';
+          if (filter === '价格') {
+            const featuredGrid = document.querySelector('#featured-grid');
+            const moreGrid = document.querySelector('#more-grid');
+            
+            [featuredGrid, moreGrid].forEach(grid => {
+                if(!grid) return;
+                const gridCards = Array.from(grid.querySelectorAll('[data-brand-card]'));
+                gridCards.sort((a, b) => {
+                    const priceA = parseFloat(a.getAttribute('data-min-price')) || 999999;
+                    const priceB = parseFloat(b.getAttribute('data-min-price')) || 999999;
+                    return priceA - priceB;
+                });
+                gridCards.forEach(card => {
+                    card.style.display = 'flex';
+                    grid.appendChild(card);
+                    visibleCount++;
+                });
+            });
+            if(noResults) noResults.style.display = 'none';
+          } else if (visibleCount === 0) {
+            if(noResults) {
+               noResults.style.display = 'block';
+               noResults.innerHTML = '<p class="text-slate-400 text-lg">{moreBrands.noResults}</p>';
+            }
           } else {
             if(noResults) noResults.style.display = 'none';
           }

@@ -45,12 +45,13 @@ const { title, description, keywords, h1, badge, heroText, quickLinks, routeHelp
           <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         </div>
         <input 
+          id="helpSearchInput"
           type="text" 
           class="block w-full pl-12 pr-4 py-4 bg-black/50 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-neon focus:border-transparent transition-all shadow-xl"
           placeholder="搜索：Windows、Clash、订阅、无法连接、更新配置……" 
         />
         <div class="absolute inset-y-0 right-0 pr-2 flex items-center">
-          <button class="px-4 py-2 bg-brand-accent hover:bg-yellow-400 text-brand-dark font-bold text-sm rounded-lg transition-colors uppercase tracking-wider">
+          <button id="helpSearchBtn" class="px-4 py-2 bg-brand-accent hover:bg-yellow-400 text-brand-dark font-bold text-sm rounded-lg transition-colors uppercase tracking-wider">
             Search
           </button>
         </div>
@@ -59,9 +60,9 @@ const { title, description, keywords, h1, badge, heroText, quickLinks, routeHelp
       <!-- Hot Topics -->
       <div>
         <h3 class="text-xs font-mono text-slate-500 uppercase tracking-widest mb-4">热门常见问题</h3>
-        <div class="flex flex-wrap justify-center gap-2 max-w-3xl mx-auto">
+        <div class="flex flex-wrap justify-center gap-2 max-w-3xl mx-auto" id="helpHotTopics">
           {hotTopics.map(topic => (
-            <a href={topic.href} class="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs text-slate-300 hover:text-white transition-colors">
+            <a href={topic.href} class="hot-topic-item px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs text-slate-300 hover:text-white transition-colors">
               {topic.name}
             </a>
           ))}
@@ -70,20 +71,21 @@ const { title, description, keywords, h1, badge, heroText, quickLinks, routeHelp
     </div>
   </section>
 
+  <div id="helpNoResults" class="hidden text-center py-12 text-slate-400 text-lg">没有找到相关帮助内容</div>
   <!-- 2. Main Help Categories -->
   <section class="py-20 bg-brand-dark relative z-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         
         {categories.map(category => (
-          <div class="bg-brand-navy border border-white/10 rounded-xl p-6 hover:border-white/20 transition-all flex flex-col h-full">
+          <div class="help-category bg-brand-navy border border-white/10 rounded-xl p-6 hover:border-white/20 transition-all flex flex-col h-full">
             <div class="flex items-center space-x-3 mb-6">
               <div class="w-10 h-10 bg-white/5 border border-white/10 rounded flex items-center justify-center text-brand-neon">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={category.icon} /></svg>
               </div>
               <div>
                 <h2 class="text-xs font-mono text-slate-500 tracking-widest uppercase mb-0.5">{category.enTitle}</h2>
-                <h3 class="text-lg font-bold text-white">{category.zhTitle}</h3>
+                <h3 class="cat-title text-lg font-bold text-white">{category.zhTitle}</h3>
               </div>
             </div>
 
@@ -91,7 +93,7 @@ const { title, description, keywords, h1, badge, heroText, quickLinks, routeHelp
               {category.isDevice ? (
                 // Device list layout
                 category.links.map(device => (
-                  <li>
+                  <li class="help-item">
                     <a href={device.href} class="flex justify-between items-center p-3 bg-white/5 hover:bg-white/10 rounded border border-transparent hover:border-white/10 transition-colors group">
                       <span class="font-bold text-sm text-slate-200 group-hover:text-brand-neon">{device.name}</span>
                       <span class="text-xs text-slate-500">{device.desc}</span>
@@ -101,7 +103,7 @@ const { title, description, keywords, h1, badge, heroText, quickLinks, routeHelp
               ) : (
                 // Normal link list layout
                 category.links.map(link => (
-                  <li>
+                  <li class="help-item">
                     <a href={link.href} class="flex items-start text-sm text-slate-400 hover:text-white group">
                       <svg class="w-4 h-4 text-slate-600 group-hover:text-brand-neon mt-0.5 mr-2 shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                       <span>{link.name}</span>
@@ -112,11 +114,11 @@ const { title, description, keywords, h1, badge, heroText, quickLinks, routeHelp
             </ul>
             
             {category.enTitle === "ROUTE HELP" && (
-              <a href="/technology" class="mt-6 block w-full py-2 bg-white/5 text-center text-xs text-slate-400 hover:text-white rounded border border-white/10 transition-colors uppercase tracking-widest">{routeHelpLinkText}</a>
+              <a href="/technology" class="help-item mt-6 block w-full py-2 bg-white/5 text-center text-xs text-slate-400 hover:text-white rounded border border-white/10 transition-colors uppercase tracking-widest">{routeHelpLinkText}</a>
             )}
             
             {category.enTitle === "SCENARIO HELP" && (
-              <a href="/use-cases" class="mt-6 block w-full py-2 bg-white/5 text-center text-xs text-slate-400 hover:text-white rounded border border-white/10 transition-colors uppercase tracking-widest">{scenarioHelpLinkText}</a>
+              <a href="/use-cases" class="help-item mt-6 block w-full py-2 bg-white/5 text-center text-xs text-slate-400 hover:text-white rounded border border-white/10 transition-colors uppercase tracking-widest">{scenarioHelpLinkText}</a>
             )}
           </div>
         ))}
@@ -174,4 +176,70 @@ const { title, description, keywords, h1, badge, heroText, quickLinks, routeHelp
     </div>
   </section>
 
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('helpSearchInput');
+      const btn = document.getElementById('helpSearchBtn');
+      const noResults = document.getElementById('helpNoResults');
+      const hotTopics = document.querySelectorAll('.hot-topic-item');
+      const categories = document.querySelectorAll('.help-category');
+      
+      if (!input) return;
+
+      function doSearch() {
+        const q = input.value.trim().toLowerCase();
+        let hasAnyMatch = false;
+
+        hotTopics.forEach(item => {
+          if (q === '' || item.textContent.toLowerCase().includes(q)) {
+            item.style.display = '';
+            hasAnyMatch = true;
+          } else {
+            item.style.display = 'none';
+          }
+        });
+
+        categories.forEach(cat => {
+          const title = cat.querySelector('.cat-title');
+          const catMatch = title && title.textContent.toLowerCase().includes(q);
+          let hasItemMatch = false;
+          
+          cat.querySelectorAll('.help-item').forEach(item => {
+            if (q === '' || catMatch || item.textContent.toLowerCase().includes(q)) {
+              item.style.display = '';
+              hasItemMatch = true;
+              hasAnyMatch = true;
+            } else {
+              item.style.display = 'none';
+            }
+          });
+
+          if (q === '' || catMatch || hasItemMatch) {
+            cat.style.display = '';
+            hasAnyMatch = true;
+          } else {
+            cat.style.display = 'none';
+          }
+        });
+
+        if (noResults) {
+          if (hasAnyMatch) {
+            noResults.classList.add('hidden');
+          } else {
+            noResults.classList.remove('hidden');
+          }
+        }
+      }
+
+      input.addEventListener('input', doSearch);
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          doSearch();
+        }
+      });
+      if (btn) btn.addEventListener('click', doSearch);
+    });
+  </script>
 </Layout>
