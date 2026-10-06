@@ -8,8 +8,6 @@ const { title, description, h1 } = page.data;
 
 // ── Brand data ───────────────────────────────────────────────────────────────
 const brandEntries = await getCollection('brands');
-const allBrandsMap = new Map();
-brandEntries.forEach(e => allBrandsMap.set(e.data.slug, e.data));
 
 // ── Price parser ─────────────────────────────────────────────────────────────
 function parsePrice(val) {
@@ -22,36 +20,45 @@ function bestPrice(p) {
 }
 
 // ── Period classifiers ───────────────────────────────────────────────────────
-const MONTHLY  = ['月付', '月付起'];
-const TERM     = ['年付', '半年付', '季付', '两年付', '二年付', '三年付'];
-const ONETIME  = ['一次性', '不限时', '永久', '总量'];
+const MONTHLY       = ['月付', '月付起'];
+const TERM          = ['年付', '半年付', '季付', '两年付', '二年付', '三年付'];
+const ONETIME       = ['一次性', '不限时', '永久', '总量'];
+// Strict single-year: period must be exactly these values (trim first).
+// Avoids "两年付".includes("年付") false-positive.
+const ANNUAL_EXACT  = ['年付', '一年付'];
 
 function classifyPeriod(period, planName) {
   const haystack = period + ' ' + planName;
-  if (MONTHLY.some(k  => period.includes(k)))                    return 'monthly';
-  if (ONETIME.some(k  => haystack.includes(k)))                  return 'onetime';
-  if (TERM.some(k     => period.includes(k)))                    return 'term';
+  if (MONTHLY.some(k  => period.includes(k)))   return 'monthly';
+  if (ONETIME.some(k  => haystack.includes(k))) return 'onetime';
+  if (TERM.some(k     => period.includes(k)))   return 'term';
   return null;
+}
+function isAnnual(period) {
+  const norm = period.trim();
+  return ANNUAL_EXACT.includes(norm);
 }
 
 // ── Build per-brand plan buckets ─────────────────────────────────────────────
-const monthlyBrands = [];   // cheapest monthly plan per brand, sorted asc
-const termBrands    = [];   // cheapest term plan per brand
-const oneTimeBrands = [];   // cheapest one-time plan per brand
+const monthlyBrands = [];
+const termBrands    = [];
+const oneTimeBrands = [];
+const annualBrands  = [];   // strictly single-year plans only
 
 brandEntries.forEach(e => {
   const b = e.data;
   if (!b.pricing || !Array.isArray(b.pricing)) return;
 
-  const monthly = [], term = [], onetime = [];
+  const monthly = [], term = [], onetime = [], annual = [];
 
   b.pricing.forEach(p => {
     const price = bestPrice(p);
     if (price === null) return;
-    const type = classifyPeriod(p.period || '', p.name || '');
-    const plan = { price, name: p.name || '', period: p.period || '', traffic: p.traffic || '' };
-    if (type === 'monthly') monthly.push(plan);
-    else if (type === 'term') term.push(plan);
+    const period = p.period || '';
+    const type = classifyPeriod(period, p.name || '');
+    const plan = { price, name: p.name || '', period, traffic: p.traffic || '' };
+    if (type === 'monthly')      monthly.push(plan);
+    else if (type === 'term')    { term.push(plan); if (isAnnual(period)) annual.push(plan); }
     else if (type === 'onetime') onetime.push(plan);
   });
 
@@ -59,37 +66,33 @@ brandEntries.forEach(e => {
     : Array.isArray(b.lineType) ? b.lineType.join(' ') : '';
 
   if (monthly.length)  { monthly.sort((a,b)  => a.price - b.price);  monthlyBrands.push({ slug: b.slug, name: b.name, lineTypeStr, best: monthly[0]  }); }
-  if (term.length)     { term.sort((a,b)      => a.price - b.price);  termBrands.push(   { slug: b.slug, name: b.name, lineTypeStr, best: term[0]     }); }
-  if (onetime.length)  { onetime.sort((a,b)   => a.price - b.price);  oneTimeBrands.push({ slug: b.slug, name: b.name, lineTypeStr, best: onetime[0]  }); }
+  if (term.length)     { term.sort((a,b)     => a.price - b.price);  termBrands.push(   { slug: b.slug, name: b.name, lineTypeStr, best: term[0]     }); }
+  if (onetime.length)  { onetime.sort((a,b)  => a.price - b.price);  oneTimeBrands.push({ slug: b.slug, name: b.name, lineTypeStr, best: onetime[0]  }); }
+  if (annual.length)   { annual.sort((a,b)   => a.price - b.price);  annualBrands.push( { slug: b.slug, name: b.name, lineTypeStr, best: annual[0]   }); }
 });
 
 monthlyBrands.sort((a,b)   => a.best.price - b.best.price);
 termBrands.sort((a,b)      => a.best.price - b.best.price);
 oneTimeBrands.sort((a,b)   => a.best.price - b.best.price);
+annualBrands.sort((a,b)    => a.best.price - b.best.price);
 
 const top8Monthly  = monthlyBrands.slice(0, 8);
 const top8Term     = termBrands.slice(0, 8);
 const top6OneTime  = oneTimeBrands.slice(0, 6);
 
-// ── Price comparison table: every brand that has ANY plan ───────────────────
-const allSlugs = new Set([
-  ...monthlyBrands.map(b => b.slug),
-  ...termBrands.map(b => b.slug),
-  ...oneTimeBrands.map(b => b.slug),
-]);
-// Build a unified map for the comparison table
+// ── Maps for comparison table ────────────────────────────────────────────────
 const monthlyMap  = new Map(monthlyBrands.map(b  => [b.slug, b]));
-const termMap     = new Map(termBrands.map(b     => [b.slug, b]));
+const annualMap   = new Map(annualBrands.map(b   => [b.slug, b]));
 const oneTimeMap  = new Map(oneTimeBrands.map(b  => [b.slug, b]));
 
-// Show table for brands that have at least monthly OR term
+// Table: top 10 monthly brands, with their annual-only and one-time prices
 const tableRows = monthlyBrands.slice(0, 10).map(mb => ({
   slug: mb.slug,
   name: mb.name,
   lineTypeStr: mb.lineTypeStr,
-  monthly:  monthlyMap.get(mb.slug)?.best  ?? null,
-  term:     termMap.get(mb.slug)?.best     ?? null,
-  onetime:  oneTimeMap.get(mb.slug)?.best  ?? null,
+  monthly: monthlyMap.get(mb.slug)?.best ?? null,
+  annual:  annualMap.get(mb.slug)?.best  ?? null,
+  onetime: oneTimeMap.get(mb.slug)?.best ?? null,
 }));
 
 // ── Schema ───────────────────────────────────────────────────────────────────
@@ -117,9 +120,9 @@ const itemListSchema = {
 
 const faqs = [
   { q: "什么价格算便宜机场？",
-    a: "这没有统一标准。月付套餐从几元到几十元不等；年付总价通常比月付更低，但付款周期更长。不同服务商定价差异较大，建议结合流量、线路和套餐限制综合比较，而不只看单一数字。" },
+    a: "这没有统一标准。月付套餐从几元到几十元不等；部分年付或长周期套餐可能提供相对优惠的长期定价，但它们的一次支付金额、使用周期和流量结构与月付不同，不能仅比较一个价格数字。不同服务商定价差异较大，建议结合流量、线路和套餐限制综合比较。" },
   { q: "月付和年付应该怎么比较？",
-    a: "月付和年付不能直接放在同一个价格列下对比，因为它们代表完全不同的付款周期。月付适合初次试用或短期需求；年付总支出虽通常较低，但一次性锁定更长时间，试错成本更高。" },
+    a: "月付和年付不能直接放在同一个价格列下对比，因为它们代表完全不同的付款周期。月付适合初次试用或短期需求；年付通常需要一次锁定更长的使用周期，因此试错成本会高于短周期套餐。" },
   { q: "年付套餐可以直接除以 12 吗？",
     a: "本站不建议自动将年付总价除以 12 来换算「月均价」，因为不同套餐的流量配额、使用周期和优惠结构各不相同，简单换算容易产生误导性比较。" },
   { q: "不限时流量包是什么意思？",
@@ -227,7 +230,7 @@ const faqSchema = {
       {/* ── Annual / term section ── */}
       <div id="annual" class="mb-20 scroll-mt-24">
         <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-4">年付和长周期套餐要怎么看？</h2>
-        <p class="text-slate-400 mb-2 max-w-3xl">年付总价低，不代表月付价格低；付款周期越长，试错成本通常越高。以下展示各品牌"总支付金额最低"的长周期套餐，包含季付、半年付、年付及以上。</p>
+        <p class="text-slate-400 mb-2 max-w-3xl">以下展示各品牌当前收录的长周期套餐中，总支付金额较低的一项，包含季付、半年付、年付及以上。付款周期越长，一次锁定的时间越久，试错成本也通常越高。</p>
         <p class="text-slate-500 text-sm mb-8 max-w-3xl">共识别到 <strong class="text-slate-300">{termBrands.length} 个</strong>含长周期套餐的品牌，展示前 8 个。</p>
 
         <div class="overflow-x-auto bg-brand-navy border border-white/10 rounded-xl mb-4">
@@ -278,7 +281,7 @@ const faqSchema = {
                   <span class="text-2xl font-black text-brand-neon">¥{b.best.price}</span>
                 </div>
                 <p class="text-xs text-slate-400 mb-1">{b.best.traffic || '—'}</p>
-                <span class="inline-block px-2 py-0.5 bg-white/5 border border-white/10 rounded text-xs text-slate-400 mb-4">一次性</span>
+                <span class="inline-block px-2 py-0.5 bg-white/5 border border-white/10 rounded text-xs text-slate-400 mb-4">{b.best.period || '不限时 / 一次性'}</span>
                 <a href={`/brands/${b.slug}`} class="mt-auto block text-center py-2 text-xs font-bold text-brand-neon border border-brand-neon/30 rounded-full hover:bg-brand-neon hover:text-brand-dark transition-colors">查看详情</a>
               </div>
             ))}
@@ -294,14 +297,14 @@ const faqSchema = {
       {/* ── Price comparison table ── */}
       <div class="mb-20">
         <h2 class="text-2xl md:text-3xl font-bold text-white px-3 border-l-4 border-brand-neon mb-4">低预算品牌价格快速比较</h2>
-        <p class="text-slate-400 mb-6 max-w-3xl">以月付入门价格为基准，同时列出该品牌的最低年付总价和最低一次性总价，方便横向对比不同付款方式。"—"表示暂无对应类型套餐。</p>
+        <p class="text-slate-400 mb-6 max-w-3xl">以月付入门价格为基准，同时列出该品牌是否有单年年付套餐及最低一次性总价，方便横向对比不同付款方式。"—"表示暂无对应类型套餐。</p>
         <div class="overflow-x-auto bg-brand-navy border border-white/10 rounded-xl">
           <table class="w-full text-left min-w-[780px] border-collapse">
             <thead>
               <tr class="bg-white/5 text-slate-400 text-xs uppercase tracking-wider">
                 <th class="p-4 font-medium border-b border-white/10">品牌</th>
                 <th class="p-4 font-medium border-b border-white/10">最低月付</th>
-                <th class="p-4 font-medium border-b border-white/10">最低年付总价</th>
+                <th class="p-4 font-medium border-b border-white/10">年付总价</th>
                 <th class="p-4 font-medium border-b border-white/10">一次性/不限时</th>
                 <th class="p-4 font-medium border-b border-white/10">线路</th>
                 <th class="p-4 font-medium border-b border-white/10 text-right">详情</th>
@@ -312,7 +315,7 @@ const faqSchema = {
                 <tr class="hover:bg-white/5 transition-colors">
                   <td class="p-4 font-bold text-white">{row.name}</td>
                   <td class="p-4 font-mono text-brand-neon">{row.monthly ? `¥${row.monthly.price} / 月付` : '—'}</td>
-                  <td class="p-4 font-mono">{row.term    ? `¥${row.term.price} ${row.term.period}` : '—'}</td>
+                  <td class="p-4 font-mono">{row.annual  ? `¥${row.annual.price} 年付` : '—'}</td>
                   <td class="p-4 font-mono text-xs">{row.onetime ? `¥${row.onetime.price} / ${row.onetime.traffic || '一次性'}` : '—'}</td>
                   <td class="p-4 text-xs text-slate-400">{row.lineTypeStr || '—'}</td>
                   <td class="p-4 text-right">
@@ -323,17 +326,17 @@ const faqSchema = {
             </tbody>
           </table>
         </div>
-        <p class="text-xs text-slate-500 italic mt-2">* 年付总价是全年一次性支付，与月付不可直接比较。一次性为流量包总价，不按月刷新。</p>
+        <p class="text-xs text-slate-500 italic mt-2">* 年付总价是单年套餐的一次性支付金额，与月付不可直接比较。一次性为流量包总价，不按月刷新。</p>
       </div>
 
       {/* ── Why not a single price ranking ── */}
       <div class="mb-20 bg-gradient-to-br from-brand-navy to-slate-900 border border-white/10 p-8 rounded-2xl">
         <h2 class="text-2xl font-bold text-white mb-6">为什么不能只按一个价格数字排名？</h2>
         <div class="prose prose-invert prose-brand max-w-none mb-8">
-          <p>如果把月付、年付和不限时套餐的价格混在一起排序，就会出现"¥12 年付比 ¥15 月付便宜"这样的误导性结论——但 ¥12 是季付总价，而 ¥15 是每月付款，两者的使用周期根本不同。以下是不能做单一排名的几个原因：</p>
+          <p>如果把月付、年付和不限时套餐的价格混在一起排序，就会出现"¥12 季付比 ¥15 月付便宜"这样的误导性结论——但 ¥12 是一个季付周期的总支付金额，而 ¥15 是一个月付周期的金额，两者不能仅按数字大小直接判断哪个更便宜。以下是不能做单一排名的几个原因：</p>
           <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
             <li>月付和年付是不同的付款周期，不是同一种成本</li>
-            <li>年付总价虽通常更低，但使用周期更长、试错成本更高</li>
+            <li>长周期套餐通常需要一次性锁定更长时间、试错成本更高</li>
             <li>一次性套餐是总流量，不按月刷新</li>
             <li>不同套餐的流量配额不同，低价可能配低流量</li>
             <li>优惠码可能有适用范围限制</li>
@@ -384,7 +387,7 @@ const faqSchema = {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div class="bg-brand-navy p-6 rounded-xl border-l-4 border-l-orange-500">
             <h3 class="text-base font-bold text-white mb-2">1. "年付 ¥96 = 每月 ¥96"</h3>
-            <p class="text-sm text-slate-400">这是全年的总支付金额，不是每月费用。¥96 年付意味着一次性支付 ¥96 使用一整年，等效月均约 ¥8，但这并不代表月付价格是 ¥8。</p>
+            <p class="text-sm text-slate-400">¥96 年付表示该周期需要一次支付 ¥96，它与真正的月付套餐属于不同付款方式，不能直接作为月付价格比较。</p>
           </div>
           <div class="bg-brand-navy p-6 rounded-xl border-l-4 border-l-orange-500">
             <h3 class="text-base font-bold text-white mb-2">2. "最低价格就是最划算"</h3>
