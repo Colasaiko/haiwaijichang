@@ -25,11 +25,30 @@ if (tags.includes('专线') && tags.includes('AI')) positioning = '专线级稳�
 else if (tags.includes('专线')) positioning = '低延迟跨境专线服务商';
 else if (tags.includes('Streaming')) positioning = '流媒体解锁优化网络服务';
 
+
 // Bullet points
 const bullets = brand.features.slice(0, 3);
+
+const parsePrice = (value) => {
+  if (value === undefined || value === null) return null;
+  const num = parseFloat(String(value).replace(/[^\d.]/g, ''));
+  return Number.isFinite(num) ? num : null;
+};
+
+let minPrice = 999999;
+if (brand.pricing && Array.isArray(brand.pricing)) {
+  brand.pricing.forEach(p => {
+    const valRaw = p.discountPrice || p.price || p.originalPrice;
+    const parsed = parsePrice(valRaw);
+    if (parsed !== null && parsed < minPrice) {
+      minPrice = parsed;
+    }
+  });
+}
+
 ---
 
-<div class={`flex flex-col relative bg-brand-navy border rounded-xl overflow-hidden transition-all duration-300 ${featured ? 'border-brand-neon/50 shadow-[0_0_15px_rgba(56,189,248,0.15)] hover:shadow-[0_0_25px_rgba(56,189,248,0.25)] scale-[1.02]' : 'border-white/10 hover:border-brand-neon/30 hover:bg-brand-navy/80'}`} data-brand-card data-tags={tags.join(',')}>
+<div class={`flex flex-col relative bg-brand-navy border rounded-xl overflow-hidden transition-all duration-300 ${featured ? 'border-brand-neon/50 shadow-[0_0_15px_rgba(56,189,248,0.15)] hover:shadow-[0_0_25px_rgba(56,189,248,0.25)] scale-[1.02]' : 'border-white/10 hover:border-brand-neon/30 hover:bg-brand-navy/80'}`} data-brand-card data-tags={tags.join(',')} data-min-price={minPrice}>
   {featured && (
     <div class="absolute top-0 right-0 bg-brand-accent text-brand-dark text-[0.65rem] font-bold px-3 py-1 uppercase tracking-widest rounded-bl-lg z-10">
       Featured
