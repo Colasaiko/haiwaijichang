@@ -78,14 +78,15 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
           </a>
 
           <!-- Desktop Nav -->
-          <nav class="hidden md:flex items-center space-x-6">
+          <nav class="hidden lg:flex items-center space-x-5 xl:space-x-6">
             <a href="/" class="text-sm font-medium hover:text-brand-neon transition-colors">首页</a>
-            <a href="/brands" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">品牌中心</a>
-            <a href="/ranking" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">机场排行榜</a>
-            <a href="/use-cases" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">使用场景</a>
-            <a href="/blog" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">官方博客</a>
-            <a href="/guides" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">使用指南</a>
-            <a href="/help" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">帮助中心</a>
+            <a href="/airport-recommendation" class="text-sm font-medium text-brand-neon hover:text-white transition-colors flex items-center"><svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>推荐总指南</a>
+            <a href="/stable-airport" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">稳定机场</a>
+            <a href="/cheap-airport" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">便宜机场</a>
+            <a href="/dedicated-line" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">专线</a>
+            <a href="/brands" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">全部品牌</a>
+            <a href="/ranking" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">排行榜</a>
+            <a href="/help" class="text-sm font-medium text-slate-300 hover:text-brand-neon transition-colors">帮助</a>
           </nav>
 
           <!-- CTA & Mobile Menu Toggle -->
@@ -93,7 +94,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
             <a href="/#board" class="hidden sm:inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-brand-dark bg-brand-accent hover:bg-yellow-400 rounded-sm transition-colors uppercase tracking-wider">
               立即登机
             </a>
-            <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-300 hover:text-white" aria-label="Menu">
+            <button id="mobile-menu-btn" class="lg:hidden p-2 text-slate-300 hover:text-white" aria-label="Menu">
               <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
@@ -103,13 +104,15 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       </div>
       
       <!-- Mobile Menu (Drawer) -->
-      <div id="mobile-menu" class="hidden md:hidden bg-brand-navy border-t border-white/5 absolute w-full pb-6 shadow-2xl">
+      <div id="mobile-menu" class="hidden lg:hidden bg-brand-navy border-t border-white/5 absolute w-full pb-6 shadow-2xl max-h-[80vh] overflow-y-auto">
         <div class="px-4 pt-2 pb-4 space-y-1">
           <a href="/" class="block px-3 py-3 rounded-md text-base font-medium bg-white/5 text-brand-neon">首页</a>
-          <a href="/brands" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">品牌中心</a>
-          <a href="/ranking" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">机场排行榜</a>
-          <a href="/use-cases" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">使用场景</a>
-          <a href="/blog" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">官方博客</a>
+          <a href="/airport-recommendation" class="block px-3 py-3 rounded-md text-base font-bold text-brand-neon hover:text-white hover:bg-white/5 flex items-center"><svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>2026 机场推荐指南</a>
+          <a href="/stable-airport" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">追求稳定机场</a>
+          <a href="/cheap-airport" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">预算优先便宜机场</a>
+          <a href="/dedicated-line" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">IPLC / IEPL 专线</a>
+          <a href="/brands" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">全部品牌</a>
+          <a href="/ranking" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">天梯排行榜</a>
           <a href="/guides" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">使用指南</a>
           <a href="/help" class="block px-3 py-3 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-white/5">帮助中心</a>
           <a href="/#board" class="block px-3 py-4 mt-4 text-center rounded-sm text-base font-bold text-brand-dark bg-brand-accent hover:bg-yellow-400 transition-colors uppercase">立即登机</a>
@@ -125,22 +128,32 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <!-- Footer - Airport Terminal Directory Style -->
     <footer class="bg-brand-dark border-t border-white/10 pt-16 pb-8 mt-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
           
-          <div class="col-span-2 md:col-span-1 mb-6 md:mb-0">
+          <div class="col-span-2 md:col-span-2 mb-6 md:mb-0">
             <div class="flex items-center space-x-2 mb-6">
               <svg class="w-5 h-5 text-brand-neon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span class="text-lg font-bold tracking-widest uppercase">TERMINAL DIR</span>
             </div>
-            <p class="text-sm text-slate-400 mb-6 max-w-xs">为海外网站、流媒体、AI 工具、远程办公与日常网络访问场景，提供更顺畅的全球网络连接体验。</p>
+            <p class="text-sm text-slate-400 mb-6 max-w-xs md:max-w-sm">为海外网站、流媒体、AI 工具、远程办公与日常网络访问场景，提供更顺畅的全球网络连接体验。</p>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">推荐 RECOM</h3>
+            <ul class="space-y-3">
+              <li><a href="/airport-recommendation" class="text-sm font-bold text-brand-neon hover:text-white transition-colors">机场推荐总指南</a></li>
+              <li><a href="/stable-airport" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">追求稳定机场</a></li>
+              <li><a href="/cheap-airport" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">便宜预算优先</a></li>
+              <li><a href="/dedicated-line" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">IPLC 专线推荐</a></li>
+            </ul>
           </div>
 
           <div>
             <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">产品 PRODUCT</h3>
             <ul class="space-y-3">
-              <li><a href="/brands" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">品牌中心</a></li>
+              <li><a href="/brands" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">全部品牌</a></li>
               <li><a href="/ranking" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">机场排行榜</a></li>
               <li><a href="/use-cases" class="text-sm text-slate-300 hover:text-brand-neon transition-colors">使用场景</a></li>
             </ul>
