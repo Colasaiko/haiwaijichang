@@ -1,13 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 
 const brandEntries = await getCollection('brands');
 const allBrandsMap = new Map();
 brandEntries.forEach(e => {
-  const data = e.data;
-  data.id = e.id;
-  allBrandsMap.set(e.data.slug, data);
+  allBrandsMap.set(e.data.slug, e.data);
 });
 
 const getStr = (val) => typeof val === 'string' ? val : (Array.isArray(val) ? val.join(' ') : '');
@@ -40,8 +38,8 @@ const processBrand = (slug) => {
 const stableSlugs = ['weifeng', 'feimao', 'firefly', 'shanyue', 'wuyou', 'kuajie'];
 const stableBrands = stableSlugs.map(processBrand).filter(Boolean);
 
-const title = "2026 稳定机场推荐：IPLC 专线、晚高峰与线路怎么判断 | 海外机场";
-const description = "2026 稳定机场选择指南，从 IPLC/IEPL 专线、线路架构、节点、套餐与晚高峰使用场景出发，整理稳定性判断方法与可参考品牌，并提供专线、排行榜和品牌详情入口。";
+const page = await getEntry('pages', 'stable-airport');
+const { title, description, h1 } = page.data;
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -71,7 +69,7 @@ const faqs = [
   },
   {
     "q": "IPLC 一定比普通中转稳定吗？",
-    "a": "IPLC 属于专线类网络方案，不经过公共国际互联网，通常拥有更稳定的跨境传输质量。但实际表现也受国内接入端带宽和当地运营商限制，并非绝对完美。"
+    "a": "IPLC 属于专线类网络方案，与普通公网中转的网络路径和接入方式不同，通常用于强调跨境链路质量。但实际体验仍会受到国内接入、运营商、服务商配置和所在地区影响。"
   },
   {
     "q": "为什么晚高峰容易变慢？",
@@ -79,11 +77,11 @@ const faqs = [
   },
   {
     "q": "怎么判断机场适不适合自己的网络？",
-    "a": "最好的方法是通过月付或低成本套餐进行真实环境测试。在不同时间段、不同设备上访问自己常用的网站或服务，观察实际表现是否符合预期。"
+    "a": "比较可靠的方法之一，是先通过月付或低成本套餐在自己的真实网络环境中测试。在不同时间段、不同设备上访问自己常用的网站或服务，观察实际表现是否符合预期。"
   },
   {
     "q": "新手应该先月付还是年付？",
-    "a": "对于初次使用的品牌，强烈建议先选择月付。在确认其线路在您的地区、宽带环境下表现稳定后，再考虑更长期限的套餐，以降低试错成本。"
+    "a": "通常更建议新用户先从月付或较短周期开始。在确认其线路在您的地区、宽带环境下表现符合预期后，再考虑更长期限的套餐，以降低试错成本。"
   }
 ];
 
@@ -112,7 +110,7 @@ const faqSchema = {
       <div class="w-[600px] h-[600px] border-[20px] border-cyan-500 rounded-full blur-[100px]"></div>
     </div>
     <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
-      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">2026 稳定机场推荐：稳定性到底怎么看？</h1>
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">{h1}</h1>
       <p class="text-lg text-slate-400 mb-10 leading-relaxed max-w-3xl mx-auto">“稳定”不能只看一张测速图。线路类型、跨境路径、节点质量、套餐限制，以及你所在地区和运营商，都会影响实际体验。</p>
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
         <a href="#stable-brands" class="w-full sm:w-auto px-8 py-3 bg-brand-neon text-brand-dark font-bold rounded-full hover:brightness-110 transition-all shadow-lg shadow-brand-neon/20">稳定机场参考品牌</a>
